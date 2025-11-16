@@ -15,20 +15,47 @@
  * - Refactored to use semantic CSS classes for better maintainability.
  */
 
-import React, { useState } from 'react';
+import React, { useState ,useEffect} from 'react';
 import { Menu, X, Bell, Search, Home, Calendar, Users, UserCheck, Plane, Building2 } from 'lucide-react';
 import '../../../styles/appbar.css';
 
 
 // AppBar Component 
+// AppBar Component 
 const AppBar = ({ onMenuClick }) => {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [searchBar, setSearchBar] = useState('');
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
 
   const toggleMobileSearch = () => {
     setIsMobileSearchOpen(!isMobileSearchOpen);
   };
-//
+
+  const toggleNotifications = () => {
+    setNotificationsOpen(prev => !prev);
+  };
+
+  const notifications = [
+  { 
+    id: "001", 
+    avatar: "/avatars/user1.png", 
+    name: "John Doe", 
+    action: "booked a flight", 
+  },
+  { 
+    id: "002", 
+    avatar: "/avatars/user2.png", 
+    name: "Jane Smith", 
+    action: "registered an account", 
+  },
+  { 
+    id: "003", 
+    avatar: "/avatars/user3.png", 
+    name: "Ali Ahmed", 
+    action: "updated booking", 
+  },
+];
+
   return (
     <header className="appbar-container">
       <div className="appbar-content">
@@ -71,15 +98,38 @@ const AppBar = ({ onMenuClick }) => {
             <Search className="w-6 h-6" />
           </button>
 
-          <button className="notification-btn">
-            <Bell className="w-6 h-6" />
-          </button>
+          {/* Bell / Notifications */}
+      {/* Bell / Notifications */}
+<div className="relative">
+  <button className="notification-btn" onClick={toggleNotifications}>
+    <Bell className="w-6 h-6" />
+  </button>
+
+  {notificationsOpen && (
+  <div className="notifications-dropdown-floating">
+    {notifications.map((note) => (
+      <div key={note.id} className="notification-item-row">
+        <img src={note.avatar} alt={note.name} className="notification-avatar" />
+        <div className="notification-content">
+          <div className="notification-main">
+            <span className="notification-name">{note.name}</span>
+            <span className="notification-action">{note.action}</span>
+          </div>
+          <div className="notification-id">ID: {note.id}</div>
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
+</div>
+
 
           <div className="profile-avatar">K</div>
         </div>
       </div>
 
-      {/* Mobile Search Input (toggleable) */}
+      {/* Mobile Search Input */}
       {isMobileSearchOpen && (
         <div className="sm:hidden px-4 pb-3">
           <div className="search-input-wrapper">
@@ -179,3 +229,37 @@ export default function AppSideBar() {
     </div>
   );
 }
+
+export const AppBarSideBarWithContent = ({children}) => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isLargeScreen, setIsLargeScreen] = useState(window.innerWidth >= 1024);
+
+  // Update isLargeScreen on window resize
+  useEffect(() => {
+    const handleResize = () => setIsLargeScreen(window.innerWidth >= 1024);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Sidebar style only for large screens
+  const sidebarStyle = isLargeScreen
+    ? { width: isSidebarOpen ? 250 : 80, transition: 'width 0.3s' }
+    : {};
+
+  return (
+    <div className="admin-dashboard" style={{ display: 'flex', minHeight: '100vh' }}>
+      {/* Sidebar */}
+      <div style={sidebarStyle}>
+        <AppSideBar 
+          isSidebarOpen={isSidebarOpen} 
+          setIsSidebarOpen={setIsSidebarOpen} 
+        />
+      </div>
+
+      {/* Main content */}
+      <div style={{ flex: 1, marginTop: 64, transition: 'margin-left 0.3s' }}>
+        {children}
+      </div>
+    </div>
+  );
+};

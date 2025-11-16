@@ -126,3 +126,82 @@
     @apply min-h-screen bg-gray-100;
   }
 }
+
+/* Floating notification dropdown */
+.notifications-dropdown-floating {
+  position: fixed;  /* use fixed so it floats outside appbar */
+  top: 64px;        /* distance from top of viewport (appbar height) */
+  right: 20px;      /* align with bell icon, adjust as needed */
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  width: 220px;
+  z-index: 9999;    /* ensure it's above everything */
+  overflow: hidden;
+}
+
+.notification-item {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f1f1f1;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #333;
+}
+
+.notification-item:hover {
+  background-color: #f3f4f6;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+ 
+.notification-item-row {
+  display: flex;
+  align-items: flex-start;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f1f1f1;
+  cursor: pointer;
+  background-color: white;
+}
+
+.notification-item-row:hover {
+  background-color: #f3f4f6;
+}
+
+.notification-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  margin-right: 0.75rem;
+  object-fit: cover;
+}
+
+.notification-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.notification-main {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #111827;
+}
+
+.notification-name {
+  font-weight: 600;
+}
+
+.notification-action {
+  color: #6b7280;
+}
+
+.notification-id {
+  font-size: 0.75rem;
+  color: #9ca3af;
+  margin-top: 0.25rem;
+}
