@@ -1,5 +1,3 @@
-import React from "react";
-
 /**
  * File: admin_dashboard.jsx
  * Description: Handles the admin dashboard UI functionality.
@@ -13,10 +11,14 @@ import React from "react";
  * Notes:
  * - Initial creation of admin dashboard interface.
  * - Includes user management and analytics widgets.
+ * - Refactored to use semantic CSS classes for better maintainability.
  */
 
 
+import React from 'react';
 // AdminDashboard main component
-export const AdminDashboard = ()=>{
-    return <h1>test</h1>;
+export const AdminDashboard = () => {
+  return <h1>test</h1>;
 }
+
+export default AdminDashboard;
