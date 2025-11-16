@@ -8,7 +8,7 @@ const AppBar = ({ onMenuClick }) => {
   const toggleMobileSearch = () => {
     setIsMobileSearchOpen(!isMobileSearchOpen);
   };
-
+//
   return (
     <header className="appbar-container">
       <div className="appbar-content">
