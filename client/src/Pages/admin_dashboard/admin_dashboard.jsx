@@ -16,9 +16,11 @@
 
 
 import React from 'react';
+import AppSideBar from '../commons/components/appBarSideBar.jsx';
+
 // AdminDashboard main component
 export const AdminDashboard = () => {
-  return <h1>test</h1>;
+  return <AppSideBar />;
 }
 
 export default AdminDashboard;

@@ -1,9 +1,29 @@
+
+/**
+ * File: appBarSideBar.jsx
+ * Description: Handles the app bar and sidebar UI components.
+ * 
+ * Created By: Kossai Baha
+ * Created On: 16-Nov-2025
+ * Version: 1.0.0
+ * Last Modified By: Kossai Baha
+ * Last Modified On: 16-Nov-2025
+ * 
+ * Notes:
+ * - Initial creation of app bar and sidebar components.
+ * - Includes menu toggle, search functionality, and notifications.
+ * - Refactored to use semantic CSS classes for better maintainability.
+ */
+
 import React, { useState } from 'react';
 import { Menu, X, Bell, Search, Home, Calendar, Users, UserCheck, Plane, Building2 } from 'lucide-react';
 import '../../../styles/appbar.css';
 
+
+// AppBar Component 
 const AppBar = ({ onMenuClick }) => {
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [searchBar, setSearchBar] = useState('');
 
   const toggleMobileSearch = () => {
     setIsMobileSearchOpen(!isMobileSearchOpen);
@@ -32,8 +52,10 @@ const AppBar = ({ onMenuClick }) => {
               type="text"
               placeholder="Search in the dashboard"
               className="search-input"
+              value={searchBar}
+              onChange={(e) => setSearchBar(e.target.value)}
             />
-            <button className="search-clear-btn">
+            <button className="search-clear-btn" onClick={() => setSearchBar('')}>
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -66,11 +88,13 @@ const AppBar = ({ onMenuClick }) => {
               type="text"
               placeholder="Search in the dashboard"
               className="search-input"
+              value={searchBar}
+              onChange={(e) => setSearchBar(e.target.value)}
               autoFocus
             />
             <button
               className="search-clear-btn"
-              onClick={() => setIsMobileSearchOpen(false)}
+              onClick={() => {setIsMobileSearchOpen(false); setSearchBar('');}}
             >
               <X className="w-5 h-5" />
             </button>
@@ -135,7 +159,7 @@ const Sidebar = ({ isOpen, onClose }) => {
   );
 };
 
-// Main App Component
+// Main AppbarSidebar Component
 export default function AppSideBar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
