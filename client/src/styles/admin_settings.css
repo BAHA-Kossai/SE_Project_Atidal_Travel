@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@import "./themes.css";
+
+
+@layer components {
+    .tab {
+        @apply bg-blue
+    }
+}
