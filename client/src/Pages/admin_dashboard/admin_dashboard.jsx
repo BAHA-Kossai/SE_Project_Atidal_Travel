@@ -18,7 +18,7 @@ import React, { useState, useEffect } from "react";
 import AppSideBar, {
   AppBarSideBarWithContent,
 } from "../commons/components/appBarSideBar.jsx";
-import Dashboard from "./components/claude_1.jsx";
+import Dashboard from "./components/adminDashboardComponents.jsx";
 
 // AdminDashboard main component
 // export const AdminDashboard = () => {
