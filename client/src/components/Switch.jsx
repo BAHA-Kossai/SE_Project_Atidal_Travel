@@ -12,7 +12,7 @@ export default function Switch({ size = 32 }) {
     return (
         <div
             className={`relative flex flex-row items-center
-            ${checked ? "bg-sky-500 hover:bg-sky-600" : "bg-gray-100 hover:bg-gray-200"}
+            ${checked ? "bg-sky-500 hover:bg-sky-600" : "bg-gray-200 hover:bg-gray-300"}
             duration-100 
             rounded-full cursor-pointer
             `}
@@ -24,7 +24,7 @@ export default function Switch({ size = 32 }) {
             }}
         >
       <span
-          className={`${checked ? "bg-white" : "bg-gray-300"} rounded-full duration-100`}
+          className={`${checked ? "bg-white" : "bg-gray-400"} rounded-full duration-100`}
           style={{
               // Dynamic Switching On/Off
               position: "absolute",
