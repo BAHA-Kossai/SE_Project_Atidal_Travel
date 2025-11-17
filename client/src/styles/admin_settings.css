@@ -5,9 +5,6 @@
     * {
         @apply font-normal;
     }
-    .main-content {
-        @apply ml-75 mr-15 mt-17 pt-10;
-    }
 
     /* Tabs */
     .tabs {
