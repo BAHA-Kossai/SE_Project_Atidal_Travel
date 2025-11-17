@@ -28,7 +28,7 @@ export default function TabSecurity() {
                 fields.map((field, ) => {
                     return (
                         <div className={"flex flex-row justify-between items-end mb-5"}>
-                            <InputField label={field.label} value={field.value} fieldMaxWidth={field.fieldMaxWidth}/>
+                            <InputField type={field.type} label={field.label} value={field.value} fieldMaxWidth={field.fieldMaxWidth}/>
                             <ButtonOutline children={field.buttonText}/>
                         </div>
                     )
