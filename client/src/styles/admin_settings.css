@@ -8,17 +8,24 @@
     .main-content {
         @apply ml-75 mr-15 mt-17 pt-10;
     }
+
+    /* Tabs */
     .tabs {
         @apply text-white border-b-1 border-gray-200;;
     }
     .tab {
-        @apply text-gray-400 w-36 text-center text-[16px] -mb-[2px] cursor-pointer;
-        @apply font-normal;
+        @apply
+        text-gray-400
+        hover:text-gray-600
+        w-36 -mb-[2px]
+        text-center text-[16px]
+        cursor-pointer font-normal
+        transition-colors duration-100;
+        ;
     }
     .tab-active {
-        @apply text-(--color-primary) border-b-3 outline-(--color-primary);
+        @apply text-(--color-primary) hover:text-(--color-primary) border-b-3 outline-(--color-primary);
     }
-
 
     /* Account Tab Components' Styles */
     .edit-profile-btn {
@@ -31,7 +38,7 @@
         transition-colors duration-100 ease-in-out
         ;
     }
-    .preference-btn {
+    .btn-outline {
         @apply
             border-1 border-(--color-primary) text-(--color-primary)
             flex flex-row justify-center items-end
