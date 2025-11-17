@@ -1,5 +1,6 @@
 import WhiteContainer from "../../WhiteContainer.jsx";
 import Switch from "../../Switch.jsx";
+import Setting from "../Setting.jsx";
 
 export default function TabNotifications() {
     const options = [
@@ -12,21 +13,13 @@ export default function TabNotifications() {
         <WhiteContainer title={"Notification settings"}>
             {
                 options.map((item) => (
-                    <NotificationOption title={item.title} description={item.description} />
+                    <Setting
+                        title={item.title}
+                        description={item.description}
+                        button={<Switch/>}
+                    />
                 ))
             }
         </WhiteContainer>
-    )
-}
-
-const NotificationOption = ({title, description}) => {
-    return (
-        <div className={"flex flex-row justify-between items-center mb-5"}>
-            <div>
-                <h1 className={"text-[18px]"}>{title}</h1>
-                <h1 className={"text-[15px] text-gray-400"}>{description}</h1>
-            </div>
-            <Switch />
-        </div>
     )
 }

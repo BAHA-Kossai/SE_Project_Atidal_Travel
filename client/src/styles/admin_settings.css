@@ -38,17 +38,6 @@
         transition-colors duration-100 ease-in-out
         ;
     }
-    .btn-outline {
-        @apply
-            border-1 border-(--color-primary) text-(--color-primary)
-            flex flex-row justify-center items-end
-            px-10 py-3
-            w-50 rounded-3xl
-            cursor-pointer hover:bg-blue-50
-            font-medium
-            transition-colors duration-100 ease-in-out
-        ;
-    }
     .profile-photo {
         background-color: var(--color-primary);
         @apply w-20 h-20 rounded-full flex items-center justify-center text-white font-semibold text-3xl relative;
