@@ -235,7 +235,13 @@
 
   overflow: hidden;
   color: white;
-  background-color: #117BB8; /* base color */
+ background: linear-gradient(
+    135deg,
+    #0d6ea3 0%,
+    #117BB8 35%,
+    #1a8dcf 65%,
+    #5db3e0 100%
+  );
   cursor: pointer;
   text-align: center;
   transition: all 0.3s ease;
@@ -256,32 +262,35 @@
   top: 10%;
   left: 30%;
   width: 180%;
-  height: 180%;
+  height: 300%;
   z-index: -1;
   background: rgba(255, 255, 255, 0.1);
   transition: transform 0.4s ease;
 }
 
+.multi-shade-card::before{
+height: 100%;
+}
 /* Polygon shapes instead of circles */
 .multi-shade-card::before {
   background: rgba(255, 255, 255, 0.15);
-  clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); /* diamond shape */
-  transform: rotate(30deg);
+   /* clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 10% 30%);  */
+  transform: rotate(40deg);
 }
 
 .multi-shade-card::after {
   background: rgba(255, 255, 255, 0.08);
-  clip-path: polygon(0 0, 100% 0, 100% 100%); /* triangle shape */
+  /* clip-path: polygon(0 0, 100% 0, 100% 100%);  */
   transform: rotate(-25deg);
 }
 
 /* Animate slightly on hover for “movement” effect */
 .multi-shade-card:hover::before {
-  transform: rotate(50deg) translateX(5%) translateY(5%);
+  transform: rotate(60deg) translateX(5%) translateY(5%);
 }
 
 .multi-shade-card:hover::after {
-  transform: rotate(-20deg) translateX(-5%) translateY(-5%);
+  transform: rotate(-23deg) translateX(-5%) translateY(-5%);
 }
 
 }

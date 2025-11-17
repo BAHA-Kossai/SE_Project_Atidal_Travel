@@ -118,7 +118,7 @@ const AppBar = ({ onMenuClick }) => {
           <div className="notification-id">ID: {note.id}</div>
         </div>
       </div>
-    ))}
+    ))} 
   </div>
 )}
 

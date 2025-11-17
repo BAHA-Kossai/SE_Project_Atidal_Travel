@@ -139,6 +139,8 @@
   width: 220px;
   z-index: 9999;    /* ensure it's above everything */
   overflow: hidden;
+  overflow-y: auto;
+  height: 300px;
 }
 
 .notification-item {
