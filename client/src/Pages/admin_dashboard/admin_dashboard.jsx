@@ -14,34 +14,12 @@
  * - Refactored to use semantic CSS classes for better maintainability.
  */
 
-import React, { useState, useEffect } from "react";
-import AppSideBar, {
-  AppBarSideBarWithContent,
-} from "../commons/components/appBarSideBar.jsx";
-import Dashboard from "./components/adminDashboardComponents.jsx";
+import  {AppBarSideBarWithContent} from "../commons/components/appBarSideBar.jsx";
+import Dashboard from './components/adminDashboardCompoents.jsx';
 
-// AdminDashboard main component
-// export const AdminDashboard = () => {
-//   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-//   return (
-//     <div className="admin-dashboard" style={{ display: 'flex', minHeight: '100vh' }}>
-//       {/* Sidebar */}
-//       <div style={{ width: isSidebarOpen ? 250 : 80, transition: 'width 0.3s' }}>
-//         <AppSideBar
-//           isSidebarOpen={isSidebarOpen}
-//           setIsSidebarOpen={setIsSidebarOpen}
-//         />
-//       </div>
 
-//       {/* Main content */}
-//       <div style={{ flex: 1, marginTop: 64, transition: 'margin-left 0.3s' }}>
-//         <Dashboard />
-//       </div>
-//     </div>
-//   );
-// };
-
+//main admin dashboard + apbar + side bar component
 export const AdminDashboard = ({ children }) => {
   return <AppBarSideBarWithContent>
     <Dashboard />
