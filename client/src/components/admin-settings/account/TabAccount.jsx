@@ -1,7 +1,7 @@
 import ProfileInfo from "./ProfileInfo.jsx";
 import ChangePreferences from "./ChangePreferences.jsx";
 
-export default function AccountTab() {
+export default function TabAccount() {
     return (
         <main>
             <ProfileInfo/>

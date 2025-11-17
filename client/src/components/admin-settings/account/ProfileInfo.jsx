@@ -1,5 +1,6 @@
 import {Edit} from "lucide-react";
 import "../../../styles/admin_settings.css"
+import InputField from "../../InputField.jsx";
 
 
 export default function ProfileInfo() {
@@ -36,11 +37,3 @@ export default function ProfileInfo() {
     )
 }
 
-const InputField = ({label, value}) => {
-    return (
-        <main className="flex flex-col text-gray-700">
-            <label className={"mb-2 font-semibold"}>{label}</label>
-            <input type="text" disabled={true} value={value} className={"border-1 py-2 px-6 border-gray-500 rounded-lg"}/>
-        </main>
-    )
-}

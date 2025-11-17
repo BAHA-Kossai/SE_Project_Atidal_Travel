@@ -1,4 +1,5 @@
-import {Edit, ChevronDown} from "lucide-react";
+import {ChevronDown} from "lucide-react";
+import ButtonOutline from "../../ButtonOutline.jsx";
 
 export default function ChangePreferences() {
     return (
@@ -21,10 +22,10 @@ const Preference = ({title, description, buttonText}) => {
                 </div>
 
                 {/* Preference Button */}
-                <button className={"preference-btn"}>
+                <ButtonOutline>
                     {buttonText}
                     <ChevronDown size={20} className="ml-2"/>
-                </button>
+                </ButtonOutline>
             </div>
         </>
     )
