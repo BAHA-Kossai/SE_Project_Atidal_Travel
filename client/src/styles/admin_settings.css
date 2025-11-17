@@ -1,9 +1,49 @@
 @import "tailwindcss";
 @import "./themes.css";
 
-
 @layer components {
+    * {
+        @apply font-normal;
+    }
+    .main-content {
+        @apply ml-75 mr-15 mt-17 pt-10;
+    }
+    .tabs {
+        @apply text-white border-b-1 border-gray-200;;
+    }
     .tab {
-        @apply bg-blue
+        @apply text-gray-400 w-36 text-center text-[16px] -mb-[2px] cursor-pointer;
+        @apply font-normal;
+    }
+    .tab-active {
+        @apply text-(--color-primary) border-b-3 outline-(--color-primary);
+    }
+
+
+    /* Account Tab Components' Styles */
+    .edit-profile-btn {
+        @apply
+        bg-(--color-primary) text-white
+        flex flex-row justify-between items-center
+        px-10 py-3
+        rounded-3xl
+        cursor-pointer hover:bg-(--color-hover)
+        transition-colors duration-100 ease-in-out
+        ;
+    }
+    .preference-btn {
+        @apply
+            border-1 border-(--color-primary) text-(--color-primary)
+            flex flex-row justify-center items-end
+            px-10 py-3
+            w-50 rounded-3xl
+            cursor-pointer hover:bg-blue-50
+            font-medium
+            transition-colors duration-100 ease-in-out
+        ;
+    }
+    .profile-photo {
+        background-color: var(--color-primary);
+        @apply w-20 h-20 rounded-full flex items-center justify-center text-white font-semibold text-3xl relative;
     }
 }
