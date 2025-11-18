@@ -2,20 +2,26 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 
-// Import routes (you'll create these later)
-// import authRoutes from './api/routes/authRoutes.js';
+// Import routes
+import destinationsRoutes from './api/routes/destinationsRoutes.js';
+import bookingsRoutes from './api/routes/bookingsRoutes.js';
 
 const app = express();
 
 // Global middlewares
-app.use(helmet()); // Security headers
-app.use(cors()); // Enable CORS for frontend-backend communication
-app.use(express.json()); // Parse JSON bodies
-app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Mount API routes
-// app.use('/api/auth', authRoutes);
+app.use('/api/destinations', destinationsRoutes);
+app.use('/api/bookings', bookingsRoutes);
 
+// Health check route
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', timestamp: new Date().toISOString() });
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -27,7 +33,7 @@ app.use((err, req, res, next) => {
 });
 
 // 404 handler
-app.use('*', (req, res) => {
+app.use((req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 

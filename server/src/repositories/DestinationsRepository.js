@@ -37,8 +37,8 @@ import BaseRepository from './baseRepository.js';
 
 class DestinationsRepository extends BaseRepository {
   constructor(supabaseClient) {
-    super(supabaseClient, 'destinations');
-    this.primaryKey = 'id';
+    super(supabaseClient, 'Destinations');
+    this.primaryKey = 'destination_id';
   }
 
   // CRUD methods
