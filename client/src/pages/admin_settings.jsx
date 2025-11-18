@@ -13,24 +13,22 @@ export default function AdminSettings() {
 
     return (
         <AppBarSideBarWithContent>
-            <div className="dashboard-layout">
-                <div className={"px-8 pt-10"}>
-                    {/* Iterate through tabs to render them */}
-                    <div className="tabs">
-                        {tabs.map((tab, index) => (
-                            <button key={index}
-                                    onClick={() => setActiveTab(tab)}
-                                    className={`tab ${activeTab  === tab ? 'tab-active' : ''}`}
-                            >{tab}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Switch Between Tabs */}
-                    {activeTab === "Account" && <TabAccount/>}
-                    {activeTab === "Notifications" && <TabNotifications/>}
-                    {activeTab === "Security" && <TabSecurity/>}
+            <div className={"px-8 pt-10"}>
+                {/* Iterate through tabs to render them */}
+                <div className="tabs">
+                    {tabs.map((tab, index) => (
+                        <button key={index}
+                                onClick={() => setActiveTab(tab)}
+                                className={`tab ${activeTab  === tab ? 'tab-active' : ''}`}
+                        >{tab}
+                        </button>
+                    ))}
                 </div>
+
+                {/* Switch Between Tabs */}
+                {activeTab === "Account" && <TabAccount/>}
+                {activeTab === "Notifications" && <TabNotifications/>}
+                {activeTab === "Security" && <TabSecurity/>}
             </div>
         </AppBarSideBarWithContent>
     );

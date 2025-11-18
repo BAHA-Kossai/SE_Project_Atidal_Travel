@@ -240,7 +240,9 @@ export const AppBarSideBarWithContent = ({children}) => {
 
             {/* Main content */}
             <div style={{ flex: 1, marginTop: 64, transition: 'margin-left 0.3s' }}>
-                {children}
+                <div className="dashboard-layout">
+                    {children}
+                </div>
             </div>
         </div>
     );
