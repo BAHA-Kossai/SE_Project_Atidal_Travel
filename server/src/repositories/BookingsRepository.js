@@ -33,8 +33,8 @@ import BaseRepository from './baseRepository.js';
 
 class BookingsRepository extends BaseRepository {
   constructor(supabaseClient) {
-    super(supabaseClient, 'bookings');
-    this.primaryKey = 'id';
+    super(supabaseClient, 'Booking');
+    this.primaryKey = 'booking_id';
   }
 
   // CRUD methods
