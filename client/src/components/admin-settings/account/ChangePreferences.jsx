@@ -11,7 +11,7 @@ export default function ChangePreferences() {
                 title={"Change Language"}
                 description={"changing the language will take a few seconds"}
                 button={
-                    <ButtonOutline>
+                    <ButtonOutline width={50}>
                         English
                         <ChevronDown size={20} className="ml-2"/>
                     </ButtonOutline>
@@ -21,7 +21,7 @@ export default function ChangePreferences() {
                 title={"Change Appearance"}
                 description={"you have the choice between light and dark mode"}
                 button={
-                    <ButtonOutline>
+                    <ButtonOutline width={50}>
                         Light
                         <ChevronDown size={20} className="ml-2"/>
                     </ButtonOutline>

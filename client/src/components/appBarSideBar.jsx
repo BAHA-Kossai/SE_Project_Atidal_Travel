@@ -1,4 +1,4 @@
-import React, { useState ,useEffect} from 'react';
+import React, { useState ,useEffect } from 'react';
 import { Menu, X, Bell, Search, Home, Calendar, Users, UserCheck, Plane, Building2 } from 'lucide-react';
 import '../styles/appbar.css';
 
@@ -80,7 +80,6 @@ const AppBar = ({ onMenuClick }) => {
                         <Search className="w-6 h-6" />
                     </button>
 
-                    {/* Bell / Notifications */}
                     {/* Bell / Notifications */}
                     <div className="relative">
                         <button className="notification-btn" onClick={toggleNotifications}>

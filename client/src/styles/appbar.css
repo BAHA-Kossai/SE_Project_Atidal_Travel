@@ -25,7 +25,7 @@
     }
 
     .appbar-search-wrapper {
-        @apply hidden sm:flex flex-1 max-w-2xl mx-8;
+        @apply hidden sm:flex flex-1 max-w-2xl;
     }
 
     .appbar-right {
@@ -118,7 +118,7 @@
 
     /* Layout */
     .dashboard-layout {
-        @apply min-h-screen bg-gray-100;
+        @apply min-h-screen bg-gray-100 px-8 pt-10;
     }
 
     /* Floating notification dropdown */
