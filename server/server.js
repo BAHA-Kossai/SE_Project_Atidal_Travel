@@ -1,1 +1,0 @@
-//used for server configuration
