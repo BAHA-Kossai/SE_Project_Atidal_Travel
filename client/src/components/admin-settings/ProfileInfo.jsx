@@ -1,6 +1,6 @@
 import {Edit} from "lucide-react";
-import "../../../styles/admin_settings.css"
-import InputField from "../../InputField.jsx";
+import "../../styles/admin_settings.css"
+import InputField from "../InputField.jsx";
 
 
 export default function ProfileInfo() {

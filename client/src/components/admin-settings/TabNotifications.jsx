@@ -1,6 +1,6 @@
-import WhiteContainer from "../../WhiteContainer.jsx";
-import Switch from "../../Switch.jsx";
-import Setting from "../Setting.jsx";
+import WhiteContainer from "../WhiteContainer.jsx";
+import Switch from "../Switch.jsx";
+import Setting from "./Setting.jsx";
 
 export default function TabNotifications() {
     const options = [

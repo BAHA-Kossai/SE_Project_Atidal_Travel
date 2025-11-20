@@ -28,7 +28,7 @@ export default function AdminDestinations() {
                     {/* Search / Sort / Filter/ New Destination */}
                     <div className="flex flex-row justify-between items-center mb-5">
                         <SearchBar placeholder={"Search for an order"}/>
-                        <div className="flex flex-row justify-between">
+                        <div className="flex flex-row justify-between w-100">
                             <ButtonOutline>Sort<ArrowUpDown size={18} className={"ml-2"}/></ButtonOutline>
                             <ButtonOutline>Filter<SlidersHorizontal size={18} className={"ml-2"}/></ButtonOutline>
                             <ButtonFill onClick={() => navigate("/admin-destinations/add-destination")}>New Destination<Plus size={22} className={"ml-2"}/></ButtonFill>

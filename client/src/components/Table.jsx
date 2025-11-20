@@ -3,7 +3,6 @@ import {useMemo, useState} from "react";
 
 export default function Table({columns = [], data = [] }) {
     const iconClass = "hover:text-gray-600 duration-100 cursor-pointer"
-    // const checkboxClass = "absolute left-5 w-4 h-4"
 
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 7
@@ -79,7 +78,7 @@ export default function Table({columns = [], data = [] }) {
             {/* Pagination */}
             <div className="flex justify-center w-full items-center gap-3">
                 <button
-                    className={`rounded-lg p-2 disabled:opacity-30 cursor-pointer`}
+                    className={`rounded-lg p-2 disabled:opacity-30 cursor-pointer duration-100 hover:text-(--color-primary)`}
                     disabled={currentPage === 0}
                     onClick={() => setCurrentPage(currentPage - 1)}
                 >
@@ -87,7 +86,7 @@ export default function Table({columns = [], data = [] }) {
                 </button>
                 {currentPage+1}/{totalPages}
                 <button
-                    className={`rounded-lg p-2 disabled:opacity-30 cursor-pointer`}
+                    className={`rounded-lg p-2 disabled:opacity-30 cursor-pointer duration-100 hover:text-(--color-primary)`}
                     disabled={currentPage === totalPages - 1}
                     onClick={() => setCurrentPage(currentPage + 1)}
                 >

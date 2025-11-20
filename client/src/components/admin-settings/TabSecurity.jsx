@@ -1,8 +1,8 @@
-import WhiteContainer from "../../WhiteContainer.jsx";
-import InputField from "../../InputField.jsx";
-import ButtonOutline from "../../ButtonOutline.jsx";
-import Setting from "../Setting.jsx";
-import Switch from "../../Switch.jsx";
+import WhiteContainer from "../WhiteContainer.jsx";
+import InputField from "../InputField.jsx";
+import ButtonOutline from "../ButtonOutline.jsx";
+import Setting from "./Setting.jsx";
+import Switch from "../Switch.jsx";
 
 export default function TabSecurity() {
     const fields = [

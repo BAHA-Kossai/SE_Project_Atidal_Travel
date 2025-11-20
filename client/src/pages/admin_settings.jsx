@@ -1,8 +1,8 @@
 import '../styles/admin_settings.css'
 import {useState} from "react";
-import TabAccount from "../components/admin-settings/account/TabAccount.jsx";
-import TabNotifications from "../components/admin-settings/notifications/TabNotifications.jsx";
-import TabSecurity from "../components/admin-settings/security/TabSecurity.jsx";
+import TabAccount from "../components/admin-settings/TabAccount.jsx";
+import TabNotifications from "../components/admin-settings/TabNotifications.jsx";
+import TabSecurity from "../components/admin-settings/TabSecurity.jsx";
 import {AppBarSideBarWithContent} from "../components/appBarSideBar.jsx";
 import Tabs from "../components/Tabs.jsx";
 

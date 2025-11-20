@@ -1,6 +1,6 @@
 import {ChevronDown} from "lucide-react";
-import ButtonOutline from "../../ButtonOutline.jsx";
-import Setting from "../Setting.jsx";
+import ButtonOutline from "../ButtonOutline.jsx";
+import Setting from "./Setting.jsx";
 
 export default function ChangePreferences() {
     return (
