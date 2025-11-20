@@ -5,8 +5,12 @@ import InputField from "../components/InputField.jsx";
 import {UploadCloud, UploadIcon} from "lucide-react";
 import ButtonOutline from "../components/ButtonOutline.jsx";
 import ButtonFill from "../components/ButtonFill.jsx";
+import {useState} from "react";
+import {useNavigate} from "react-router-dom";
 
 export default function AdminAddDestination() {
+    const navigate = useNavigate();
+    const [selectedImage, setSelectedImage] = useState();
 
     return (
         <AppBarSideBarWithContent>
@@ -21,40 +25,74 @@ export default function AdminAddDestination() {
 
             <WhiteContainer title={"Add new destination"}>
 
-                <div className={"flex flex-row justify-around"}>
+                <div className={"flex flex-row justify-start p-5"}>
 
                     {/* Upload Image */}
-                    <div className="border-4 border-dashed border-(--color-primary) rounded-2xl cursor-pointer"
-                         style={{
-                             backgroundColor: "#f4f8fb",
-                             borderColor: "#669bbc",
-                         }}
+                    <label
+                        className="
+                         w-140 h-130 mr-10
+                         content-center
+                         border-4 border-dashed border-(--color-primary)
+                         hover:bg-red-500
+                         rounded-2xl relative cursor-pointer cover z-10 overflow-hidden"
+                        style={{
+                            backgroundColor: "#f4f8fb",
+                            borderColor: "#669bbc",
+                        }}
                     >
-                        <div className={"flex flex-col items-center p-8"}>
-                            <UploadCloud size={140} className={"text-(--color-primary)"}
-                                         style={{
-                                             color: "#669bbc",
-                                         }}/>
-                            <div className={"flex flex-row items-center"}>
-                                <UploadIcon className={"mr-2"}
-                                            style={{
-                                                color: "#669bbc",
-                                            }}
-                                />
-                                Drop your files, or Browse
-                            </div>
-                        </div>
-                    </div>
+                        <input
+                            hidden
+                            type="file"
+                            accept="image/*"
+                            name="image-upload"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0];
 
-                    <div>
+                                // Only update the state if a real file (image) is selected
+                                if (!file) return
+                                setSelectedImage(file ? URL.createObjectURL(file) : null);
+                            }}
+                        />
+
+                        {/* Show placeholder if no image is uploaded, else show the image */}
+                        {
+                            selectedImage ?
+                                (
+                                    <img className={"absolute w-full h-full inset-0 object-cover"}
+                                        src={selectedImage}
+                                        alt={"Preview Image"}
+                                    />
+                                ) : (
+                                    <div className={"flex flex-col items-center p-8"}>
+                                        <UploadCloud size={140} className={"text-(--color-primary)"}
+                                                     style={{
+                                                         color: "#669bbc",
+                                                     }}/>
+                                        <div className={"flex flex-row items-center"}>
+                                            <UploadIcon className={"mr-2"}
+                                                        style={{
+                                                            color: "#669bbc",
+                                                        }}
+                                            />
+                                            Drop your files, or Browse
+                                        </div>
+                                    </div>
+                                )
+                        }
+                    </label>
+
+                    <div className={"w-full flex flex-col justify-between"}>
+                        {/* Input Fields */}
                         <div>
-                            <InputField label={"Destination Country"} fieldMaxWidth={200}/>
-                            <InputField label={"Destination City(ies)"}/>
-                            <InputField label={"First name"}/>
+                            <InputField className={"mb-5"} label={"Destination Country"}/>
+                            <InputField className={"mb-5"} label={"Destination City(ies)"}/>
+                            <InputField className={"mb-5"} label={"First name"}/>
                         </div>
-                        <div className={"flex flex-row"}>
-                            <ButtonOutline>Cancel</ButtonOutline>
-                            <ButtonFill>Add destination</ButtonFill>
+
+                        {/* Action Buttons */}
+                        <div className={"flex flex-row justify-end"}>
+                            <ButtonOutline className={"mr-4 w-40"} onClick={() => navigate("/admin-destinations") }>Cancel</ButtonOutline>
+                            <ButtonFill className={"w-40"}>Add destination</ButtonFill>
                         </div>
                     </div>
                 </div>

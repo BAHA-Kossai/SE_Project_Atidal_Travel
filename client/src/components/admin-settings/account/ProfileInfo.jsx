@@ -23,10 +23,10 @@ export default function ProfileInfo() {
 
             {/* Input Fields Grid */}
             <div className={"grid grid-cols-2 gap-4 mb-6"}>
-                <InputField label="Firstname" value={"Abderrahim"}/>
-                <InputField label="Lastname" value={"Khefif"}/>
-                <InputField label="Phone Number" value={"+213 555 555 555"}/>
-                <InputField label="Address" value={"****, Algiers, Algeria"}/>
+                <InputField label="Firstname" value={"Abderrahim"} disabled={true}/>
+                <InputField label="Lastname" value={"Khefif"} disabled={true}/>
+                <InputField label="Phone Number" value={"+213 555 555 555"} disabled={true}/>
+                <InputField label="Address" value={"****, Algiers, Algeria"} disabled={true}/>
             </div>
 
             <button className={"edit-profile-btn"}>
