@@ -17,10 +17,6 @@
  */
 
 
-import SignUpUseCase from '../../core/usecases/SignUpUseCase.js';
-import LoginUseCase from '../../core/usecases/LoginUseCase.js';
-import supabase from '../../config/supabase.js';
-import UserRepository from '../../repositories/userRepository.js';
 /**
  * authRouter
  * @function
