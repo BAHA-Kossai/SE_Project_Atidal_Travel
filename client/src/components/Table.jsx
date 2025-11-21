@@ -1,7 +1,16 @@
 import {Copy, Edit, Trash2, ChevronLeft, ChevronRight} from "lucide-react";
 import {useMemo, useState} from "react";
 
-export default function Table({columns = [], data = [] }) {
+export default function Table({columns = [],  data = []}) {
+    /*
+    Dynamic Table component:
+
+    @param columns
+    a list of key-value pairs, consisting of the `title` key, which is the name of the column, and the `format` key,
+    which contains the HTML structure of each row in the corresponding column
+    @param data
+    the actual content of the table
+    */
     const iconClass = "hover:text-gray-600 duration-100 cursor-pointer"
 
     const [currentPage, setCurrentPage] = useState(1);
@@ -18,7 +27,7 @@ export default function Table({columns = [], data = [] }) {
     return (
         <>
             {/* Table Header */}
-            <table className="border-1 border-gray-200">
+            <table className="border-1 border-gray-200 w-full">
                 <thead className="bg-gray-100">
                 <tr className={"h-10 relative text-left"}>
                     <th className="p-3 text-left">
@@ -26,52 +35,48 @@ export default function Table({columns = [], data = [] }) {
                     </th>
                     {columns.map((column, index) => (
                         <th key={index}>
-                            {column}
+                            {column.title}
                         </th>
                     ))}
+                    <th className="p-3 text-left">
+                        Actions
+                    </th>
                 </tr>
                 </thead>
 
                 {/* Table Rows */}
                 <tbody className={"text-center"}>
-                {paginatedRows.map((item) => (
-                    <tr className={"h-17 border-1 border-gray-200 relative"}>
-                        <td className="p-3 text-left">
-                            <input type="checkbox"/>
-                        </td>
-                        {/* Destination Country + City */}
-                        <td className={"text-gray-400 text-center"}>
-                            <div className="flex items-center gap-3">
 
-                                {/* Avatar / Image placeholder */}
-                                <div className="w-10 h-10 bg-gray-100 rounded">
-                                    <img src={item["imageURL"]} width={40} alt="img"/>
-                                </div>
+                        {
+                            paginatedRows.map((item) => (
+                                <tr className={"h-17 border-1 border-gray-200 relative"}>
+                                    {/* Row Checkbox */}
+                                    <td className="p-3 text-left">
+                                        <input type="checkbox"/>
+                                    </td>
 
-                                <div className={"flex flex-col items-start gap-3"}>
-                                    <div className="text-gray-700 font-medium">{item["Destination"].country}</div>
-                                    <div className="text-(--color-text-secondary) text-sm cursor-pointer">{item["Destination"].city}</div>
-                                </div>
+                                    {/* Dynamic Rendering of each column */}
+                                    {
+                                        columns.map((column, index) => (
+                                            <td key={index}>
+                                                {column.format ? column.format(item) : null}
+                                            </td>
+                                        ))
+                                    }
 
-                            </div>
-                        </td>
+                                    {/* Actions */}
+                                    <td className={"text-gray-400 text-left"}>
+                                        <div className={"flex flex-row justify-around"}>
+                                            <Copy className={iconClass}/>
+                                            <Edit className={iconClass}/>
+                                            <Trash2 className={`${iconClass} hover:text-red-700`}/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))
 
-                        {/* Created By */}
-                        <td className={"text-gray-400 text-left"}>{item["Created By"]}</td>
+                        }
 
-                        {/* Created At */}
-                        <td className={"text-gray-400 text-left"}>{item["Created At"]["date"]} at {item["Created At"]["time"]}</td>
-
-                        {/* Actions */}
-                        <td className={"text-gray-400 text-left"}>
-                            <div className={"flex flex-row justify-around"}>
-                                <Copy className={iconClass}/>
-                                <Edit className={iconClass}/>
-                                <Trash2 className={`${iconClass} hover:text-red-700`}/>
-                            </div>
-                        </td>
-                    </tr>
-                ))}
                 </tbody>
             </table>
 

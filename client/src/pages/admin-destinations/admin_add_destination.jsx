@@ -1,10 +1,10 @@
-import {AppBarSideBarWithContent} from "../components/appBarSideBar.jsx";
-import WhiteContainer from "../components/WhiteContainer.jsx";
-import PagePath from "../components/PagePath.jsx";
-import InputField from "../components/InputField.jsx";
+import {AppBarSideBarWithContent} from "../../components/appBarSideBar.jsx";
+import WhiteContainer from "../../components/WhiteContainer.jsx";
+import PagePath from "../../components/PagePath.jsx";
+import InputField from "../../components/InputField.jsx";
 import {UploadCloud, UploadIcon} from "lucide-react";
-import ButtonOutline from "../components/ButtonOutline.jsx";
-import ButtonFill from "../components/ButtonFill.jsx";
+import ButtonOutline from "../../components/ButtonOutline.jsx";
+import ButtonFill from "../../components/ButtonFill.jsx";
 import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 
