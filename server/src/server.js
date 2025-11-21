@@ -1,17 +1,14 @@
 //------------test case only ---------------//
 
 import http from 'http';
-import  config  from './config/config.js'; // assuming you still want to read .env configs
-import supabase from './config/supabase.js';
-import BaseRepository from './repositories/baseRepository.js';
-import UserRepository from './repositories/userRepository.js';
-
-import SignUpUseCase from './core/usecases/SignUpUseCase.js';
+import  config  from './config/config.js'; 
+import { authRouter } from './api/routes/authRoutes.js';
 
 const PORT = config.PORT || 3000;
-const userRepo = new UserRepository(supabase);
+
 const server = http.createServer(async (req, res) => {
-  
+   // Forward every request to the authRouter
+    authRouter(req, res);
 
 });
 

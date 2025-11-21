@@ -29,7 +29,7 @@ class LoginUseCase {
 
     const user = await this.userRepository.findByEmail(data.email);
     if (!user) return { status: 404, message: "User not found." };
- 
+
     if (!user.confirmed) {
       // Resend confirmation email via Supabase Auth
       await this.userRepository.registerAuthUser({
@@ -38,7 +38,7 @@ class LoginUseCase {
         last_name: user.last_name,
         phone: user.phone,
         date_of_birth: user.date_of_birth,
-        password: "temporaryPassword", 
+        password: "temporaryPassword",
       });
 
       return {
@@ -56,18 +56,46 @@ class LoginUseCase {
       user.password_hash
     );
     if (!passwordMatch) return { status: 401, message: "Incorrect password." };
-   
+
     // Sign in with Supabase
     const { data: supabaseSession, error } =
       await this.userRepository.supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       });
-    if (error) throw { status: 500, message: error.message };
+    if (error) {
+      // If email not confirmed -> resend confirmation link
+      if (error.message.includes("Email not confirmed")) {
+        await this.userRepository.registerAuthUser({
+          email: user.email,
+          first_name: user.first_name,
+          last_name: user.last_name,
+          phone: user.phone,
+          date_of_birth: user.date_of_birth,
+          password: data.password, 
+        });
 
+        throw {
+          status: 403,
+          message: "Email not confirmed. Confirmation email resent.",
+        };
+      }
 
+      // Other Supabase errors
+      throw { status: 500, message: error.message };
+    }
 
-    return supabaseSession ;
+    const token = {
+      access: supabaseSession.session.access_token,
+      refresh: supabaseSession.session.refresh_token,
+    };
+
+    const userInfo = {
+      id: supabaseSession.session.user.id,
+      email: supabaseSession.session.user.email,
+    };
+
+    return { token, user: userInfo };
   }
 }
 

@@ -69,7 +69,27 @@ class SignUpUseCase {
     const {password,...userWithoutPassword} = user;
     const createdUser = await this.userRepository.createRegularUser(userWithoutPassword);
 
-    return {supabase:supabaseToken ,database: createdUser};
+
+    const cleanSupabaseUser = {
+  id: supabaseToken.id,
+  email: supabaseToken.email,
+  first_name: supabaseToken.user_metadata.first_name,
+  last_name: supabaseToken.user_metadata.last_name,
+  date_of_birth: supabaseToken.user_metadata.date_of_birth,
+  confirmation_sent_at: supabaseToken.confirmation_sent_at,
+  email_verified: supabaseToken.user_metadata.email_verified || false
+};
+
+  const cleanUser = {
+    id: createdUser.user_id,
+    phone : createdUser.phone,
+    type : createdUser.type,
+
+  }
+
+ 
+  console.log(supabaseToken);
+    return {supabase:cleanSupabaseUser ,database: cleanUser};
   }
 
 
