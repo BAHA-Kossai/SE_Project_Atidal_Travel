@@ -34,7 +34,7 @@
  * - All errors should be handled gracefully and returned with proper HTTP status codes.
  */
 import express from 'express';
-import { signUpController, signInController } from '../controllers/authController.js';
+import { signUpController, signInController,forgotPasswordController } from '../controllers/authController.js';
 
 const router = express.Router();
 
@@ -43,5 +43,8 @@ router.post('/signup', signUpController);
 
 // POST /auth/signin
 router.post('/signin', signInController);
+
+// POST /auth/forgot-password
+router.post("/forgot-password", forgotPasswordController);
 
 export default router;

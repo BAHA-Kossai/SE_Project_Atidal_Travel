@@ -86,9 +86,6 @@ class SignUpUseCase {
     type : createdUser.type,
 
   }
-
- 
-  console.log(supabaseToken);
     return {supabase:cleanSupabaseUser ,database: cleanUser};
   }
 

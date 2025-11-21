@@ -1,14 +1,21 @@
 import express from 'express';
 import config from './config/config.js';
 import authRouter from './api/routes/authRoutes.js';
+import adminRouter from './api/routes/adminRoutes.js'; // <-- import your admin routes
 
 const app = express();
 
 // Parse JSON automatically
 app.use(express.json());
 
-// Register routes
-app.use('/auth', authRouter);
+// Routes
+app.use('/auth', authRouter);          // Auth routes: signup/signin
+app.use('/api/admin', adminRouter);    // Admin management routes: create admin
+
+// Simple health check
+app.get('/', (req, res) => {
+  res.json({ status: 'success', message: 'Server is running' });
+});
 
 const PORT = config.PORT || 3000;
 

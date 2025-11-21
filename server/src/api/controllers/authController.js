@@ -16,12 +16,13 @@
 
 import SignUpUseCase from '../../core/usecases/SignUpUseCase.js';
 import LoginUseCase from '../../core/usecases/LoginUseCase.js';
-import supabase from '../../config/supabase.js';
+import supabase, { supabaseAdmin } from '../../config/supabase.js';
 import UserRepository from '../../repositories/userRepository.js';
+import ForgotPasswordUseCase from '../../core/usecases/ForgotPasswordUseCase.js';
+import { ResetPasswordUseCase } from '../../core/usecases/ForgotPasswordUseCase.js';
 //user repository for database controle
 const userRepo = new UserRepository(supabase);
-
-
+const userAdminRepo = new UserRepository(supabaseAdmin);
 /**
  * @function signUpController
  * @description Handles HTTP request for user signup via email/password.
@@ -47,9 +48,16 @@ export const signUpController = async (req, res) => {
         const signUp = new SignUpUseCase(userRepo);
         const user = await signUp.signUpWithEmail(req.body);
 
-        return res.status(201).json(user);
+        return res.status(201).json({
+            status: "success",
+            data: user
+        });
     } catch (err) {
-        return res.status(err.status || 400).json({ error: err.message });
+        return res.status(err.status || 400).json({
+            status: "error",
+            data: {},
+            message: err.message
+        });
     }
 };
 
@@ -80,8 +88,62 @@ export const signInController = async (req, res) => {
         const login = new LoginUseCase(userRepo);
         const result = await login.loginWithEmail(req.body);
 
-        return res.status(200).json(result);
+        return res.status(200).json({
+            status: "success",
+            data: result
+        });
     } catch (err) {
-        return res.status(err.status || 401).json({ error: err.message });
+        return res.status(err.status || 401).json({
+            status: "error",
+            data: {},
+            message: err.message
+        });
     }
+};
+
+/**
+ * @function forgotPasswordController
+ * @description Handles "forgot password" requests.
+ * @argument { email : string }
+ */
+export const forgotPasswordController = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const forgotPasswordUseCase = new ForgotPasswordUseCase(userAdminRepo);
+    const result = await forgotPasswordUseCase.sendResetEmail({ email });
+
+    return res.status(200).json({
+      status: "success",
+      data: result,
+    });
+  } catch (err) {
+    return res.status(err.status || 500).json({
+      status: "error",
+      data: {},
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+
+
+
+const resetPasswordUseCase = new ResetPasswordUseCase();
+
+export const resetPasswordController = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+
+    const result = await resetPasswordUseCase.resetPassword({ token, newPassword });
+
+    return res.status(200).json({
+      status: "success",
+      data: result
+    });
+  } catch (err) {
+    return res.status(err.status || 500).json({
+      status: "error",
+      data: {},
+      message: err.message || "Internal Server Error"
+    });
+  }
 };

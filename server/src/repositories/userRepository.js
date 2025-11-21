@@ -31,8 +31,7 @@
  */
 
 import BaseRepository from "./baseRepository.js";
-import { signUpUser } from "../utils/helpers.js";
-
+import { hashPassword } from "../utils/formValidation.js";
 class UserRepository extends BaseRepository {
   constructor(supabaseClient) {
     super(supabaseClient, "Users");
@@ -80,7 +79,6 @@ class UserRepository extends BaseRepository {
       type: "USER",
     };
     return this.create(userRecord);
-   
   }
 
   createAdminUser(record) {
@@ -114,30 +112,122 @@ class UserRepository extends BaseRepository {
     return data;
   }
 
-
-
   //function to controll supabase (Authentication)
   /**
- * @method registerAuthUser
- * @description Creates a user in Supabase Auth and stores all fields in user.metadata
- * @param {Object} userData The user data
- * @returns {Object} Supabase Auth user object
- * @throws {Object} Error object with status and message
- */
-async registerAuthUser(userData) {
-  const { data: authData, error } = await this.supabase.auth.signUp({
-    email: userData.email,
-    password: userData.password,
-    options: {
-      emailRedirectTo: 'https://user-Profile-(to add later)',
-      data: userData,  // store full user object in metadata
-    },
-  });
+   * @method registerAuthUser
+   * @description Creates a user in Supabase Auth and stores all fields in user.metadata
+   * @param {Object} userData The user data
+   * @returns {Object} Supabase Auth user object
+   * @throws {Object} Error object with status and message
+   */
+  async registerAuthUser(userData) {
+    const { data: authData, error } = await this.supabase.auth.signUp({
+      email: userData.email,
+      password: userData.password,
+      options: {
+        emailRedirectTo: "https://user-Profile-(to add later)",
+        data: userData, // store full user object in metadata
+      },
+    });
 
-  if (error) throw { status: 500, message: error.message };
+    if (error) throw { status: 500, message: error.message };
 
-  return authData.user;
-}
+    return authData.user;
+  }
+
+  /**
+   * @method registerAdminAuthUser
+   * @description Creates an admin user in Supabase Auth using the admin API.
+   *              Bypasses email confirmation and stores relevant metadata.
+   * @param {Object} adminData - The admin data (email, password, first_name, last_name, phone, date_of_birth)
+   * @returns {Object} Supabase Auth user object
+   * @throws {Object} Error object with status and message
+   */
+  async registerAdminAuthUser(adminData) {
+    // Use the server-side Supabase client (with service role key)
+    const { data: supabaseUser, error } =
+      await this.supabase.auth.admin.createUser({
+        email: adminData.email,
+        password: adminData.password,
+        email_confirm: true, // skip confirmation email
+        user_metadata: {
+          first_name: adminData.first_name,
+          last_name: adminData.last_name,
+          date_of_birth: adminData.date_of_birth,
+          phone: adminData.phone,
+          type: "ADMIN",
+        },
+      });
+
+    if (error) throw { status: 500, message: error.message };
+
+    return supabaseUser;
+  }
+
+  /**
+         * @method registerSuperAdmin
+         * @description Creates a Super Admin in Supabase Auth and stores it in your Users table.
+         * @param {Object} superAdminData - Object containing email, password, first_name, last_name, phone, date_of_birth
+         * @returns {Object} Supabase and DB user objects
+         * @throws {Object} Error object with status and message
+         */
+        async registerSuperAdmin(superAdminData) {
+          //Check if user already exists in DB
+          const existingUser = await this.findByEmail(superAdminData.email);
+          if (existingUser) {
+            throw { status: 409, message: "Email already in use" };
+          }
+
+          //Hash password for your DB
+          const password_hash = await hashPassword(superAdminData.password);
+          const { password, ...userWithoutPassword } = superAdminData;
+
+          const superAdminUser = {
+            ...userWithoutPassword,
+            type: "SUPER_ADMIN",
+            password_hash,
+            confirmed: true,
+          };
+
+          //Create user in Supabase Auth using admin API
+          const { data: supabaseUser, error } =
+            await this.supabase.auth.admin.createUser({
+              email: superAdminData.email,
+              password: superAdminData.password,
+              email_confirm: true, // skip confirmation
+              user_metadata: {
+                first_name: superAdminData.first_name,
+                last_name: superAdminData.last_name,
+                date_of_birth: superAdminData.date_of_birth,
+                phone: superAdminData.phone,
+                type: "SUPER_ADMIN",
+              },
+            });
+
+          if (error) throw { status: 500, message: error.message };
+
+          // Save in your DB
+          const dbUser = await this.createUser(superAdminUser);
+
+          //Return both objects
+          return {
+            supabase: {
+              id: supabaseUser.id,
+              email: supabaseUser.email,
+              type: "SUPER_ADMIN",
+              first_name: superAdminData.first_name,
+              last_name: superAdminData.last_name,
+            },
+            database: {
+              user_id: dbUser.user_id,
+              email: dbUser.email,
+              type: dbUser.type,
+              first_name: dbUser.first_name,
+              last_name: dbUser.last_name,
+              phone: dbUser.phone,
+            },
+          };
+        }
 }
 
 export default UserRepository;

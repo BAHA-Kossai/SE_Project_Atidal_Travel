@@ -95,7 +95,7 @@ class LoginUseCase {
       email: supabaseSession.session.user.email,
     };
 
-    return { token, user: userInfo };
+    return { token: token, user: userInfo };
   }
 }
 
