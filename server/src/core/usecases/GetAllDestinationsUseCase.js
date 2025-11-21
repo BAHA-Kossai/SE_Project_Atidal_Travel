@@ -4,7 +4,7 @@ class GetAllDestinationsUseCase {
   }
 
   async execute() {
-    // Business logic: Get all destinations (no filtering needed since all are active)
+    // Business logic: Get all destinations
     const destinations = await this.destinationsRepository.getAllDestinations();
     return destinations;
   }
