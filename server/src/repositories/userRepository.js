@@ -30,7 +30,8 @@
  * const found = await userRepo.findByEmail('test@example.com');
  */
 
-import BaseRepository from './baseRepository.js'
+import BaseRepository from "./baseRepository.js";
+import { signUpUser } from "../utils/helpers.js";
 
 class UserRepository extends BaseRepository {
   constructor(supabaseClient) {
@@ -41,10 +42,9 @@ class UserRepository extends BaseRepository {
   // CRUD methods using BaseRepository
   getAllUsers() {
     return this.getAll();
-
   }
   //---- variantes to getAll
-    // New: get all admins
+  // New: get all admins
   async getAllAdmins() {
     const { data, error } = await this.supabase
       .from(this.table)
@@ -61,6 +61,7 @@ class UserRepository extends BaseRepository {
       .select("*")
       .eq("type", "USER");
     if (error) throw error;
+
     return data;
   }
   getUserById(id) {
@@ -70,20 +71,22 @@ class UserRepository extends BaseRepository {
     return this.create(record);
   }
 
-  //---variante for create user 
+  //---variante for create user
   // Create methods with automatic type
-  createRegularUser(record) {
+  async createRegularUser(record) {
+    //create user record
     const userRecord = {
       ...record,
-      type: "USER"
+      type: "USER",
     };
     return this.create(userRecord);
+   
   }
 
   createAdminUser(record) {
     const userRecord = {
       ...record,
-      type: "ADMIN"
+      type: "ADMIN",
     };
     return this.create(userRecord);
   }
@@ -106,19 +109,35 @@ class UserRepository extends BaseRepository {
       .from(this.table)
       .select("*")
       .eq("email", email)
-      .single();
+      .maybeSingle();
     if (error) throw error;
     return data;
   }
 
-  async findByBranch(branch_id) {
-    const { data, error } = await this.supabase
-      .from(this.table)
-      .select("*")
-      .eq("branch_id", branch_id);
-    if (error) throw error;
-    return data;
-  }
+
+
+  //function to controll supabase (Authentication)
+  /**
+ * @method registerAuthUser
+ * @description Creates a user in Supabase Auth and stores all fields in user.metadata
+ * @param {Object} userData The user data
+ * @returns {Object} Supabase Auth user object
+ * @throws {Object} Error object with status and message
+ */
+async registerAuthUser(userData) {
+  const { data: authData, error } = await this.supabase.auth.signUp({
+    email: userData.email,
+    password: userData.password,
+    options: {
+      emailRedirectTo: 'https://user-Profile-(to add later)',
+      data: userData,  // store full user object in metadata
+    },
+  });
+
+  if (error) throw { status: 500, message: error.message };
+
+  return authData.user;
+}
 }
 
 export default UserRepository;

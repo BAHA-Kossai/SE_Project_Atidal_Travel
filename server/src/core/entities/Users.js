@@ -23,29 +23,29 @@
 
 class User {
   constructor({
-    userId,
-    createdAt,
+    user_id,
+    created_at,
     type,
-    branchId,
     email,
-    passwordHash,
-    lastName,
-    firstName,
+    password_hash,
+     password,
+    last_name,
+    first_name,
     phone,
-    dateOfBirth,
-    updatedAt
+    date_of_birth,
+    updated_at
   }) {
-        userId,
-    type = "USER",// default to 'USER' if not provided
-    branchId,
-    email,
-    passwordHash,
-    lastName,
-    firstName,
-    phone,
-    dateOfBirth,
-    createdAt = new Date(), // default to now if not provided
-    updatedAt = new Date()  // default to now if not provided
+    this.user_id = user_id;
+    this.type = type;
+    this.email = email;
+    this.password_hash = password_hash;
+     this.password = password;
+    this.last_name = last_name;
+    this.first_name = first_name;
+    this.phone = phone;
+    this.date_of_birth = date_of_birth;
+    this.created_at = created_at || new Date(); // default to now if not provided
+    this.updated_at = updated_at || new Date(); // default to now if not provided
   }
 
   // Helper method to check user type

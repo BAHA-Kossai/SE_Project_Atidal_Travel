@@ -45,7 +45,7 @@ class BaseRepository {
       .from(this.table)
       .select('*')
       .eq(primary_key, id)
-      .single();
+      .maybeSingle();
     if (error) throw error;
     return data;
   }

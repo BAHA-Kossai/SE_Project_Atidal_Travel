@@ -26,7 +26,7 @@
  * }
  */
 
-import crypto from 'crypto';
+import bcrypt from 'bcrypt';
 import validator from 'validator';
 
 /**
@@ -57,6 +57,7 @@ function sanitizeInput(str) {
  * @returns {boolean}
  */
 function validateFirstName(firstName) {
+  firstName = sanitizeInput(firstName);
   const trimmed = trimString(firstName);
   return /^[A-Za-z]{2,}$/.test(trimmed);
 }
@@ -67,6 +68,7 @@ function validateFirstName(firstName) {
  * @returns {boolean}
  */
 function validateLastName(lastName) {
+    lastName = sanitizeInput(lastName);
   const trimmed = trimString(lastName);
   return /^[A-Za-z]{2,}$/.test(trimmed);
 }
@@ -78,6 +80,7 @@ function validateLastName(lastName) {
  * @returns {boolean}
  */
 function validatePhoneNumber(phone) {
+  phone = sanitizeInput(phone);
   const trimmed = trimString(phone);
   const regex = /^(0[5-7][0-9]{8}|\+213[5-7][0-9]{8})$/;
   return regex.test(trimmed);
@@ -100,15 +103,64 @@ function validatePassword(password) {
 }
 
 /**
- * Hash password using SHA-256
+ * Hash password securely with bcrypt
  * @param {string} password
- * @returns {string} hashed password in hex
+ * @returns {Promise<string>} hashed password
  */
-function hashPassword(password) {
-  return crypto.createHash('sha256').update(password).digest('hex');
+async function hashPassword(password) {
+  const saltRounds = 10;
+  const hash = await bcrypt.hash(password, saltRounds);
+  return hash;
 }
 
 
+/**
+ * Validate birth date
+ * - Must be a valid date string (YYYY-MM-DD)
+ * - User must be at least `minAge` years old
+ * @param {string|Date} birthDate
+ * @param {number} minAge - minimum age required (default: 18)
+ * @returns {boolean}
+ */
+function validateBirthDate(birthDate, minAge = 18) {
+  //check valid format
+  const date = new Date(birthDate);
+  if (isNaN(date.getTime())) return false; // invalid date
+  //check valid age
+  const today = new Date();
+  const age = today.getFullYear() - date.getFullYear();
+  const monthDiff = today.getMonth() - date.getMonth();
+  const dayDiff = today.getDate() - date.getDate();
+  // Adjust age if birthday hasn't occurred yet this year
+  const actualAge = monthDiff < 0 || (monthDiff === 0 && dayDiff < 0) ? age - 1 : age;
+
+  return actualAge >= minAge;
+}
+
+/**
+ * Validate email format
+ * @param {string} email
+ * @returns {boolean}
+ */
+function validateEmail(email) {
+  
+  if (typeof email !== "string") return false;
+  email = sanitizeInput(email);
+  const trimmed = email.trim().toLowerCase();
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  return regex.test(trimmed);
+}
+
+/**
+ * Compare a plain password with a hashed password
+ * @param {string} plainPassword - The password provided by the user
+ * @param {string} hashedPassword - The hashed password stored in DB
+ * @returns {Promise<boolean>} true if match, false otherwise
+ */
+async function comparePassword(plainPassword, hashedPassword) {
+  return await bcrypt.compare(plainPassword, hashedPassword);
+}
 
 export {
   trimString,
@@ -117,5 +169,8 @@ export {
   validateLastName,
   validatePhoneNumber,
   validatePassword,
-  hashPassword
+  hashPassword,
+  validateBirthDate,
+  validateEmail,
+  comparePassword
 };
