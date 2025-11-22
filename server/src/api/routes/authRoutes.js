@@ -34,7 +34,8 @@
  * - All errors should be handled gracefully and returned with proper HTTP status codes.
  */
 import express from 'express';
-import { signUpController, signInController,forgotPasswordController } from '../controllers/authController.js';
+import { signUpController, signInController,forgotPasswordController,resetPasswordController,logoutController } from '../controllers/authController.js';
+import { validateResetToken,verifySupabaseToken } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
@@ -46,5 +47,11 @@ router.post('/signin', signInController);
 
 // POST /auth/forgot-password
 router.post("/forgot-password", forgotPasswordController);
+
+// POST /auth/reset-password
+router.post("/reset-password", validateResetToken, resetPasswordController);
+
+// POST /auth/signout
+router.post("/signout",  logoutController);
 
 export default router;

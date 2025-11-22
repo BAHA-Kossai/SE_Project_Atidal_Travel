@@ -24,72 +24,62 @@ import { hashPassword } from "../../utils/formValidation.js";
 import UserRepository from "../../repositories/userRepository.js";
 import supabase from "../../config/supabase.js";
 import { SignUpWithEmailValidator } from "../../api/validators/SignUpValidator.js";
+
 class SignUpUseCase {
-  /**
-   * @constructor
-   * @param {UserRepository} userRepository
-   */
   constructor(userRepository) {
     this.userRepository = userRepository;
   }
 
-  /**
-   * @method signUpWithEmail
-   * @description Handles regular email/password signup.
-   * @param {Object} data - User signup input
-   * @returns {Object} Created user data
-   * @throws {Object} Error object with status and message
-   */
   async signUpWithEmail(data) {
-    //Validate input
+    // Validate input
     const errors = SignUpWithEmailValidator.validate(data);
     if (errors.length > 0) throw { status: 400, message: errors.join("\n ") };
 
-    // Check for existing email
+    // Check existing user by email
     const existingUser = await this.userRepository.findByEmail(data.email);
     if (existingUser) {
-    if (!existingUser.confirmed) {
-      // User exists but not confirmed → resend email
-      await this.userRepository.registerAuthUser(data);
+      // If already exists in Supabase but not confirmed, resend confirmation
+      const { email, first_name, last_name, phone, date_of_birth } = existingUser;
+      await this.userRepository.registerAuthUser({ email, first_name, last_name, phone, date_of_birth, password: data.password });
       return { status: 202, message: "Email not confirmed. Confirmation email resent." };
     }
-    return { status: 409, message: "Email already in use." };
-  }
 
-    //Hash password
+    // Hash password for DB
     const password_hash = await hashPassword(data.password);
 
-    // Build the user object correctly
-    const user = new User({
-      ...data,
-      password_hash: password_hash,
+    // Create User entity
+    const user = new User({ ...data, password_hash });
+
+    // Register in Supabase Auth
+    const supabaseUser = await this.userRepository.registerAuthUser(user);
+
+    // Store in DB including supabase_id
+    const { password, ...userWithoutPassword } = user;
+    const createdUser = await this.userRepository.createRegularUser({
+      ...userWithoutPassword,
+      supabase_id: supabaseUser.id
     });
 
-    const supabaseToken = await this.userRepository.registerAuthUser(user);
-    const {password,...userWithoutPassword} = user;
-    const createdUser = await this.userRepository.createRegularUser(userWithoutPassword);
-
-
-    const cleanSupabaseUser = {
-  id: supabaseToken.id,
-  email: supabaseToken.email,
-  first_name: supabaseToken.user_metadata.first_name,
-  last_name: supabaseToken.user_metadata.last_name,
-  date_of_birth: supabaseToken.user_metadata.date_of_birth,
-  confirmation_sent_at: supabaseToken.confirmation_sent_at,
-  email_verified: supabaseToken.user_metadata.email_verified || false
-};
-
-  const cleanUser = {
-    id: createdUser.user_id,
-    phone : createdUser.phone,
-    type : createdUser.type,
-
+    // Return clean objects
+    return {
+      supabase: {
+        id: supabaseUser.id,
+        email: supabaseUser.email,
+        first_name: supabaseUser.user_metadata.first_name,
+        last_name: supabaseUser.user_metadata.last_name,
+        date_of_birth: supabaseUser.user_metadata.date_of_birth,
+        confirmation_sent_at: supabaseUser.confirmation_sent_at,
+        email_verified: supabaseUser.user_metadata.email_verified || false
+      },
+      database: {
+        id: createdUser.user_id,
+        supabase_id: createdUser.supabase_id,
+        phone: createdUser.phone,
+        type: createdUser.type
+      }
+    };
   }
-    return {supabase:cleanSupabaseUser ,database: cleanUser};
-  }
-
-
 }
+
 
 export default SignUpUseCase;

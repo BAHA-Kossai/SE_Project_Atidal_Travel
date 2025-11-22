@@ -16,6 +16,7 @@
 
 import SignUpUseCase from '../../core/usecases/SignUpUseCase.js';
 import LoginUseCase from '../../core/usecases/LoginUseCase.js';
+import LogoutUseCase from '../../core/usecases/LogOutUseCase.js';
 import supabase, { supabaseAdmin } from '../../config/supabase.js';
 import UserRepository from '../../repositories/userRepository.js';
 import ForgotPasswordUseCase from '../../core/usecases/ForgotPasswordUseCase.js';
@@ -127,18 +128,47 @@ export const forgotPasswordController = async (req, res) => {
 
 
 
-const resetPasswordUseCase = new ResetPasswordUseCase();
+
 
 export const resetPasswordController = async (req, res) => {
+  const resetPasswordUseCase = new ResetPasswordUseCase(userAdminRepo);
   try {
-    const { token, newPassword } = req.body;
+    const { newPassword } = req.body;
+    const token = req.token; // <- from middleware
 
-    const result = await resetPasswordUseCase.resetPassword({ token, newPassword });
+    const result = await resetPasswordUseCase.resetPassword({ newPassword , token});
 
     return res.status(200).json({
       status: "success",
       data: result
     });
+  } catch (err) {
+    return res.status(err.status || 500).json({
+      status: "error",
+      data: {},
+      message: err.message || "Internal Server Error"
+    });
+  }
+};
+
+
+
+
+
+
+export const logoutController = async (req, res) => {
+  const logoutUseCase = new LogoutUseCase(userRepo.supabase);
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(400).json({ status: "error", message: "Access token is required." });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    const result = await logoutUseCase.logout(token);
+
+    return res.json(result);
   } catch (err) {
     return res.status(err.status || 500).json({
       status: "error",

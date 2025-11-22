@@ -18,7 +18,16 @@
 import UserRepository from "../../repositories/userRepository.js";
 import { validateEmail } from "../../utils/formValidation.js";
 import supabase from "../../config/supabase.js";
+import { createClient } from "@supabase/supabase-js";
+import { supabaseAdmin } from "../../config/supabase.js";
+import { hashPassword } from "../../utils/formValidation.js";
 
+import jwt from "jsonwebtoken";
+
+const decodeEmailFromToken = (token) => {
+  const decoded = jwt.decode(token);
+  return decoded?.email; // usually the email is inside the payload
+};
 class ForgotPasswordUseCase {
   /**
    * @constructor
@@ -52,7 +61,7 @@ class ForgotPasswordUseCase {
     // Use Supabase Auth to send password reset email
     const { data: resetData, error } =
       await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: "-----", // frontend page to handle password reset
+        redirectTo: "http://localhost:5173/", // frontend page to handle password reset
       });
 
     if (error) throw { status: 500, message: error.message };
@@ -63,65 +72,44 @@ class ForgotPasswordUseCase {
 
 export default ForgotPasswordUseCase;
 
-import supabase from "../../config/supabase.js";
-import { hashPassword } from "../../utils/formValidation.js";
-import { hashPassword } from "../../utils/formValidation.js";
 
 class ResetPasswordUseCase {
-  /**
-   * @constructor
-   * @param {UserRepository} userRepository
-   */
   constructor(userRepository) {
     this.userRepository = userRepository;
   }
 
-  /**
-   * @method resetPassword
-   * @description Reset user's password using token from Supabase email link.
-   *              Also updates password hash in your database.
-   * @param {Object} data - { token, newPassword }
-   * @returns {Object} Success message
-   * @throws {Object} Error object with status and message
-   */
   async resetPassword(data) {
     const { token, newPassword } = data;
-
     if (!token || !newPassword) {
       throw { status: 400, message: "Token and new password are required." };
     }
 
-    try {
-      // Reset password in Supabase
-      const { data: updatedUser, error } = await supabase.auth.updateUser(
-        { password: newPassword },
-        token
-      );
+    const email = decodeEmailFromToken(token);
+    if (!email) throw { status: 400, message: "Invalid token." };
 
-      if (error) throw { status: 500, message: error.message };
+    // Find user via listUsers
+    const { data: listData, error: listError } =
+      await supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+    if (listError) throw { status: 500, message: listError.message };
 
-      // Get email from Supabase response
-      const email = updatedUser?.email;
-      if (!email) throw { status: 500, message: "Could not retrieve user email." };
+    const user = listData.users.find((u) => u.email === email);
+    if (!user) throw { status: 404, message: "User not found" };
 
-      // Hash the new password for your database
-      const password_hash = await hashPassword(newPassword);
+    // Update password
+    const { data: updatedUser, error: updateError } =
+      await supabaseAdmin.auth.admin.updateUserById(user.id, {
+        password: newPassword,
+      });
+    if (updateError) throw { status: 500, message: updateError.message };
 
-      // Update user record in DB
-      const userInDb = await this.userRepository.findByEmail(email);
-      if (!userInDb) {
-        console.warn("User not found in DB after password reset:", email);
-      } else {
-        await this.userRepository.updateUser(userInDb.user_id, { password_hash });
-      }
-
-      return { status: 200, message: "Password reset successful." };
-    } catch (err) {
-      throw {
-        status: err.status || 500,
-        message: err.message || "Internal Server Error",
-      };
+    // Hash and update in DB
+    const password_hash = await hashPassword(newPassword);
+    const userInDb = await this.userRepository.findByEmail(email);
+    if (userInDb) {
+      await this.userRepository.updateUser(userInDb.user_id, { password_hash });
     }
+
+    return { status: 200, message: "Password reset successful." };
   }
 }
 

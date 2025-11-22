@@ -45,3 +45,22 @@ export const requireSuperAdmin = (req, res, next) => {
   }
   next();
 };
+
+
+
+
+export const validateResetToken = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(400).json({
+      status: "error",
+      data: {},
+      message: "A valid reset token is required.",
+    });
+  }
+
+  // Extract token from header
+  req.token = authHeader.split(" ")[1];
+  next();
+};

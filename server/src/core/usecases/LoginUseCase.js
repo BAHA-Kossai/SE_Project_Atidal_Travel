@@ -17,6 +17,7 @@ import supabase from "../../config/supabase.js";
 import { comparePassword } from "../../utils/formValidation.js";
 import { LogInValidator } from "../../api/validators/LogInValidator.js";
 
+
 class LoginUseCase {
   constructor(userRepository) {
     this.userRepository = userRepository;
@@ -27,76 +28,47 @@ class LoginUseCase {
     const errors = LogInValidator.validate(data);
     if (errors.length > 0) throw { status: 400, message: errors.join("\n ") };
 
+    // Get user from DB
     const user = await this.userRepository.findByEmail(data.email);
     if (!user) return { status: 404, message: "User not found." };
 
-    if (!user.confirmed) {
-      // Resend confirmation email via Supabase Auth
-      await this.userRepository.registerAuthUser({
-        email: user.email,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        phone: user.phone,
-        date_of_birth: user.date_of_birth,
-        password: "temporaryPassword",
-      });
-
-      return {
-        status: 403,
-        message: "Email not confirmed. Confirmation email resent.",
-      };
-    }
-
+    // Check password method
     if (user.password_hash === "authByGoogle") {
       return { status: 403, message: "Error: user must log in with Google." };
     }
 
-    const passwordMatch = await comparePassword(
-      data.password,
-      user.password_hash
-    );
+    // Verify password
+    const passwordMatch = await comparePassword(data.password, user.password_hash);
     if (!passwordMatch) return { status: 401, message: "Incorrect password." };
 
-    // Sign in with Supabase
-    const { data: supabaseSession, error } =
-      await this.userRepository.supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      });
-    if (error) {
-      // If email not confirmed -> resend confirmation link
-      if (error.message.includes("Email not confirmed")) {
-        await this.userRepository.registerAuthUser({
-          email: user.email,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          phone: user.phone,
-          date_of_birth: user.date_of_birth,
-          password: data.password, 
-        });
+    // Sign in with Supabase to get session & confirm email
+    const { data: supabaseSession, error } = await this.userRepository.supabase.auth.signInWithPassword({
+      email: data.email,
+      password: data.password
+    });
 
-        throw {
-          status: 403,
-          message: "Email not confirmed. Confirmation email resent.",
-        };
-      }
+    if (error) throw { status: 500, message: error.message };
 
-      // Other Supabase errors
-      throw { status: 500, message: error.message };
+    // Check if email confirmed in Supabase
+    if (!supabaseSession.session.user.email_confirmed_at) {
+      return { status: 403, message: "Email not confirmed in Supabase." };
     }
 
-    const token = {
-      access: supabaseSession.session.access_token,
-      refresh: supabaseSession.session.refresh_token,
+    // Return token and user info
+    return {
+      token: {
+        access: supabaseSession.session.access_token,
+        refresh: supabaseSession.session.refresh_token
+      },
+      user: {
+        id: user.user_id,
+        supabase_id: user.supabase_id,
+        email: user.email
+      }
     };
-
-    const userInfo = {
-      id: supabaseSession.session.user.id,
-      email: supabaseSession.session.user.email,
-    };
-
-    return { token: token, user: userInfo };
   }
 }
+
+
 
 export default LoginUseCase;

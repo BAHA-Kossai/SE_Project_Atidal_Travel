@@ -33,7 +33,8 @@ class User {
     first_name,
     phone,
     date_of_birth,
-    updated_at
+    updated_at,
+    supabase_id
   }) {
     this.user_id = user_id;
     this.type = type;
@@ -46,6 +47,7 @@ class User {
     this.date_of_birth = date_of_birth;
     this.created_at = created_at || new Date(); // default to now if not provided
     this.updated_at = updated_at || new Date(); // default to now if not provided
+    this.supabase_id = supabase_id;
   }
 
   // Helper method to check user type
