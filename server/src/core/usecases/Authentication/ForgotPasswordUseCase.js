@@ -15,12 +15,12 @@
  *              - Sends password reset email with Supabase redirect URL.
  */
 
-import UserRepository from "../../repositories/userRepository.js";
-import { validateEmail } from "../../utils/formValidation.js";
-import supabase from "../../config/supabase.js";
+import UserRepository from "../../../repositories/userRepository.js";
+import { validateEmail } from "../../../utils/formValidation.js";
+import supabase from "../../../config/supabase.js";
 import { createClient } from "@supabase/supabase-js";
-import { supabaseAdmin } from "../../config/supabase.js";
-import { hashPassword } from "../../utils/formValidation.js";
+import { supabaseAdmin } from "../../../config/supabase.js";
+import { hashPassword } from "../../../utils/formValidation.js";
 
 import jwt from "jsonwebtoken";
 

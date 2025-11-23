@@ -24,7 +24,7 @@ const router = express.Router();
  * Create a new admin (Super Admin only)
  */
 router.post(
-  '/',
+  '/add-admin',
   verifySupabaseToken,   // validate JWT & attach req.user
   requireSuperAdmin,     // ensure SUPER_ADMIN
   createAdminController  // call controller

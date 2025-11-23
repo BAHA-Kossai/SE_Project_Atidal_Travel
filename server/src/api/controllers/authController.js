@@ -14,13 +14,13 @@
  * @lastModified 2025-11-21
  */
 
-import SignUpUseCase from '../../core/usecases/SignUpUseCase.js';
-import LoginUseCase from '../../core/usecases/LoginUseCase.js';
-import LogoutUseCase from '../../core/usecases/LogOutUseCase.js';
+import SignUpUseCase from '../../core/usecases/Authentication/SignUpUseCase.js';
+import LoginUseCase from '../../core/usecases/Authentication/LoginUseCase.js';
+import LogoutUseCase from '../../core/usecases/Authentication/LogOutUseCase.js';
 import supabase, { supabaseAdmin } from '../../config/supabase.js';
 import UserRepository from '../../repositories/userRepository.js';
-import ForgotPasswordUseCase from '../../core/usecases/ForgotPasswordUseCase.js';
-import { ResetPasswordUseCase } from '../../core/usecases/ForgotPasswordUseCase.js';
+import ForgotPasswordUseCase from '../../core/usecases/Authentication/ForgotPasswordUseCase.js';
+import { ResetPasswordUseCase } from '../../core/usecases/Authentication/ForgotPasswordUseCase.js';
 //user repository for database controle
 const userRepo = new UserRepository(supabase);
 const userAdminRepo = new UserRepository(supabaseAdmin);

@@ -17,7 +17,7 @@ export const verifySupabaseToken = async (req, res, next) => {
     req.user = {
       id: user.id,
       email: user.email,
-      type: user.user_metadata.type, // SUPER_ADMIN or ADMIN
+      type: user.user_metadata.type, 
       first_name: user.user_metadata.first_name,
       last_name: user.user_metadata.last_name,
     };

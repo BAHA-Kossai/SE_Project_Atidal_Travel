@@ -19,10 +19,10 @@
  * On Success: Newly created admin data from Supabase and database
  * On Failure: Error JSON with status and message
  */
-import AdminManagementUseCase from '../../core/usecases/AdminManagementUseCase.js';
+import AdminManagementUseCase from '../../core/usecases/Authentication/AdminManagementUseCase.js';
 import UserRepository from '../../repositories/userRepository.js';
 import { supabaseAdmin } from '../../config/supabase.js';
-import { hashPassword } from '../../utils/formValidation.js';
+
 
 const userRepo = new UserRepository(supabaseAdmin);
 const adminUseCase = new AdminManagementUseCase(userRepo);

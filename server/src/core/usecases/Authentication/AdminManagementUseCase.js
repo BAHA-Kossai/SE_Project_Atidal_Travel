@@ -12,7 +12,7 @@
  * @lastModified 2025-11-21
  */
 
-import { hashPassword } from "../../utils/formValidation.js";
+import { hashPassword } from "../../../utils/formValidation.js";
 
 class AdminManagementUseCase {
   constructor(userRepository) {

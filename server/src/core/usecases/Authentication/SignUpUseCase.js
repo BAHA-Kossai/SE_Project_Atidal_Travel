@@ -19,11 +19,9 @@
  *
  */
 
-import User from "../entities/Users.js";
-import { hashPassword } from "../../utils/formValidation.js";
-import UserRepository from "../../repositories/userRepository.js";
-import supabase from "../../config/supabase.js";
-import { SignUpWithEmailValidator } from "../../api/validators/SignUpValidator.js";
+import User from "../../entities/Users.js";
+import { hashPassword } from "../../../utils/formValidation.js";
+import { SignUpWithEmailValidator } from "../../../api/validators/SignUpValidator.js";
 
 class SignUpUseCase {
   constructor(userRepository) {

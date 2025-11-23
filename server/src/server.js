@@ -1,8 +1,8 @@
 import express from 'express';
 import config from './config/config.js';
 import authRouter from './api/routes/authRoutes.js';
-import adminRouter from './api/routes/adminRoutes.js'; // <-- import your admin routes
-
+import adminRouter from './api/routes/adminRoutes.js'; 
+import userRouter from './api/routes/userRoutes.js';
 
 import cors from 'cors'; 
 const app = express();
@@ -18,8 +18,9 @@ app.use(cors({
 app.use(express.json());
 
 // Routes
-app.use('/auth', authRouter);          // Auth routes: signup/signin
+app.use('/api/auth', authRouter);          // Auth routes: signup/signin
 app.use('/api/admin', adminRouter);    // Admin management routes: create admin
+app.use('/api/user',userRouter ); 
 
 // Simple health check
 app.get('/', (req, res) => {

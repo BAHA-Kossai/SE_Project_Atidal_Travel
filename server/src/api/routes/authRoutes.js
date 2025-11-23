@@ -39,19 +39,19 @@ import { validateResetToken,verifySupabaseToken } from '../middlewares/authMiddl
 
 const router = express.Router();
 
-// POST /auth/signup
+// POST /api/auth/signup
 router.post('/signup', signUpController);
 
-// POST /auth/signin
+// POST /api/auth/signin
 router.post('/signin', signInController);
 
-// POST /auth/forgot-password
+// POST /api/auth/forgot-password
 router.post("/forgot-password", forgotPasswordController);
 
-// POST /auth/reset-password
+// POST /api/auth/reset-password
 router.post("/reset-password", validateResetToken, resetPasswordController);
 
-// POST /auth/signout
+// POST /api/auth/signout
 router.post("/signout",  logoutController);
 
 export default router;
