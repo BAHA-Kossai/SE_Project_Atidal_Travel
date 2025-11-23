@@ -1,4 +1,4 @@
-import {Copy, Edit, Trash2, ChevronLeft, ChevronRight} from "lucide-react";
+import {Edit, Trash2, ChevronLeft, ChevronRight} from "lucide-react";
 import {useMemo, useState} from "react";
 
 export default function Table({columns = [],  data = []}) {
@@ -38,7 +38,7 @@ export default function Table({columns = [],  data = []}) {
                             {column.title}
                         </th>
                     ))}
-                    <th className="p-3 text-left">
+                    <th className="text-center">
                         Actions
                     </th>
                 </tr>
@@ -65,9 +65,8 @@ export default function Table({columns = [],  data = []}) {
                                     }
 
                                     {/* Actions */}
-                                    <td className={"text-gray-400 text-left"}>
+                                    <td className={"text-gray-400 text-center"}>
                                         <div className={"flex flex-row justify-around"}>
-                                            <Copy className={iconClass}/>
                                             <Edit className={iconClass}/>
                                             <Trash2 className={`${iconClass} hover:text-red-700`}/>
                                         </div>

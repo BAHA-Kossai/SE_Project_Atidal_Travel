@@ -10,7 +10,7 @@ export default function ModalDialog({title, description, children, open}) {
             <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50`}>
                 {/* Modal */}
                 <div
-                    className={`bg-white rounded-xl shadow-xl px-10 py-4 max-w-3xl w-full  overflow-y-auto relative`}>
+                    className={`bg-white rounded-xl shadow-xl px-10 py-8 max-w-3xl w-full overflow-y-auto relative`}>
 
                     {/* Title and Description */}
                     <div className={"mb-5"}>
