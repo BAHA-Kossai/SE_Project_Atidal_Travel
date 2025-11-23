@@ -23,23 +23,25 @@ export default function TabSecurity() {
     ]
 
     return (
-        <WhiteContainer title={"Security settings"}>
-            {
-                fields.map((field, ) => {
-                    return (
-                        <div className={"flex flex-row justify-between items-end mb-5"}>
-                            <InputField type={field.type} label={field.label} value={field.value} fieldMaxWidth={field.fieldMaxWidth}/>
-                            <ButtonOutline children={field.buttonText}/>
-                        </div>
-                    )
-                })
-            }
+        <main className={"mt-5"}>
+            <WhiteContainer title={"Security settings"}>
+                {
+                    fields.map((field, ) => {
+                        return (
+                            <div className={"flex flex-row justify-between items-end mb-5"}>
+                                <InputField type={field.type} label={field.label} value={field.value} fieldMaxWidth={field.fieldMaxWidth}/>
+                                <ButtonOutline children={field.buttonText}/>
+                            </div>
+                        )
+                    })
+                }
 
-            <Setting
-                title={"2-Step Authentication"}
-                description={"add an additional layer of security to your account during login"}
-                button={<Switch/>}
-            />
-        </WhiteContainer>
+                <Setting
+                    title={"2-Step Authentication"}
+                    description={"add an additional layer of security to your account during login"}
+                    button={<Switch/>}
+                />
+            </WhiteContainer>
+        </main>
     )
 }

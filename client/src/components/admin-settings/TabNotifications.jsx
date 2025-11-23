@@ -10,16 +10,18 @@ export default function TabNotifications() {
     ]
 
     return (
-        <WhiteContainer title={"Notification settings"}>
-            {
-                options.map((item) => (
-                    <Setting
-                        title={item.title}
-                        description={item.description}
-                        button={<Switch/>}
-                    />
-                ))
-            }
-        </WhiteContainer>
+        <main className={"mt-5"}>
+            <WhiteContainer title={"Notification settings"}>
+                {
+                    options.map((item) => (
+                        <Setting
+                            title={item.title}
+                            description={item.description}
+                            button={<Switch/>}
+                        />
+                    ))
+                }
+            </WhiteContainer>
+        </main>
     )
 }
