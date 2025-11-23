@@ -1,701 +1,801 @@
 [{
-  "id": "01KAM7ZK4AWB9A07DK9J6JYTX2",
-  "name": "Thomasin",
-  "phone_number": "556-254-9707",
-  "role": "Supervisor",
-  "hire_date": "18-10-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK4B0DT1RNM3KQQN8Q90",
-  "name": "Magdaia",
-  "phone_number": "848-459-9135",
-  "role": "Supervisor",
-  "hire_date": "19-10-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK4C4P6XPE8ENEQ1GNYN",
-  "name": "Courtnay",
-  "phone_number": "181-157-2406",
-  "role": "Architect",
-  "hire_date": "22-07-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK4CBX4Z2TQ75PP66591",
-  "name": "Cleo",
-  "phone_number": "254-915-5850",
-  "role": "Supervisor",
-  "hire_date": "08-02-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK4D285DAHAK60BE8JR4",
-  "name": "Cull",
-  "phone_number": "368-757-4337",
-  "role": "Project Manager",
-  "hire_date": "04-02-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK4EJ0S8BXNTGKMWR6RH",
-  "name": "Selby",
-  "phone_number": "490-964-2294",
-  "role": "Electrician",
-  "hire_date": "11-05-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK4E155FKMSYSR3PXV0G",
-  "name": "Tybie",
-  "phone_number": "635-298-3823",
-  "role": "Electrician",
-  "hire_date": "19-06-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK4FCAK8W3GJM1RYYRF6",
-  "name": "Laurena",
-  "phone_number": "277-203-3231",
-  "role": "Surveyor",
-  "hire_date": "10-04-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK4GS8ZPQQCK5X88PCBB",
-  "name": "Jacky",
-  "phone_number": "762-895-9705",
-  "role": "Engineer",
-  "hire_date": "27-08-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK4GC9YF9F0YC2QVCT9A",
-  "name": "Prent",
-  "phone_number": "881-313-2458",
-  "role": "Construction Manager",
-  "hire_date": "08-05-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK4HQGYE7GEFNTM21FZ6",
-  "name": "Alica",
-  "phone_number": "866-142-6181",
-  "role": "Project Manager",
-  "hire_date": "06-10-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK4J16ZWKQRAZBQ44PZE",
-  "name": "Allsun",
-  "phone_number": "848-151-7989",
-  "role": "Subcontractor",
-  "hire_date": "30-10-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK4K6AYM21PB3D1MT1KN",
-  "name": "Kimball",
-  "phone_number": "507-374-4967",
-  "role": "Electrician",
-  "hire_date": "07-08-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK4KK2KPM7FDH9ZGVWYA",
-  "name": "Lisle",
-  "phone_number": "229-966-6554",
-  "role": "Supervisor",
-  "hire_date": "03-05-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK4MY1VM3G3V0J6H1R11",
-  "name": "Deny",
-  "phone_number": "576-209-5931",
+  "id": "01KAQRHT7S4FXYR5MD9WAN1NWN",
+  "first_name": "Sol",
+  "last_name": "Bunkle",
+  "phone_number": "751-753-0641",
   "role": "Estimator",
-  "hire_date": "09-03-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK4NZSYC5PH7MA2DYT68",
-  "name": "Darrel",
-  "phone_number": "704-280-8284",
-  "role": "Project Manager",
-  "hire_date": "14-12-2024",
-  "availability": false
-}, {
-  "id": "01KAM7ZK4N3HN0ZN5V7CW4ZKQ5",
-  "name": "Tabitha",
-  "phone_number": "141-782-5997",
-  "role": "Construction Manager",
-  "hire_date": "25-12-2024",
+  "hire_date": "21-02-2025",
   "availability": true
 }, {
-  "id": "01KAM7ZK4PFNXZQ5SY5YP81WDN",
-  "name": "Harp",
-  "phone_number": "888-424-5482",
-  "role": "Construction Foreman",
-  "hire_date": "16-07-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK4QV6BGGN9Z3M4J1PXT",
-  "name": "Bertina",
-  "phone_number": "261-160-6824",
-  "role": "Electrician",
-  "hire_date": "20-01-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK4QD7YWQ4C3TPEDQF4K",
-  "name": "Chloe",
-  "phone_number": "538-177-9020",
-  "role": "Supervisor",
-  "hire_date": "20-02-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK4R1Y9CGEJT1E8QN6CA",
-  "name": "Daveen",
-  "phone_number": "101-485-8168",
-  "role": "Engineer",
-  "hire_date": "20-05-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK4SGYE7E0ZHVXYWTRN0",
-  "name": "Florie",
-  "phone_number": "438-769-9791",
-  "role": "Project Manager",
-  "hire_date": "23-07-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK4T07TZ6HZE99SQ5G6F",
-  "name": "Giffer",
-  "phone_number": "212-595-7926",
+  "id": "01KAQRHT7V8N7EWAN31VR2XV0Y",
+  "first_name": "Barrie",
+  "last_name": "Cluet",
+  "phone_number": "621-678-6290",
   "role": "Surveyor",
-  "hire_date": "20-11-2025",
+  "hire_date": "27-10-2025",
   "availability": true
 }, {
-  "id": "01KAM7ZK4TZHKY72SZH8QQWM5V",
-  "name": "Vachel",
-  "phone_number": "597-368-8452",
-  "role": "Subcontractor",
-  "hire_date": "06-06-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK4V43MNN4RKHV3R2K4W",
-  "name": "Augustus",
-  "phone_number": "766-169-9489",
-  "role": "Construction Manager",
-  "hire_date": "21-07-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK4W2ZWEX8WNV7EV33C8",
-  "name": "Wylma",
-  "phone_number": "330-480-3142",
-  "role": "Engineer",
-  "hire_date": "22-05-2025",
+  "id": "01KAQRHT7WWHW0FQC4P92VXEAJ",
+  "first_name": "Kizzee",
+  "last_name": "Bartholomew",
+  "phone_number": "330-928-2308",
+  "role": "Architect",
+  "hire_date": "15-05-2025",
   "availability": false
 }, {
-  "id": "01KAM7ZK4WFZJ2WJTCM815F2FB",
-  "name": "Waylen",
-  "phone_number": "603-442-5103",
+  "id": "01KAQRHT7XEXPB1KECF05VNNJM",
+  "first_name": "Keeley",
+  "last_name": "Jakuszewski",
+  "phone_number": "162-528-5144",
+  "role": "Construction Expeditor",
+  "hire_date": "08-01-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHT7X8RPH76T00EKH90AY",
+  "first_name": "Leonard",
+  "last_name": "Trumper",
+  "phone_number": "155-596-7402",
   "role": "Supervisor",
-  "hire_date": "10-08-2025",
+  "hire_date": "28-11-2024",
   "availability": true
 }, {
-  "id": "01KAM7ZK4XZGT19JWHK0K53MZW",
-  "name": "Aime",
-  "phone_number": "208-823-8415",
-  "role": "Construction Foreman",
-  "hire_date": "12-12-2024",
-  "availability": false
-}, {
-  "id": "01KAM7ZK4YY5JZ7HXWHRHQ3GF3",
-  "name": "Teresina",
-  "phone_number": "437-587-4180",
-  "role": "Construction Expeditor",
-  "hire_date": "27-05-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK4ZZZRG0MN7W8SQ8CH3",
-  "name": "Edvard",
-  "phone_number": "159-739-4476",
-  "role": "Architect",
-  "hire_date": "01-03-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK4ZWTHJWM79SN67XZC9",
-  "name": "Isis",
-  "phone_number": "487-559-3334",
-  "role": "Subcontractor",
-  "hire_date": "24-11-2024",
-  "availability": false
-}, {
-  "id": "01KAM7ZK50MCYBCVTMWR7ARAFP",
-  "name": "Edgar",
-  "phone_number": "787-167-4439",
-  "role": "Architect",
-  "hire_date": "10-11-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK51ZM6VMWPZZCT8G1G5",
-  "name": "Brook",
-  "phone_number": "895-358-9885",
+  "id": "01KAQRHT7Y5N6THG39P6C3XTPN",
+  "first_name": "Elene",
+  "last_name": "Follen",
+  "phone_number": "487-194-2958",
   "role": "Project Manager",
-  "hire_date": "09-02-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK51P5ZB8JNZD8X1G3D3",
-  "name": "Vincent",
-  "phone_number": "736-355-5492",
-  "role": "Construction Worker",
-  "hire_date": "22-11-2024",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5250ZW643ZAE6D2EAH",
-  "name": "Arvie",
-  "phone_number": "269-738-2933",
-  "role": "Construction Worker",
-  "hire_date": "26-09-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK53V3GW098W29WWFH4S",
-  "name": "Fredrick",
-  "phone_number": "446-355-1370",
-  "role": "Construction Expeditor",
-  "hire_date": "07-05-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK546413RAK1Y7Z8KECC",
-  "name": "Morrie",
-  "phone_number": "556-364-9464",
-  "role": "Engineer",
-  "hire_date": "21-09-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK54Q0N09YDYE57H1PM5",
-  "name": "Melva",
-  "phone_number": "206-226-6586",
-  "role": "Construction Foreman",
   "hire_date": "17-07-2025",
   "availability": true
 }, {
-  "id": "01KAM7ZK55CXSRJ9ZKN8FW61H5",
-  "name": "Gwyneth",
-  "phone_number": "383-371-8608",
-  "role": "Subcontractor",
-  "hire_date": "29-10-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK566RAVYQGBRK4AG967",
-  "name": "Tris",
-  "phone_number": "229-935-3444",
-  "role": "Construction Expeditor",
-  "hire_date": "28-05-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK56S0V6YBXASVVNA182",
-  "name": "Juliette",
-  "phone_number": "981-998-3725",
-  "role": "Electrician",
-  "hire_date": "11-06-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK57TN7Y1GMJ3QYTJMEC",
-  "name": "Easter",
-  "phone_number": "264-345-9133",
-  "role": "Estimator",
-  "hire_date": "13-08-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK58AZGKC5JZ9HDCFSEZ",
-  "name": "Jose",
-  "phone_number": "400-353-9661",
-  "role": "Subcontractor",
-  "hire_date": "20-07-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK58NJDGTQ309K4K0HBD",
-  "name": "Abbe",
-  "phone_number": "796-268-5667",
-  "role": "Subcontractor",
-  "hire_date": "21-08-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK591G4807DSXWN2FKKY",
-  "name": "Templeton",
-  "phone_number": "926-268-4836",
-  "role": "Surveyor",
-  "hire_date": "19-04-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5AK8V4FFCRN664DAPB",
-  "name": "Dede",
-  "phone_number": "622-266-7185",
-  "role": "Construction Manager",
-  "hire_date": "28-04-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5BTS6BKX6EFB2CD3WP",
-  "name": "Mechelle",
-  "phone_number": "334-904-7650",
-  "role": "Subcontractor",
-  "hire_date": "25-09-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5B8M997GN73XX4DXP4",
-  "name": "Shelton",
-  "phone_number": "793-375-1356",
-  "role": "Electrician",
-  "hire_date": "06-09-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5CV3MAFWFYYSYF831Q",
-  "name": "Demetris",
-  "phone_number": "582-133-9271",
-  "role": "Construction Manager",
-  "hire_date": "08-11-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5D63PQEVZ6C79QSSXY",
-  "name": "Kelbee",
-  "phone_number": "127-811-7919",
-  "role": "Construction Foreman",
-  "hire_date": "06-02-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5DHG9A6AGKAFW4CMX2",
-  "name": "Gisela",
-  "phone_number": "423-461-1631",
-  "role": "Subcontractor",
-  "hire_date": "30-03-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK5E2VXXKRYQGEA9JBKF",
-  "name": "Marten",
-  "phone_number": "230-213-9991",
-  "role": "Project Manager",
-  "hire_date": "12-12-2024",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5FG2T7QJNPF7Y3FP6Y",
-  "name": "Brendis",
-  "phone_number": "290-417-0079",
-  "role": "Construction Foreman",
-  "hire_date": "16-07-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK5GR0AWKTPTN32ACNBZ",
-  "name": "Claudie",
-  "phone_number": "125-659-6903",
-  "role": "Construction Manager",
-  "hire_date": "20-03-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK5G7XT1VW02GDD59WZC",
-  "name": "Mellie",
-  "phone_number": "241-831-8000",
-  "role": "Construction Foreman",
-  "hire_date": "11-08-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5HCZ772WRVQ64GC7VC",
-  "name": "Ofella",
-  "phone_number": "925-222-5192",
-  "role": "Construction Worker",
-  "hire_date": "15-03-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK5J69SFYTBY8WR8XN7C",
-  "name": "Lorelle",
-  "phone_number": "690-132-3210",
-  "role": "Surveyor",
-  "hire_date": "19-01-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5JVVHK3Q2TW82MD979",
-  "name": "Leah",
-  "phone_number": "431-773-9575",
-  "role": "Construction Foreman",
-  "hire_date": "09-06-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5KGNB4CFCCAYRJRJWQ",
-  "name": "Layney",
-  "phone_number": "564-341-1707",
-  "role": "Subcontractor",
-  "hire_date": "29-11-2024",
-  "availability": true
-}, {
-  "id": "01KAM7ZK5MXTB4SDZ5RQTC96GZ",
-  "name": "Kelly",
-  "phone_number": "937-946-5039",
+  "id": "01KAQRHT7Z5KRECS3BQ2KCZRTC",
+  "first_name": "Adiana",
+  "last_name": "Slane",
+  "phone_number": "416-772-2069",
   "role": "Architect",
-  "hire_date": "20-05-2025",
+  "hire_date": "30-12-2024",
   "availability": false
 }, {
-  "id": "01KAM7ZK5MZF99THM63HV5M8MG",
-  "name": "Birgit",
-  "phone_number": "610-850-7615",
-  "role": "Construction Expeditor",
-  "hire_date": "06-07-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5NS1EKF75WH7JMZ8ED",
-  "name": "Kendal",
-  "phone_number": "989-590-9076",
-  "role": "Electrician",
-  "hire_date": "25-08-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5PA18D0NE2QCZTH64T",
-  "name": "Ardelia",
-  "phone_number": "814-132-8727",
-  "role": "Estimator",
-  "hire_date": "08-05-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5P9VX88JP9VND5TJGV",
-  "name": "Curran",
-  "phone_number": "468-159-7587",
-  "role": "Construction Worker",
-  "hire_date": "03-12-2024",
-  "availability": true
-}, {
-  "id": "01KAM7ZK5QVZE9RAZHWEQ34CJP",
-  "name": "Georgianne",
-  "phone_number": "604-847-4833",
-  "role": "Supervisor",
-  "hire_date": "24-06-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK5R393Z940P9N97DB29",
-  "name": "Kristen",
-  "phone_number": "314-484-4245",
+  "id": "01KAQRHT80HE8P5TKEDN3EEJBM",
+  "first_name": "Mel",
+  "last_name": "Rosensaft",
+  "phone_number": "780-285-2871",
   "role": "Surveyor",
-  "hire_date": "09-01-2025",
+  "hire_date": "09-06-2025",
   "availability": true
 }, {
-  "id": "01KAM7ZK5RNM6BXZP5X9PN4C7N",
-  "name": "Giraldo",
-  "phone_number": "927-352-2836",
+  "id": "01KAQRHT81KSGHBE3W23VJB5TK",
+  "first_name": "Tabitha",
+  "last_name": "Moyne",
+  "phone_number": "847-471-0392",
   "role": "Supervisor",
-  "hire_date": "26-06-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5S0144F9G9TYD4ESKV",
-  "name": "Bettine",
-  "phone_number": "663-144-7230",
-  "role": "Engineer",
-  "hire_date": "23-10-2025",
+  "hire_date": "23-08-2025",
   "availability": true
 }, {
-  "id": "01KAM7ZK5TSV67G58CKGBDHWA1",
-  "name": "Drucie",
-  "phone_number": "246-355-9633",
-  "role": "Supervisor",
-  "hire_date": "06-01-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5TPD1X9PMZKZMQVD68",
-  "name": "Fabiano",
-  "phone_number": "830-815-8201",
-  "role": "Electrician",
-  "hire_date": "07-11-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5V0843YFXHQ3GCENWK",
-  "name": "Marcel",
-  "phone_number": "204-306-7405",
-  "role": "Surveyor",
-  "hire_date": "28-11-2024",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5WY4AP3ZJQ3BWDD0SC",
-  "name": "Clayson",
-  "phone_number": "309-701-4138",
-  "role": "Electrician",
-  "hire_date": "04-06-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK5WQHEGBZM0RK3QGWNN",
-  "name": "Reider",
-  "phone_number": "824-871-3201",
-  "role": "Estimator",
-  "hire_date": "23-04-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK5XKTF08G5J4V0808RA",
-  "name": "Claiborn",
-  "phone_number": "692-559-8698",
-  "role": "Estimator",
-  "hire_date": "11-01-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK5YZTEAR95VQ04E1A7C",
-  "name": "Gael",
-  "phone_number": "414-975-5721",
-  "role": "Supervisor",
-  "hire_date": "05-02-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK5ZB4NPBB2QJ79YKZ6V",
-  "name": "Julietta",
-  "phone_number": "395-275-1125",
-  "role": "Supervisor",
-  "hire_date": "28-02-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK5ZV54QP6J70AF63P2K",
-  "name": "Roberta",
-  "phone_number": "186-941-5193",
-  "role": "Engineer",
-  "hire_date": "25-10-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK60E0WY6WXRWGM46XPG",
-  "name": "Gannon",
-  "phone_number": "282-233-1438",
-  "role": "Construction Expeditor",
-  "hire_date": "04-03-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK61V64A18S9YT8QNG5T",
-  "name": "Prisca",
-  "phone_number": "756-739-9440",
-  "role": "Surveyor",
-  "hire_date": "17-11-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK61W06JFC03MDVMR9S4",
-  "name": "Emmye",
-  "phone_number": "364-112-6334",
-  "role": "Engineer",
-  "hire_date": "03-08-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK62Y6WP26JK7ZMMF845",
-  "name": "Buddie",
-  "phone_number": "182-249-0320",
-  "role": "Construction Foreman",
-  "hire_date": "25-10-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK631S5GNKV6XKV0PNNQ",
-  "name": "Emilee",
-  "phone_number": "960-420-2584",
-  "role": "Supervisor",
-  "hire_date": "21-12-2024",
-  "availability": false
-}, {
-  "id": "01KAM7ZK63RE06CC8Y4610SYPF",
-  "name": "Mira",
-  "phone_number": "514-729-7498",
-  "role": "Construction Worker",
-  "hire_date": "08-10-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK64TF7PW3JP7ZHN6ET5",
-  "name": "Lindsay",
-  "phone_number": "193-737-0872",
+  "id": "01KAQRHT82CKN5YXNVGKXM327K",
+  "first_name": "Dud",
+  "last_name": "Fishly",
+  "phone_number": "615-933-1490",
   "role": "Construction Manager",
-  "hire_date": "18-06-2025",
+  "hire_date": "18-07-2025",
   "availability": true
 }, {
-  "id": "01KAM7ZK65GG84V7FAM1ZA3VZ7",
-  "name": "Jamil",
-  "phone_number": "664-192-4438",
-  "role": "Surveyor",
-  "hire_date": "28-08-2025",
+  "id": "01KAQRHT83V71AYXYTFHHZGMP4",
+  "first_name": "Delbert",
+  "last_name": "Folliott",
+  "phone_number": "186-187-1368",
+  "role": "Project Manager",
+  "hire_date": "13-03-2025",
   "availability": false
 }, {
-  "id": "01KAM7ZK65ZS5R4109BKYNEFWK",
-  "name": "Mischa",
-  "phone_number": "406-832-1197",
-  "role": "Supervisor",
-  "hire_date": "12-01-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK66FXAQ8MDVYE7RTXQ7",
-  "name": "Bethanne",
-  "phone_number": "866-919-8167",
-  "role": "Electrician",
-  "hire_date": "28-04-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK6748G6MF3M0QKHGF1C",
-  "name": "Denna",
-  "phone_number": "283-958-8896",
+  "id": "01KAQRHT83BBZ69JAN7ZWVW8S4",
+  "first_name": "Marwin",
+  "last_name": "Brims",
+  "phone_number": "400-228-3631",
   "role": "Estimator",
-  "hire_date": "06-06-2025",
+  "hire_date": "19-02-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHT85Z52EHV3SNH8Z605Y",
+  "first_name": "Austin",
+  "last_name": "Skirven",
+  "phone_number": "805-240-4178",
+  "role": "Project Manager",
+  "hire_date": "02-12-2024",
   "availability": true
 }, {
-  "id": "01KAM7ZK67CC0TGPCA2HPQ3HTR",
-  "name": "Lona",
-  "phone_number": "149-569-9717",
+  "id": "01KAQRHT85F521MP3S14FV5JDH",
+  "first_name": "Simona",
+  "last_name": "Plaister",
+  "phone_number": "987-187-7274",
+  "role": "Estimator",
+  "hire_date": "04-04-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT86E32FF5B0CH5YRA4C",
+  "first_name": "Brander",
+  "last_name": "Trood",
+  "phone_number": "176-281-4816",
+  "role": "Engineer",
+  "hire_date": "27-11-2024",
+  "availability": false
+}, {
+  "id": "01KAQRHT87T48WXMB092RYD9JX",
+  "first_name": "Shaina",
+  "last_name": "Arbor",
+  "phone_number": "309-311-4454",
   "role": "Subcontractor",
-  "hire_date": "02-02-2025",
+  "hire_date": "10-01-2025",
   "availability": false
 }, {
-  "id": "01KAM7ZK686KQZEV0K3D18RAMA",
-  "name": "Liesa",
-  "phone_number": "690-467-4113",
-  "role": "Construction Expeditor",
-  "hire_date": "14-02-2025",
+  "id": "01KAQRHT88Z0K82JT0JN37W8D0",
+  "first_name": "Duffy",
+  "last_name": "Tenman",
+  "phone_number": "164-505-5178",
+  "role": "Construction Manager",
+  "hire_date": "18-07-2025",
   "availability": true
 }, {
-  "id": "01KAM7ZK69X0SBFTRQXEV37D2Y",
-  "name": "Lezlie",
-  "phone_number": "207-467-2781",
-  "role": "Project Manager",
-  "hire_date": "06-07-2025",
+  "id": "01KAQRHT8A5MWFBY5K6VEQHEEJ",
+  "first_name": "Mick",
+  "last_name": "O'Heneghan",
+  "phone_number": "323-690-0180",
+  "role": "Subcontractor",
+  "hire_date": "10-08-2025",
   "availability": false
 }, {
-  "id": "01KAM7ZK69RTQ2DRYE1TNH1RYD",
-  "name": "Lily",
-  "phone_number": "618-227-3888",
-  "role": "Project Manager",
+  "id": "01KAQRHT8CMN69Q7P50YR45VQN",
+  "first_name": "Donnell",
+  "last_name": "Hanster",
+  "phone_number": "354-387-1808",
+  "role": "Electrician",
+  "hire_date": "10-05-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT8EW097DRX2QHZKQ71J",
+  "first_name": "Rhiamon",
+  "last_name": "Dummigan",
+  "phone_number": "119-520-2581",
+  "role": "Construction Manager",
+  "hire_date": "27-12-2024",
+  "availability": false
+}, {
+  "id": "01KAQRHT8FVDJJ8C2JT9EVFAN3",
+  "first_name": "Shermie",
+  "last_name": "Houlston",
+  "phone_number": "446-673-2957",
+  "role": "Construction Expeditor",
+  "hire_date": "23-02-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHT8HJ3SH6JB44TKWMC0M",
+  "first_name": "Leta",
+  "last_name": "Ellery",
+  "phone_number": "515-970-4794",
+  "role": "Supervisor",
+  "hire_date": "20-09-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT8J4NXEV9A7GNSS1RMC",
+  "first_name": "Fidelio",
+  "last_name": "Proughten",
+  "phone_number": "912-256-5611",
+  "role": "Electrician",
+  "hire_date": "08-01-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHT8KZC5FDECB7R86940B",
+  "first_name": "Philip",
+  "last_name": "Wasbey",
+  "phone_number": "742-297-7125",
+  "role": "Supervisor",
+  "hire_date": "12-08-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT8M7JYXDZR168F6JN53",
+  "first_name": "Anita",
+  "last_name": "Caroli",
+  "phone_number": "849-706-8175",
+  "role": "Supervisor",
+  "hire_date": "04-08-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHT8NVH6RCHRW2ZBZ1225",
+  "first_name": "Vivyan",
+  "last_name": "Ramsdale",
+  "phone_number": "512-229-6561",
+  "role": "Subcontractor",
+  "hire_date": "16-03-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT8PDP6RCXYB6ATDRR53",
+  "first_name": "Cchaddie",
+  "last_name": "Adshad",
+  "phone_number": "245-823-4115",
+  "role": "Construction Worker",
+  "hire_date": "25-01-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT8PG2QHNQR8RFRENZ1M",
+  "first_name": "Nils",
+  "last_name": "Livezey",
+  "phone_number": "307-427-2502",
+  "role": "Estimator",
+  "hire_date": "26-05-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHT8QD80TXQXNBFQ0MDHZ",
+  "first_name": "Troy",
+  "last_name": "Selley",
+  "phone_number": "969-520-5397",
+  "role": "Construction Expeditor",
+  "hire_date": "07-03-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT8R103TDG9J8VJEE4B4",
+  "first_name": "Ardisj",
+  "last_name": "Sermin",
+  "phone_number": "294-634-8731",
+  "role": "Construction Foreman",
+  "hire_date": "13-12-2024",
+  "availability": true
+}, {
+  "id": "01KAQRHT8SSB8FXZVY0AGJMCS3",
+  "first_name": "Bert",
+  "last_name": "O'Kinneally",
+  "phone_number": "278-870-6287",
+  "role": "Construction Worker",
+  "hire_date": "30-05-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT8T093SE77ZHGHADTND",
+  "first_name": "Vivi",
+  "last_name": "Adamovicz",
+  "phone_number": "100-126-6737",
+  "role": "Electrician",
+  "hire_date": "07-05-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT8VK2Z1EP90Q9HBYBT5",
+  "first_name": "Jacquenetta",
+  "last_name": "Goodier",
+  "phone_number": "804-970-9435",
+  "role": "Construction Expeditor",
+  "hire_date": "22-06-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHT8WGXBXA216PJ9SJ8P8",
+  "first_name": "Curry",
+  "last_name": "Sorel",
+  "phone_number": "940-580-6412",
+  "role": "Supervisor",
+  "hire_date": "04-01-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT8X9RZNQCBW1FRP1TFM",
+  "first_name": "Durand",
+  "last_name": "Goulbourne",
+  "phone_number": "305-334-0995",
+  "role": "Construction Worker",
+  "hire_date": "29-06-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHT8Y1YWQ5JCTECPF8C5S",
+  "first_name": "Alexandro",
+  "last_name": "Norledge",
+  "phone_number": "853-847-3959",
+  "role": "Surveyor",
+  "hire_date": "12-05-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT8Y3VHP3NGR0B65CGA8",
+  "first_name": "Herve",
+  "last_name": "Prebble",
+  "phone_number": "133-115-2849",
+  "role": "Engineer",
+  "hire_date": "12-09-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHT8ZA44RWWCE8ZCY8VMV",
+  "first_name": "Faythe",
+  "last_name": "Hackford",
+  "phone_number": "129-645-0859",
+  "role": "Construction Worker",
+  "hire_date": "27-08-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT906NVK9K1T54PCD4NT",
+  "first_name": "Philip",
+  "last_name": "Deegin",
+  "phone_number": "767-437-2959",
+  "role": "Supervisor",
+  "hire_date": "22-04-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHT92A9J1TSECCKHT9AJQ",
+  "first_name": "Gaylor",
+  "last_name": "Zellmer",
+  "phone_number": "529-212-6516",
+  "role": "Estimator",
+  "hire_date": "25-10-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT93A5GV3XY255HJGDPR",
+  "first_name": "Lanette",
+  "last_name": "Feltham",
+  "phone_number": "921-220-6852",
+  "role": "Construction Expeditor",
+  "hire_date": "25-09-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT94B3T1KY825TFC9RV0",
+  "first_name": "Rikki",
+  "last_name": "Covert",
+  "phone_number": "657-858-6692",
+  "role": "Construction Expeditor",
+  "hire_date": "19-03-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHT961RWRAK9CK425Y2P6",
+  "first_name": "Patti",
+  "last_name": "Aidler",
+  "phone_number": "232-881-7967",
+  "role": "Electrician",
+  "hire_date": "26-10-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT97K09EKA17D6ZE7AFT",
+  "first_name": "Agathe",
+  "last_name": "Hembrow",
+  "phone_number": "725-974-8278",
+  "role": "Estimator",
+  "hire_date": "25-10-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHT98YRSC55VK3WYVVZBQ",
+  "first_name": "Jolene",
+  "last_name": "O' Ronan",
+  "phone_number": "958-201-5966",
+  "role": "Architect",
+  "hire_date": "19-11-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT9AMPBVK27WMH7G2CX1",
+  "first_name": "Ginger",
+  "last_name": "Joliffe",
+  "phone_number": "833-914-2603",
+  "role": "Electrician",
   "hire_date": "01-02-2025",
   "availability": false
 }, {
-  "id": "01KAM7ZK6A4J7EQY83VZKCXNF7",
-  "name": "Milt",
-  "phone_number": "724-356-2049",
+  "id": "01KAQRHT9CCWSC1V9PJ4R0NB3S",
+  "first_name": "Saw",
+  "last_name": "Andreotti",
+  "phone_number": "384-105-4296",
+  "role": "Supervisor",
+  "hire_date": "30-05-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHT9E03ZKZC1FH113MM4V",
+  "first_name": "Vergil",
+  "last_name": "Rawdall",
+  "phone_number": "818-654-6547",
   "role": "Project Manager",
+  "hire_date": "15-02-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT9FQBR308PX4WQNZW3Y",
+  "first_name": "Gabe",
+  "last_name": "Fatkin",
+  "phone_number": "479-869-9529",
+  "role": "Electrician",
+  "hire_date": "27-05-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHT9JJ9X54KRRP1MJ5RN1",
+  "first_name": "Brion",
+  "last_name": "Janata",
+  "phone_number": "682-512-6738",
+  "role": "Construction Expeditor",
+  "hire_date": "13-06-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT9M9YQH5Q8V23G10JW6",
+  "first_name": "Harald",
+  "last_name": "Mixture",
+  "phone_number": "296-981-9072",
+  "role": "Construction Worker",
+  "hire_date": "27-06-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT9NTYHB2423PDS06QGP",
+  "first_name": "Standford",
+  "last_name": "Kleen",
+  "phone_number": "786-865-8053",
+  "role": "Project Manager",
+  "hire_date": "30-12-2024",
+  "availability": false
+}, {
+  "id": "01KAQRHT9QFCQJ247FMM1N6EWK",
+  "first_name": "Rheba",
+  "last_name": "Marcombe",
+  "phone_number": "670-460-3388",
+  "role": "Supervisor",
+  "hire_date": "01-05-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT9STJ5KBGFMV5DMHYPX",
+  "first_name": "Arther",
+  "last_name": "Vanyatin",
+  "phone_number": "170-123-3871",
+  "role": "Construction Manager",
+  "hire_date": "10-01-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT9T8S4Z3GY2GMW9KB4A",
+  "first_name": "Gorden",
+  "last_name": "Oxbrough",
+  "phone_number": "308-902-7310",
+  "role": "Construction Worker",
+  "hire_date": "22-01-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT9WKXQPEJ81R96THVHE",
+  "first_name": "Gordan",
+  "last_name": "Grinikhinov",
+  "phone_number": "819-505-3113",
+  "role": "Supervisor",
+  "hire_date": "27-05-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT9XGYCTXT0X1QE92EG0",
+  "first_name": "Idelle",
+  "last_name": "Storry",
+  "phone_number": "217-823-3226",
+  "role": "Architect",
+  "hire_date": "30-12-2024",
+  "availability": true
+}, {
+  "id": "01KAQRHT9Y8PNCX7HX8KGH6Z9B",
+  "first_name": "Sileas",
+  "last_name": "Barck",
+  "phone_number": "367-526-8407",
+  "role": "Construction Foreman",
+  "hire_date": "16-01-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHT9Z5MD0HSKQ01BA80VW",
+  "first_name": "Diego",
+  "last_name": "Stibbs",
+  "phone_number": "176-797-6084",
+  "role": "Supervisor",
+  "hire_date": "13-04-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHTA08MNVVNCDNVW5EDF7",
+  "first_name": "Kimberlyn",
+  "last_name": "Antao",
+  "phone_number": "117-994-3392",
+  "role": "Estimator",
   "hire_date": "04-12-2024",
   "availability": true
 }, {
-  "id": "01KAM7ZK6BCA0B7T4TEEHSAACK",
-  "name": "Giusto",
-  "phone_number": "942-166-1284",
-  "role": "Construction Worker",
-  "hire_date": "03-05-2025",
+  "id": "01KAQRHTA1ADN73Q869GWDPQVR",
+  "first_name": "Theresita",
+  "last_name": "Kenvin",
+  "phone_number": "872-498-6522",
+  "role": "Engineer",
+  "hire_date": "27-02-2025",
   "availability": false
 }, {
-  "id": "01KAM7ZK6BG5Z11ZGF5RKNR4BF",
-  "name": "Justinn",
-  "phone_number": "808-209-8699",
-  "role": "Electrician",
-  "hire_date": "21-04-2025",
-  "availability": false
-}, {
-  "id": "01KAM7ZK6CBM57MGG78FZ5D8XH",
-  "name": "Bobbie",
-  "phone_number": "822-766-6654",
-  "role": "Construction Manager",
-  "hire_date": "18-08-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK6D1HPNHR7BGD1T9AK2",
-  "name": "Anthiathia",
-  "phone_number": "741-574-2124",
-  "role": "Construction Foreman",
-  "hire_date": "13-05-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK6EB05KB998G2V3E8R7",
-  "name": "Fraze",
-  "phone_number": "518-754-4169",
-  "role": "Construction Foreman",
-  "hire_date": "04-09-2025",
-  "availability": true
-}, {
-  "id": "01KAM7ZK6EKRTP3ZYA75SW5ZTK",
-  "name": "Staford",
-  "phone_number": "159-628-4118",
-  "role": "Subcontractor",
+  "id": "01KAQRHTA46PWKRMQHZSBVH01K",
+  "first_name": "Dwight",
+  "last_name": "Bergeon",
+  "phone_number": "876-810-0555",
+  "role": "Project Manager",
   "hire_date": "17-05-2025",
   "availability": true
 }, {
-  "id": "01KAM7ZK6FCAPXV09QW55WGS23",
-  "name": "Marcia",
-  "phone_number": "740-255-8888",
-  "role": "Construction Worker",
-  "hire_date": "14-05-2025",
+  "id": "01KAQRHTA668115MHE5C4YWW8N",
+  "first_name": "Savina",
+  "last_name": "Orritt",
+  "phone_number": "272-204-7124",
+  "role": "Project Manager",
+  "hire_date": "15-07-2025",
   "availability": true
+}, {
+  "id": "01KAQRHTA8FQMQNMXVKFWYQ9CX",
+  "first_name": "Lyndsey",
+  "last_name": "Fears",
+  "phone_number": "221-434-2135",
+  "role": "Construction Manager",
+  "hire_date": "18-06-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHTAAFWKKK632RCM1MY3V",
+  "first_name": "Lissy",
+  "last_name": "Eaden",
+  "phone_number": "632-217-3535",
+  "role": "Architect",
+  "hire_date": "18-03-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTACCEXDT3BMC6RD5ZQV",
+  "first_name": "Flora",
+  "last_name": "Burnham",
+  "phone_number": "636-374-9402",
+  "role": "Subcontractor",
+  "hire_date": "14-04-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHTAE1X65VXNGQ8THVCB7",
+  "first_name": "Ebonee",
+  "last_name": "Kornel",
+  "phone_number": "773-900-4854",
+  "role": "Construction Manager",
+  "hire_date": "16-06-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTAGKW7F4G0ZYD1KKATH",
+  "first_name": "Gusty",
+  "last_name": "Passe",
+  "phone_number": "266-974-5396",
+  "role": "Construction Manager",
+  "hire_date": "10-06-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTAHAGJS37Z6JVQW8SPZ",
+  "first_name": "Malvin",
+  "last_name": "Barthelemy",
+  "phone_number": "120-998-7214",
+  "role": "Project Manager",
+  "hire_date": "06-12-2024",
+  "availability": false
+}, {
+  "id": "01KAQRHTAK69ZM8389280Y65J9",
+  "first_name": "Earle",
+  "last_name": "Raggatt",
+  "phone_number": "645-670-8551",
+  "role": "Engineer",
+  "hire_date": "29-09-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHTANNTHXXBS3BABE61YN",
+  "first_name": "Stillmann",
+  "last_name": "Ruzicka",
+  "phone_number": "557-697-2554",
+  "role": "Surveyor",
+  "hire_date": "29-01-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTAQAV4Y92YS7BT32X60",
+  "first_name": "Sher",
+  "last_name": "Santer",
+  "phone_number": "289-274-6062",
+  "role": "Estimator",
+  "hire_date": "07-11-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHTAS098PZHRYHB2ABTH8",
+  "first_name": "Cortie",
+  "last_name": "Digwood",
+  "phone_number": "210-330-0924",
+  "role": "Subcontractor",
+  "hire_date": "11-07-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTATHE53A0KG3TTKRAJM",
+  "first_name": "Torey",
+  "last_name": "Egell",
+  "phone_number": "808-638-3382",
+  "role": "Construction Worker",
+  "hire_date": "02-03-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTAVNCVN68AYVMHP2XDS",
+  "first_name": "Nils",
+  "last_name": "Costello",
+  "phone_number": "976-931-6136",
+  "role": "Subcontractor",
+  "hire_date": "09-03-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTAWS34JV62F6TXC98RG",
+  "first_name": "Tiffy",
+  "last_name": "Buckhurst",
+  "phone_number": "960-698-6699",
+  "role": "Surveyor",
+  "hire_date": "06-07-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTAXP9SQ1FEVTYCF57B4",
+  "first_name": "Olivero",
+  "last_name": "Seldner",
+  "phone_number": "961-943-8570",
+  "role": "Engineer",
+  "hire_date": "19-03-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTAYM0WEYVZWKY7CX22A",
+  "first_name": "Bianca",
+  "last_name": "Frobisher",
+  "phone_number": "566-321-6339",
+  "role": "Project Manager",
+  "hire_date": "21-11-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHTB0WFWRGGPHZXVENTJD",
+  "first_name": "Leta",
+  "last_name": "Burrell",
+  "phone_number": "826-602-3053",
+  "role": "Construction Manager",
+  "hire_date": "22-02-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTB11SAY9RE8A0NVSKW3",
+  "first_name": "Normand",
+  "last_name": "Hamshere",
+  "phone_number": "615-682-9960",
+  "role": "Electrician",
+  "hire_date": "19-07-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTB29K4ZWQF8248HWE7M",
+  "first_name": "Hanna",
+  "last_name": "Leupold",
+  "phone_number": "239-697-0941",
+  "role": "Engineer",
+  "hire_date": "20-12-2024",
+  "availability": false
+}, {
+  "id": "01KAQRHTB3MGRRGE1SEPFCGJQ9",
+  "first_name": "Augustus",
+  "last_name": "Hadden",
+  "phone_number": "500-595-4874",
+  "role": "Construction Foreman",
+  "hire_date": "03-07-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTB5YHSR2WCJFJ9V4GE0",
+  "first_name": "Berte",
+  "last_name": "Boykett",
+  "phone_number": "902-427-5783",
+  "role": "Architect",
+  "hire_date": "29-03-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTB71DFRG36VK7ZPD26G",
+  "first_name": "Leta",
+  "last_name": "Dunmore",
+  "phone_number": "728-530-9954",
+  "role": "Estimator",
+  "hire_date": "15-07-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTB9P5TYESK3WF7XFXYK",
+  "first_name": "Codi",
+  "last_name": "Reary",
+  "phone_number": "896-144-8870",
+  "role": "Project Manager",
+  "hire_date": "18-12-2024",
+  "availability": false
+}, {
+  "id": "01KAQRHTBAP4KGS2XY1N48AJ10",
+  "first_name": "Ahmad",
+  "last_name": "Crepin",
+  "phone_number": "592-481-0002",
+  "role": "Estimator",
+  "hire_date": "23-12-2024",
+  "availability": false
+}, {
+  "id": "01KAQRHTBBV4EJXEW0MAABFEQR",
+  "first_name": "Merilee",
+  "last_name": "Gummory",
+  "phone_number": "136-455-0642",
+  "role": "Construction Manager",
+  "hire_date": "18-07-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHTBC2PY9MBG3XPH32JS1",
+  "first_name": "Lauritz",
+  "last_name": "Busby",
+  "phone_number": "451-339-9516",
+  "role": "Construction Foreman",
+  "hire_date": "11-08-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTBD7E1KWEK11PJE3N04",
+  "first_name": "Sarena",
+  "last_name": "Angood",
+  "phone_number": "704-385-6459",
+  "role": "Construction Expeditor",
+  "hire_date": "04-03-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTBEXHSX6NSAP30N24SX",
+  "first_name": "Curcio",
+  "last_name": "Fisk",
+  "phone_number": "109-484-7269",
+  "role": "Supervisor",
+  "hire_date": "29-08-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHTBFQM8QTFASDR1AK7MH",
+  "first_name": "Marisa",
+  "last_name": "Ordelt",
+  "phone_number": "690-593-4858",
+  "role": "Project Manager",
+  "hire_date": "11-12-2024",
+  "availability": true
+}, {
+  "id": "01KAQRHTBGB0NTGQCWVGBEF3F5",
+  "first_name": "Reamonn",
+  "last_name": "Colvie",
+  "phone_number": "915-179-6912",
+  "role": "Surveyor",
+  "hire_date": "25-07-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTBHCRVZMZJVC3VCHE3H",
+  "first_name": "Wyn",
+  "last_name": "Guille",
+  "phone_number": "322-665-0100",
+  "role": "Project Manager",
+  "hire_date": "19-03-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTBJ4YMK9M1RQXRMDGCJ",
+  "first_name": "Shirl",
+  "last_name": "Usborn",
+  "phone_number": "583-573-1960",
+  "role": "Construction Manager",
+  "hire_date": "24-09-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTBJ85WZ7CV7GDTAMGDY",
+  "first_name": "Pollyanna",
+  "last_name": "Goulbourn",
+  "phone_number": "768-749-0025",
+  "role": "Subcontractor",
+  "hire_date": "07-08-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHTBKE8K4E8F8N6X4BAHN",
+  "first_name": "Coraline",
+  "last_name": "Worral",
+  "phone_number": "759-646-7302",
+  "role": "Supervisor",
+  "hire_date": "25-09-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHTBMCG0AK34TQ7W64GSR",
+  "first_name": "Thane",
+  "last_name": "Hindenburg",
+  "phone_number": "541-793-7792",
+  "role": "Electrician",
+  "hire_date": "06-04-2025",
+  "availability": false
+}, {
+  "id": "01KAQRHTBNKCX6D5T3KGV12ZZ7",
+  "first_name": "Amabel",
+  "last_name": "Lamkin",
+  "phone_number": "902-175-3723",
+  "role": "Supervisor",
+  "hire_date": "20-02-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTBPFTVP7JE6D952JHEA",
+  "first_name": "Elset",
+  "last_name": "Pocke",
+  "phone_number": "380-526-4954",
+  "role": "Estimator",
+  "hire_date": "28-10-2025",
+  "availability": true
+}, {
+  "id": "01KAQRHTBQ8MVV109X0QFZKCPA",
+  "first_name": "Bernarr",
+  "last_name": "Consadine",
+  "phone_number": "817-137-8839",
+  "role": "Project Manager",
+  "hire_date": "01-01-2025",
+  "availability": false
 }]
