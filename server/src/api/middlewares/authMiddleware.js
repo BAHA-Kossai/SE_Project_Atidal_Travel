@@ -46,6 +46,21 @@ export const requireSuperAdmin = (req, res, next) => {
   next();
 };
 
+/**
+ * Middleware to ensure the user is a Admin or super admin
+ */
+export const requireAdmin_or_SuperAdmin = (req, res, next) => {
+
+  if (!req.user || (req.user.type !== 'SUPER_ADMIN'&&req.user.type !== 'ADMIN')) {
+    return res.status(403).json({
+      status: "error",
+      data: {},
+      message: "Forbidden: Only admins or super admin can perform this action"
+    });
+  }
+  next();
+};
+
 
 
 

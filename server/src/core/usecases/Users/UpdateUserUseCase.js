@@ -18,82 +18,9 @@
  *              - Throws errors for invalid data, missing user, or database issues.
  */
 
-import { UpdateUserValidator } from "../../../api/validators/UpdateUserValidator.js";
-import supabase,{supabaseAdmin} from '../../../config/supabase.js';
-import UserRepository from "../../../repositories/userRepository.js";
+import { UpdateUserValidator } from "../../../api/validators/User/UpdateUserValidator.js";
+import supabase from '../../../config/supabase.js';
 import User from "../../entities/Users.js";
-
-// class UpdateUserUseCase {
-//   constructor(userRepository) {
-//     this.userRepository = userRepository;
-//   }
-
-//   async updateInfo(authUser, data) {
-//     // Validate input
-//     const errors = UpdateUserValidator.validate(data);
-//     if (errors.length > 0) throw { status: 400, message: errors.join("\n ") };
-
-//     // Find user in internal database using the one from token
-//     const existingUser = await this.userRepository.findByEmail(authUser.email);
-
-//     if (!existingUser) {
-//       throw { status: 404, message: "User not found." };
-//     }
-
-//     // Detect if email changed
-//     const emailChanged = data.email && data.email !== existingUser.email;
-
-//     // Build updated user model for DB
-//     const updatedUser = new User({
-//       ...data,
-//       // Important fields preserved
-//       created_at: existingUser.created_at,
-//       user_id: existingUser.user_id,
-//       supabase_id: existingUser.supabase_id,
-//       password_hash: existingUser.password_hash,
-//       type: existingUser.type
-//     });
-
-//     // Update Supabase Auth metadata
-//     const supabasePayload = {
-//       user_metadata: {
-
-//         first_name: data.first_name,
-//         last_name: data.last_name,
-//         phone: data.phone,
-//         date_of_birth: data.date_of_birth,
-//         type: existingUser.type,
-//         email_verified: false
-//       }
-//     };
-
-//     // If email changed, update primary Supabase email too
-//     if (emailChanged) {
-//       supabasePayload.email = data.email;
-//     }
-
-//     const { data: supabaseUpdate, error } =
-//       await supabaseAdmin.auth.admin.updateUserById(
-//         existingUser.supabase_id,
-//         supabasePayload
-//       );
-
-//     if (error) {
-//       throw { status: 500, message: "Failed to update Supabase auth", detail: error.message };
-//     }
-   
-//     const {updated_at,password,user_id,created_at,supabase_id,type,...cleanUpdatedtUser} = updatedUser;
-//     // Update internal database
-//     await this.userRepository.updateUser(existingUser.user_id, cleanUpdatedtUser);
-
-//     return {
-//       status: 200,
-//       message: "User updated successfully",
-//       data: updatedUser
-//     };
-//   }
-// }
-
 
 class UpdateUserUseCase {
   constructor(userRepository) {

@@ -11,7 +11,7 @@
  */
 
 import {supabaseAdmin} from '../../../config/supabase.js';
-import UserRepository from '../../../repositories/userRepository.js';
+
 
 class DeleteUserUseCase {
   constructor(userRepository) {

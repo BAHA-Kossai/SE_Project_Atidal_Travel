@@ -15,7 +15,7 @@
 import UserRepository from "../../../repositories/userRepository.js";
 import supabase from "../../../config/supabase.js";
 import { comparePassword } from "../../../utils/formValidation.js";
-import { LogInValidator } from "../../../api/validators/LogInValidator.js";
+import { LogInValidator } from "../../../api/validators/auth/LogInValidator.js";
 
 
 class LoginUseCase {

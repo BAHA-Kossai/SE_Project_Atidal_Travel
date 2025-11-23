@@ -23,7 +23,7 @@ import {
   validateEmail,
   validatePassword,
   validateBirthDate,
-} from "../../utils/formValidation.js";
+} from "../../../utils/formValidation.js";
 
 /**
  * Validate Update user info input fields.

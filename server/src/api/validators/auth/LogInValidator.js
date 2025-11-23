@@ -12,7 +12,7 @@
  *              - No database access or business logic here.
  */
 
-import { validateEmail, validatePassword } from "../../utils/formValidation.js";
+import { validateEmail, validatePassword } from "../../../utils/formValidation.js";
 
 class LogInValidator {
   /**

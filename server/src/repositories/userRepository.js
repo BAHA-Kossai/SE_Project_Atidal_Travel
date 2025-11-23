@@ -32,6 +32,7 @@
 
 import BaseRepository from "./baseRepository.js";
 import { hashPassword } from "../utils/formValidation.js";
+import { supabaseAdmin } from "../config/supabase.js";
 class UserRepository extends BaseRepository {
   constructor(supabaseClient) {
     super(supabaseClient, "Users");
@@ -231,7 +232,7 @@ class UserRepository extends BaseRepository {
       });
 
     if (error) throw { status: 500, message: error.message };
-
+      superAdminUser.supabase_id = supabaseUser.id;
     // Save in DB
     const dbUser = await this.createUser(superAdminUser);
 

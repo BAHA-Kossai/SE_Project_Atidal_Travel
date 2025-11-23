@@ -21,7 +21,7 @@
 
 import User from "../../entities/Users.js";
 import { hashPassword } from "../../../utils/formValidation.js";
-import { SignUpWithEmailValidator } from "../../../api/validators/SignUpValidator.js";
+import { SignUpWithEmailValidator } from "../../../api/validators/auth/SignUpValidator.js";
 
 class SignUpUseCase {
   constructor(userRepository) {

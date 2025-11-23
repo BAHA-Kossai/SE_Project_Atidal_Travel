@@ -23,7 +23,7 @@ import {
   validateEmail,
   validatePassword,
   validateBirthDate,
-} from "../../utils/formValidation.js";
+} from "../../../utils/formValidation.js";
 
 /**
  * Validate Sign-Up input fields for email registration.
