@@ -55,7 +55,7 @@ class DestinationsRepository extends BaseRepository {
   }
 
   updateDestination(id, updates) {
-    // Optional: add updated_at if you have such a column
+   
     const updatedRecord = {
       ...updates,
       updated_at: new Date().toISOString(),

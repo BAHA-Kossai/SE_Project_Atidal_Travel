@@ -11,6 +11,7 @@
  * @notes       - This file contains only database access logic.
  *              - No business logic should be placed here.
  *              - All methods return data or throw errors from Supabase.
+ *              - Data retuned is an object {prop1: ...  ,prop2: ...}
  * 
  * Usage Example:
  * 
@@ -44,7 +45,7 @@ class BaseRepository {
       .from(this.table)
       .select('*')
       .eq(primary_key, id)
-      .single();
+      .maybeSingle();
     if (error) throw error;
     return data;
   }
