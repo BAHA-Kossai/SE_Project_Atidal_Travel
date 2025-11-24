@@ -4,9 +4,8 @@ import authRouter from './api/routes/authRoutes.js';
 import adminRouter from './api/routes/adminRoutes.js'; 
 import userRouter from './api/routes/userRoutes.js';
 import guideRouter from './api/routes/guideRoutes.js';
-import UserRepository from './repositories/userRepository.js';
+import BookingRouter from './api/routes/BookingRoute.js';
 import cors from 'cors'; 
-import { supabaseAdmin } from './config/supabase.js';
 const app = express();
 
 // Enable CORS for your frontend
@@ -24,7 +23,7 @@ app.use('/api/auth', authRouter);          // Auth routes: signup/signin
 app.use('/api/admin', adminRouter);    // Admin management routes: create admin
 app.use('/api/user',userRouter ); 
 app.use('/api/guide',guideRouter);
-
+app.use('/api/bookings',BookingRouter);
 // Simple health check
 app.get('/', (req, res) => {
   res.json({ status: 'success', message: 'Server is running' });

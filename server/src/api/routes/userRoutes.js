@@ -1,11 +1,33 @@
 import express from "express";
-import { verifySupabaseToken } from "../middlewares/authMiddleware.js";
-import { updateUserController } from "../controllers/userController.js";
-import { deleteUserController } from "../controllers/userController.js";
+import {
+  verifySupabaseToken,
+  requireSuperAdmin,
+} from "../middlewares/authMiddleware.js";
+import {
+  updateUserController,
+  deleteUserController,
+  readUserController,
+  changePasswordController,
+  readAdminsController,
+} from "../controllers/userController.js";
+
 const router = express.Router();
 
 // PUT /api/user/update-profile
 router.put("/update-profile", verifySupabaseToken, updateUserController);
 // DELETE /api/user/delete-profile
-router.delete("/delete-profile", verifySupabaseToken,deleteUserController );
+router.delete("/delete-profile", verifySupabaseToken, deleteUserController);
+// GET /api/user/me - logged-in user's profile
+router.get("/me", verifySupabaseToken, readUserController);
+// PATCH /api/users/change-password
+router.patch("/change-password", verifySupabaseToken, changePasswordController);
+
+// GET /api/users/admins
+// Only accessible to SUPER_ADMIN users
+router.get(
+  "/admins",
+  verifySupabaseToken,
+  requireSuperAdmin,
+  readAdminsController
+);
 export default router;

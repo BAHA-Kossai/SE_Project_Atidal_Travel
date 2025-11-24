@@ -85,6 +85,22 @@ class BranchesRepository extends BaseRepository {
     if (error) throw error;
     return data;
   }
+
+  /**
+ * Check if a branch exists by ID
+ * @param {number} branch_id
+ * @returns {boolean} true if exists, false otherwise
+ */
+async exists(branch_id) {
+  const { data, error } = await this.supabase
+    .from(this.table)
+    .select('branch_id')
+    .eq(this.primaryKey, branch_id)
+    .maybeSingle();
+
+  if (error) throw error;
+  return !!data; // true if branch exists
+}
 }
 
 export default BranchesRepository;

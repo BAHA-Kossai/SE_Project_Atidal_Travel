@@ -124,12 +124,13 @@ class UserRepository extends BaseRepository {
    * @throws {Object} Error object with status and message
    */
   async registerAuthUser(userData) {
+    const {password,password_hash,...userWithoutpass} = userData;
     const { data: authData, error } = await this.supabase.auth.signUp({
       email: userData.email,
       password: userData.password,
       options: {
         emailRedirectTo: "http://localhost:5173/",
-        data: userData, // store full user object in metadata
+        data: userWithoutpass, // store full user object in metadata
       },
     });
 

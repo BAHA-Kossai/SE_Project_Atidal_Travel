@@ -18,7 +18,6 @@
 import UserRepository from "../../../repositories/userRepository.js";
 import { validateEmail } from "../../../utils/formValidation.js";
 import supabase from "../../../config/supabase.js";
-import { createClient } from "@supabase/supabase-js";
 import { supabaseAdmin } from "../../../config/supabase.js";
 import { hashPassword } from "../../../utils/formValidation.js";
 
@@ -71,7 +70,6 @@ class ForgotPasswordUseCase {
 }
 
 export default ForgotPasswordUseCase;
-
 
 class ResetPasswordUseCase {
   constructor(userRepository) {

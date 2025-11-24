@@ -12,6 +12,7 @@
 import CreateGuideUseCase from "../../core/usecases/Guide/GuideCreateUseCase.js";
 import UpdateGuideUseCase from "../../core/usecases/Guide/GuideUpdateUseCase.js";
 import GuideDeleteUseCase from "../../core/usecases/Guide/GuideDeleteUseCase.js";
+import GuideReadUseCase from "../../core/usecases/Guide/GuideReadUseCase.js";
 import GuideRepository from "../../repositories/guideRepository.js";
 import supabase from "../../config/supabase.js";
 // Initialize repository and use case
@@ -80,6 +81,28 @@ export const deleteGuideController = async (req, res) => {
     const guideId = req.params.id;
 
     const result = await guideDeleteUseCase.execute(admin, guideId);
+
+    return res.status(200).json({
+      status: "success",
+      data: result,
+    });
+  } catch (err) {
+    return res.status(err.status || 500).json({
+      status: "error",
+      data: {},
+      message: err.message || "Internal Server Error",
+    });
+  }
+};
+
+export const readGuideController = async (req, res) => {
+  const readUseCase = new GuideReadUseCase(guideRepo);
+
+  try {
+    const single = !!req.params.id; //     not(not(null)) = not(true) = false (faster way to check :D)
+    const id = req.params.id ? Number(req.params.id) : null;
+
+    const result = await readUseCase.execute({ single, id });
 
     return res.status(200).json({
       status: "success",
