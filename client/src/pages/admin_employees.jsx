@@ -10,6 +10,7 @@ import {ArrowUpDown, Plus, SlidersHorizontal} from "lucide-react";
 import mock_employees from "../mock-employees.json"
 import ModalDialog from "../components/ModalDialog.jsx";
 import InputField from "../components/InputField.jsx";
+import ButtonSwitch from "../components/ButtonSwitch.jsx";
 
 export default function AdminEmployees() {
     // Employee Modal
@@ -25,6 +26,9 @@ export default function AdminEmployees() {
     const [employeeBranchName, setEmployeeBranchName] = useState("");
     const [employeeStatus, setEmployeeStatus] = useState(false);
     const [isSubmit, setIsSubmit] = useState(false);
+
+    // Admin/Guide Buttons
+    const [adminSelectedButton, setAdminSelectedButton] = useState(true)
     // Errors
     const [errors, setErrors] = useState({});
 
@@ -167,7 +171,12 @@ export default function AdminEmployees() {
                 open={isAddEmployeeModalOpen}
             >
 
-                {/* Employee Modal Form */}
+                <div className={"grid grid-cols-2 gap-4 mb-5"}>
+                    <ButtonSwitch isSelected={adminSelectedButton} onClick={() => setAdminSelectedButton(true)}>Admin</ButtonSwitch>
+                    <ButtonSwitch isSelected={!adminSelectedButton} onClick={() => setAdminSelectedButton(false)}>Guide</ButtonSwitch>
+                </div>
+
+                {/* Form */}
                 <form onSubmit={handleSubmit}>
                     {/* Personal Information */}
                     <h1 className={"text-xl"}>
@@ -176,9 +185,17 @@ export default function AdminEmployees() {
                     <div className={"grid grid-cols-2 gap-4 mb-7"}>
                         <InputField error={errors["first_name"]} label={"First name"} type="text" onChange={e => setEmployeeFirstName(e.target.value)}/>
                         <InputField error={errors["last_name"]} label={"Last name"} type="text" onChange={e => setEmployeeLastName(e.target.value)}/>
-                        <InputField error={errors["email"]} label={"Email"} type="text" onChange={e => setEmployeeEmail(e.target.value)}/>
                         <InputField error={errors["phone_number"]} label={"Phone number"} type="text" onChange={e => setEmployeePhoneNumber(e.target.value)}/>
                         <InputField error={errors["date_of_birth"]} label={"Date of birth"} type="date" onChange={e => setEmployeeDateOfBirth(e.target.value)}/>
+                        {
+                            adminSelectedButton ?
+                            <>
+                                <InputField error={errors["email"]} label={"Email"} type="text"/>
+                                <InputField error={errors["password"]} label={"Password"} type="password"/>
+                            </>
+                                :
+                                <InputField className={"col-span-2"} error={errors["date_of_birth"]} label={"Experience"} type="text area" onChange={e => setEmployeeDateOfBirth(e.target.value)}/>
+                        }
                     </div>
 
 
@@ -187,7 +204,6 @@ export default function AdminEmployees() {
                         Employment Details
                     </h1>
                     <div className={"grid grid-cols-2 gap-4 mb-7"}>
-                        <InputField error={errors["role"]} label={"Role"} type="text" onChange={(e) => setEmployeeRole(e.target.value)}/>
                         <InputField error={errors["hire_date"]} label={"Hire date"} type="date" onChange={e => setEmployeeHireDate(e.target.value)}/>
                         <InputField error={errors["branch_name"]} label={"Branch name"} type="text" onChange={e => setEmployeeBranchName(e.target.value)}/>
                         <InputField
@@ -202,13 +218,7 @@ export default function AdminEmployees() {
 
 
                     {/* Add/Cancel Buttons */}
-                    <div className={"flex flex-row justify-center w-full"}>
-                        <ButtonOutline
-                            width="full"
-                            onClick={() => setIsAddEmployeeModalOpen(false)}
-                        >
-                            Cancel
-                        </ButtonOutline>
+                    <div className={"grid grid-cols-2 gap-4"}>
                         <ButtonFill
                             width="full"
                             onClick={
@@ -217,7 +227,13 @@ export default function AdminEmployees() {
                                     employeeRole, employeeHireDate, employeeBranchName, employeeStatus
                                 )
                             }
-                        >Add Employee</ButtonFill>
+                        >
+                            Add Employee</ButtonFill>
+                        <ButtonOutline
+                            width="full"
+                            onClick={() => setIsAddEmployeeModalOpen(false)}
+                        >
+                            Cancel</ButtonOutline>
                     </div>
                 </form>
             </ModalDialog>
