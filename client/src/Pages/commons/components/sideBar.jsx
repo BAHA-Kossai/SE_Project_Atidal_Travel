@@ -17,7 +17,7 @@
 
 import React, { useState ,useEffect} from 'react';
 import { Menu, X, Bell, Search, Home, Calendar, Users, UserCheck, Plane, Building2,BookOpen } from 'lucide-react';
-import '../../../styles/appbar.css';
+import '../../../styles/appBar.css';
 
 // Sidebar Component
 export const Sidebar = ({ isOpen, onClose }) => {

@@ -16,7 +16,7 @@
  */
 
 import React, { useState ,useEffect} from 'react';
-import '../../../styles/appbar.css';
+import '../../../styles/appBar.css';
 import {AppBar} from  './appBar.jsx';
 import { Sidebar } from './sideBar.jsx';
 
