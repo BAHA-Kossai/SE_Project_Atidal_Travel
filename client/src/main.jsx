@@ -4,6 +4,9 @@ import AdminSettings from './pages/admin_settings.jsx';
 import AdminDestinations from "./pages/admin_destinations.jsx";
 import AdminEmployees from "./pages/admin_employees.jsx";
 import {AdminDashboard} from "./pages/admin_dashboard/admin_dashboard.jsx";
+import Login from "./pages/authentication/login.jsx";
+import ForgotPassword from './Pages/Authentication/ForgotPassword.jsx';
+import ResetPassword from './Pages/Authentication/ResetPassword.jsx';
 
 
 const rootElement = document.getElementById('root');
@@ -11,6 +14,9 @@ const rootElement = document.getElementById('root');
 createRoot(rootElement).render(
     <BrowserRouter>
         <Routes>
+            <Route path="/reset-password" element={<ResetPassword/>} />
+            <Route path="/forgot-password" element={<ForgotPassword/>} />
+            <Route path="/login" element={<Login/>} />
             <Route path="/admin-dashboard" element={<AdminDashboard/>} />
             <Route path="/admin-settings" element={<AdminSettings/>} />
             <Route path="/admin-destinations" element={<AdminDestinations/>} />
