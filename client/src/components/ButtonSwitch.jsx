@@ -12,7 +12,7 @@ export default function ButtonSwitch({onClick, className, style, width = 15, chi
                 isSelected ? 
                     'bg-blue-50 border-(--color-primary) text-(--color-primary)' 
                     : 
-                    'bg-transparent border-gray-400 text-gray-400'}
+                    'bg-transparent border-gray-300 text-gray-300'}
             font-medium
             transition-colors duration-100 ease-in-out
             ${className}

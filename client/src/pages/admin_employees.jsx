@@ -13,18 +13,27 @@ import InputField from "../components/InputField.jsx";
 import ButtonSwitch from "../components/ButtonSwitch.jsx";
 
 export default function AdminEmployees() {
-    // Employee Modal
+    // New/Edit/Delete Employee Modals
+    const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [isAddEmployeeModalOpen, setIsAddEmployeeModalOpen] = useState(false);
-    // Employee Credentials
-    const [employeeFirstName, setEmployeeFirstName] = useState("");
-    const [employeeLastName, setEmployeeLastName] = useState("");
-    const [employeeEmail, setEmployeeEmail] = useState("");
-    const [employeePhoneNumber, setEmployeePhoneNumber] = useState("");
-    const [employeeDateOfBirth, setEmployeeDateOfBirth] = useState("");
-    const [employeeRole, setEmployeeRole] = useState("");
-    const [employeeHireDate, setEmployeeHireDate] = useState("");
-    const [employeeBranchName, setEmployeeBranchName] = useState("");
-    const [employeeStatus, setEmployeeStatus] = useState(false);
+    const [isEditEmployeeModalOpen, setIsEditEmployeeModalOpen] = useState(false);
+    const [isDeleteEmployeeModalOpen, setIsDeleteEmployeeModalOpen] = useState(false);
+    // Employee Form Credentials
+    const [employeeForm, setEmployeeForm] = useState({
+        first_name: "",
+        last_name: "",
+        phone_number: "",
+        role: "",
+        hire_date: "",
+        availability: false,
+    });
+
+    const handleFormChange = e => {
+        setEmployeeForm({
+            ...employeeForm,
+            [e.target.name]: e.target.value,
+        })
+    }
     const [isSubmit, setIsSubmit] = useState(false);
 
     // Admin/Guide Buttons
@@ -33,54 +42,54 @@ export default function AdminEmployees() {
     const [errors, setErrors] = useState({});
 
 
-    const AddEmployee = (first_name, last_name, phone_number, date_of_birth, role, hire_date, branch_name, status) => {
+    const AddEmployee = (employee) => {
         console.log("Employee Added Successfully!");
-        console.log(first_name, last_name, phone_number, date_of_birth, role, hire_date, branch_name, status);
+        console.log(employee);
     }
 
 
-    const validateSubmission = () => {
-        const errors = {}
-
-        const firstNameLastNameRegex = /^[A-Za-z]+$/;
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-        // First name
-        if (!employeeFirstName) {
-            errors["first_name"] = "First name is required";
-        }
-        else if (!firstNameLastNameRegex.test(employeeFirstName)) {
-            errors["first_name"] = "First name should not contain any digits or special characters";
-        }
-
-        // Last name
-        if (!employeeLastName) {
-            errors["last_name"] = "Last name is required";
-        }
-        else if (!firstNameLastNameRegex.test(employeeLastName)) {
-            errors["last_name"] = "Last name should not contain any digits or special characters";
-        }
-
-        // Email
-        if (!employeeEmail) {
-            errors["email"] = "Email name is required";
-        }
-        else if (!emailRegex.test(employeeEmail)) {
-            errors["email"] = "Invalid Email";
-        }
-
-        return errors;
-    }
+    // const validateSubmission = () => {
+    //     const errors = {}
+    //
+    //     const firstNameLastNameRegex = /^[A-Za-z]+$/;
+    //     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    //
+    //     // First name
+    //     if (!employeeFirstName) {
+    //         errors["first_name"] = "First name is required";
+    //     }
+    //     else if (!firstNameLastNameRegex.test(employeeFirstName)) {
+    //         errors["first_name"] = "First name should not contain any digits or special characters";
+    //     }
+    //
+    //     // Last name
+    //     if (!employeeLastName) {
+    //         errors["last_name"] = "Last name is required";
+    //     }
+    //     else if (!firstNameLastNameRegex.test(employeeLastName)) {
+    //         errors["last_name"] = "Last name should not contain any digits or special characters";
+    //     }
+    //
+    //     // Email
+    //     if (!employeeEmail) {
+    //         errors["email"] = "Email name is required";
+    //     }
+    //     else if (!emailRegex.test(employeeEmail)) {
+    //         errors["email"] = "Invalid Email";
+    //     }
+    //
+    //     return errors;
+    // }
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        setErrors(validateSubmission());
+        // setErrors(validateSubmission());
         setIsSubmit(true);
 
         if (Object.keys(errors).length === 0 && isSubmit) {
             // Add employee entry and close modal
             AddEmployee()
-            setIsAddEmployeeModalOpen(false)
+            setIsDeleteEmployeeModalOpen(false)
         }
     }
 
@@ -111,6 +120,20 @@ export default function AdminEmployees() {
                         </div>
                     </div>
                 <Table
+                    onEdit={
+                        (employee) => // employee gets sent by the Table component
+                        {
+                            setSelectedEmployee(employee)
+                            setIsEditEmployeeModalOpen(true)
+                        }
+                    }
+                    onDelete={
+                        (employee) => // employee gets sent by the Table component
+                        {
+                            setSelectedEmployee(employee)
+                            setIsDeleteEmployeeModalOpen(true)
+                        }
+                    }
                     columns={[
                         {
                             title: "ID",
@@ -165,6 +188,7 @@ export default function AdminEmployees() {
                 />
             </WhiteContainer>
 
+            {/* New Employee Modal */}
             <ModalDialog
                 title={"New Employee"}
                 description={"Add an employee to the team"}
@@ -183,10 +207,10 @@ export default function AdminEmployees() {
                         Personal Information
                     </h1>
                     <div className={"grid grid-cols-2 gap-4 mb-7"}>
-                        <InputField error={errors["first_name"]} label={"First name"} type="text" onChange={e => setEmployeeFirstName(e.target.value)}/>
-                        <InputField error={errors["last_name"]} label={"Last name"} type="text" onChange={e => setEmployeeLastName(e.target.value)}/>
-                        <InputField error={errors["phone_number"]} label={"Phone number"} type="text" onChange={e => setEmployeePhoneNumber(e.target.value)}/>
-                        <InputField error={errors["date_of_birth"]} label={"Date of birth"} type="date" onChange={e => setEmployeeDateOfBirth(e.target.value)}/>
+                        <InputField name={"first_name"} error={errors["first_name"]} label={"First name"} type="text" onChange={handleFormChange}/>
+                        <InputField name={"last_name"} error={errors["last_name"]} label={"Last name"} type="text" onChange={handleFormChange}/>
+                        <InputField name={"phone_number"} error={errors["phone_number"]} label={"Phone number"} type="text" onChange={handleFormChange}/>
+                        <InputField name={"date_of_birth"} error={errors["date_of_birth"]} label={"Date of birth"} type="date" onChange={handleFormChange}/>
                         {
                             adminSelectedButton ?
                             <>
@@ -194,7 +218,7 @@ export default function AdminEmployees() {
                                 <InputField error={errors["password"]} label={"Password"} type="password"/>
                             </>
                                 :
-                                <InputField className={"col-span-2"} error={errors["date_of_birth"]} label={"Experience"} type="text area" onChange={e => setEmployeeDateOfBirth(e.target.value)}/>
+                                <InputField className={"col-span-2"} error={errors["date_of_birth"]} label={"Experience"} type="text area" onChange={handleFormChange}/>
                         }
                     </div>
 
@@ -204,8 +228,8 @@ export default function AdminEmployees() {
                         Employment Details
                     </h1>
                     <div className={"grid grid-cols-2 gap-4 mb-7"}>
-                        <InputField error={errors["hire_date"]} label={"Hire date"} type="date" onChange={e => setEmployeeHireDate(e.target.value)}/>
-                        <InputField error={errors["branch_name"]} label={"Branch name"} type="text" onChange={e => setEmployeeBranchName(e.target.value)}/>
+                        <InputField error={errors["hire_date"]} label={"Hire date"} type="date" onChange={handleFormChange}/>
+                        <InputField error={errors["branch_name"]} label={"Branch name"} type="text" onChange={handleFormChange}/>
                         <InputField
                             label={"Status"}
                             type="select"
@@ -213,7 +237,7 @@ export default function AdminEmployees() {
                                 {name: "Available", value: true},
                                 {name: "Not Available", value: false}
                             ]}
-                            onChange={e => setEmployeeStatus(e.target.value)}/>
+                            onChange={handleFormChange}/>
                     </div>
 
 
@@ -222,20 +246,78 @@ export default function AdminEmployees() {
                         <ButtonFill
                             width="full"
                             onClick={
-                                () => AddEmployee(
-                                    employeeFirstName, employeeLastName, employeePhoneNumber, employeeDateOfBirth,
-                                    employeeRole, employeeHireDate, employeeBranchName, employeeStatus
-                                )
+                                () => AddEmployee(employeeForm)
                             }
                         >
                             Add Employee</ButtonFill>
                         <ButtonOutline
                             width="full"
-                            onClick={() => setIsAddEmployeeModalOpen(false)}
+                            onClick={() => setIsDeleteEmployeeModalOpen(false)}
                         >
                             Cancel</ButtonOutline>
                     </div>
                 </form>
+            </ModalDialog>
+
+            {/* Edit Employee Modal */}
+            <ModalDialog
+                title={`Edit Employee ${selectedEmployee?.id ?? ""}`}
+                open={isEditEmployeeModalOpen}
+            >
+                <div className={"grid grid-cols-2 gap-4"}>
+                    <InputField
+                        label={"First name"}
+                        disabled={false}
+                        value={selectedEmployee?.["first_name"]}
+                        />
+                    <InputField
+                        label={"Last name"}
+                        disabled={false}
+                        value={selectedEmployee?.["last_name"]}
+                    />
+                    <InputField
+                        label={"Phone number"}
+                        disabled={false}
+                        value={selectedEmployee?.["phone_number"]}
+                    />
+                    <InputField
+                        label={"Role"}
+                        disabled={false}
+                        value={selectedEmployee?.["role"]}
+                    />
+                    <InputField
+                        label={"Hire date"}
+                        disabled={false}
+                        value={selectedEmployee?.["hire_date"]}
+                    />
+                    <InputField
+                        label={"Availability"}
+                        disabled={false}
+                        value={selectedEmployee?.["availability"]}
+                    />
+                </div>
+                <ButtonOutline onClick={() => setIsEditEmployeeModalOpen(false)}>Cancel</ButtonOutline>
+            </ModalDialog>
+
+            {/* Delete Employee Modal */}
+            <ModalDialog
+                open={isDeleteEmployeeModalOpen}
+            >
+                <div className={"text-center text-xl"}>
+                    <h1>
+                        Are you sure that you want to delete the employee with ID
+                    </h1>
+                    <span className={"text-(--color-text-secondary)"}>
+                    {selectedEmployee?.id}
+                    </span>
+                    <h1>
+                        This action cannot be undone
+                    </h1>
+                </div>
+                <div className={"grid grid-cols-2 gap-4 mt-8"}>
+                    <ButtonFill>Yes</ButtonFill>
+                    <ButtonOutline onClick={() => setIsDeleteEmployeeModalOpen(false)}>No</ButtonOutline>
+                </div>
             </ModalDialog>
         </AppBarSideBarWithContent>
     )

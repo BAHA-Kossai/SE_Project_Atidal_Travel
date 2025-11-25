@@ -22,6 +22,7 @@ export default function InputField(props) {
                     <input
                         type={props.type}
                         disabled={props.disabled}
+                        name={props.name}
                         value={props.value}
                         className={`border-1 py-3 px-3 border-gray-500 rounded-lg w-${props.width} max-w-${props.fieldMaxWidth}`}
                         onChange={props.onChange}

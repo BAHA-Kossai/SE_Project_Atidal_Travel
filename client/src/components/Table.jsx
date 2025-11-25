@@ -1,7 +1,7 @@
 import {Edit, Trash2, ChevronLeft, ChevronRight} from "lucide-react";
 import {useMemo, useState} from "react";
 
-export default function Table({columns = [],  data = []}) {
+export default function Table({columns = [],  data = [], onEdit, onDelete}) {
     /*
     Dynamic Table component:
 
@@ -11,15 +11,20 @@ export default function Table({columns = [],  data = []}) {
     @param data
     the actual content of the table
     */
+
     const iconClass = "hover:text-gray-600 duration-100 cursor-pointer"
 
+    // Pagination
     const [currentPage, setCurrentPage] = useState(1);
     const pageSize = 7
-
-    const paginatedRows = useMemo(() => {
-        const start = currentPage * pageSize;
-        return data.slice(start, start + pageSize);
-    }, [data, currentPage, pageSize]);
+    const paginatedRows = useMemo(
+        () =>
+        {
+            const start = currentPage * pageSize;
+            return data.slice(start, start + pageSize);
+        }
+        , [data, currentPage, pageSize]
+    );
 
     const totalPages = Math.ceil(data.length / pageSize);
 
@@ -67,8 +72,18 @@ export default function Table({columns = [],  data = []}) {
                                     {/* Actions */}
                                     <td className={"text-gray-400 text-center"}>
                                         <div className={"flex flex-row justify-around"}>
-                                            <Edit className={iconClass}/>
-                                            <Trash2 className={`${iconClass} hover:text-red-700`}/>
+                                            <Edit
+                                                onClick={
+                                                    () => onEdit(item) // pass the object so that it gets stored by the parent component
+                                                }
+                                                className={iconClass}
+                                            />
+                                            <Trash2
+                                                onClick={
+                                                    () => onDelete(item) // pass the object so that it gets stored by the parent component
+                                                }
+                                                className={`${iconClass} hover:text-red-700`}
+                                            />
                                         </div>
                                     </td>
                                 </tr>
