@@ -105,40 +105,6 @@ class BookingsRepository extends BaseRepository {
     return data;
   }
 
-  // Find bookings within a date range
-  async findBookingsByDateRange(startDate, endDate) {
-    const { data, error } = await this.supabase
-      .from(this.table)
-      .select('*')
-      .gte('departure_time', startDate)
-      .lte('returning_time', endDate);
-    if (error) throw error;
-    return data;
-  }
-
-  // Find upcoming bookings (future check-ins)
-  async getUpcomingBookings() {
-    const today = new Date().toISOString().split('T')[0];
-    const { data, error } = await this.supabase
-      .from(this.table)
-      .select('*')
-      .gte('departure_time', today);
-    if (error) throw error;
-    return data;
-  }
-
-  // Find upcoming bookings by type
-  async getUpcomingBookingsByType(bookingType) {
-    const today = new Date().toISOString().split('T')[0];
-    const { data, error } = await this.supabase
-      .from(this.table)
-      .select('*')
-      .eq('_type', bookingType)
-      .gte('departure_time', today);
-    if (error) throw error;
-    return data;
-  }
-
   // Update booking status
   async updateBookingStatus(id, status) {
     const { data, error } = await this.supabase
@@ -181,6 +147,42 @@ class BookingsRepository extends BaseRepository {
     if (error) throw error;
     return { data, totalCount: count };
   }
+
+  // Get bookings by type with status filter and limit
+  async getBookingsByTypeAndStatus(bookingType, status = 'draft', limit = null) {
+    let query;
+    
+    // For guided_trip type, join with guided_trips table
+    if (bookingType === 'guided_trip' || bookingType === 'umrah') {
+      query = this.supabase
+        .from(this.table)
+        .select(`
+          *,
+          Guided_trips (*)
+        `)
+        .eq('type', bookingType)
+        .eq('booking_status', status);
+    } else {
+      // For other booking types, use normal select
+      query = this.supabase
+        .from(this.table)
+        .select('*')
+        .eq('type', bookingType)
+        .eq('booking_status', status);
+    }
+
+    // Add limit if specified
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data;
+  }
+
+
+
 }
 
 export default BookingsRepository;

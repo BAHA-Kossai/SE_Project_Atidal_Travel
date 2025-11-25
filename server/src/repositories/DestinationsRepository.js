@@ -88,6 +88,17 @@ class DestinationsRepository extends BaseRepository {
     if (error) throw error;
     return data;
   }
+  // Get limited number of destinations
+  async getDestinationsWithLimit(limit = 3) {
+    const { data, error } = await this.supabase
+      .from(this.table)
+      .select('*')
+      .limit(limit)
+      .order('destination_id', { ascending: true }); 
+    
+    if (error) throw error;
+    return data;
+  }
 
 }
 

@@ -5,5 +5,7 @@ const router = express.Router();
 
 router.post('/', bookingsController.createBooking);
 router.get('/user/:userId', bookingsController.getUserBookings);
+router.get('/type/:type', bookingsController.getBookingsByType);
+
 
 export default router;

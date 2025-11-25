@@ -1,5 +1,6 @@
-import GetAllDestinationsUseCase from '../../core/usecases/GetAllDestinationsUseCase.js';
-import SearchDestinationsUseCase from '../../core/usecases/SearchDestinationsUseCase.js';
+import GetAllDestinationsUseCase from '../../core/usecases/Destinations/GetAllDestinationsUseCase.js';
+import SearchDestinationsUseCase from '../../core/usecases/Destinations/SearchDestinationsUseCase.js';
+import GetFeaturedDestinationsUseCase from '../../core/usecases/Destinations/GetFeaturedDestinationsUseCase.js'; 
 import DestinationsRepository from '../../repositories/DestinationsRepository.js';
 import supabase from '../../config/supabase.js';
 
@@ -48,6 +49,26 @@ class DestinationsController {
     } catch (error) {
       res.status(500).json({
         status: "error",
+        data: null,
+        message: error.message
+      });
+    }
+  }
+
+  async getFeaturedDestinations(req, res) {
+    try {
+      const { limit } = req.query;
+      const useCase = new GetFeaturedDestinationsUseCase(destinationsRepository);
+      const featuredDestinations = await useCase.execute(parseInt(limit) || 3);
+      
+      res.json({
+        status: "success",
+        data: featuredDestinations,
+        message: "Featured destinations retrieved successfully"
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error", 
         data: null,
         message: error.message
       });

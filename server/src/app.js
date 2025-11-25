@@ -2,7 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 
-// Import routes
+// Import ONLY the routes that work
 import destinationsRoutes from './api/routes/destinationsRoutes.js';
 import bookingsRoutes from './api/routes/bookingsRoutes.js';
 
@@ -10,11 +10,15 @@ const app = express();
 
 // Global middlewares
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Mount API routes
+// Mount ONLY working API routes
 app.use('/api/destinations', destinationsRoutes);
 app.use('/api/bookings', bookingsRoutes);
 
