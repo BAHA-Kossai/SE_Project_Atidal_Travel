@@ -128,15 +128,15 @@
 
     /* Floating notification dropdown */
     .notifications-dropdown-floating {
-        position: fixed;  /* use fixed so it floats outside appbar */
-        top: 64px;        /* distance from top of viewport (appbar height) */
-        right: 20px;      /* align with bell icon, adjust as needed */
+        position: fixed; /* use fixed so it floats outside appbar */
+        top: 64px; /* distance from top of viewport (appbar height) */
+        right: 20px; /* align with bell icon, adjust as needed */
         background: white;
         border: 1px solid #e5e7eb;
         border-radius: 0.5rem;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         width: 220px;
-        z-index: 9999;    /* ensure it's above everything */
+        z-index: 9999; /* ensure it's above everything */
         overflow: hidden;
         overflow-y: auto;
         height: 300px;
@@ -206,5 +206,4 @@
         color: #9ca3af;
         margin-top: 0.25rem;
     }
-
 }
