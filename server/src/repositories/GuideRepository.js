@@ -55,7 +55,7 @@ class GuideRepository extends BaseRepository {
   updateGuide(id, updates) {
     const updatedRecord = {
       ...updates,
-      updated_at: new Date().toISOString(), // optional if you have updated_at
+      updated_at: new Date().toISOString(),
     };
     return this.update(this.primaryKey, id, updatedRecord);
   }

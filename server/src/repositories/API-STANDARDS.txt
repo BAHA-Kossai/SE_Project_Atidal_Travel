@@ -38,3 +38,41 @@ Example Error Response:
     data: {},
     message: "User not found"
 }
+
+
+ * Error Status Codes Reference
+ *
+ * 400 - Bad Request
+ *      - Input validation failed
+ *      - Required fields missing or invalid
+ *      - Example: Missing email, invalid password format
+ *
+ * 401 - Unauthorized
+ *      - Authentication failed
+ *      - Example: Invalid login credentials, token missing or invalid
+ *
+ * 403 - Forbidden
+ *      - User does not have permission to perform the action
+ *      - Example: Regular user trying to access admin-only endpoint
+ *
+ * 404 - Not Found
+ *      - Requested resource does not exist
+ *      - Example: User with given ID does not exist in database
+ *
+ * 409 - Conflict
+ *      - Resource already exists
+ *      - Example: Email already in use during signup
+ *
+ * 422 - Unprocessable Entity
+ *      - Input format is correct but semantic errors exist
+ *      - Example: Booking date in the past
+ *
+ * 500 - Internal Server Error
+ *      - Unexpected server/database error
+ *      - Example: Supabase query fails, server crashes
+ *
+ * Usage Example in SignUpUseCase:
+ * 
+ * throw { status: 400, message: "Email is invalid" };
+ * throw { status: 409, message: "Email already in use" };
+
