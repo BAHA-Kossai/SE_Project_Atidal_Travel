@@ -10,13 +10,13 @@ export default class UpdateBookingStatusUseCase {
   }
 
   async execute(authUser, booking_id, booking_status) {
-
     //Check permissions
     if (!authUser || !["ADMIN", "SUPER_ADMIN"].includes(authUser.type)) {
       return {
         status: 403,
-        message: "Forbidden: Only admins or super admins can update booking status",
-        data: {}
+        message:
+          "Forbidden: Only admins or super admins can update booking status",
+        data: {},
       };
     }
 
@@ -25,7 +25,7 @@ export default class UpdateBookingStatusUseCase {
       return {
         status: 400,
         message: "booking_id and booking_status are required",
-        data: {}
+        data: {},
       };
     }
 
@@ -35,14 +35,14 @@ export default class UpdateBookingStatusUseCase {
       "confirmed",
       "cancelled",
       "completed",
-      "rejected"
+      "rejected",
     ];
 
     if (!allowedStatuses.includes(booking_status)) {
       return {
         status: 400,
         message: `Invalid status. Valid values: ${allowedStatuses.join(", ")}`,
-        data: {}
+        data: {},
       };
     }
 
@@ -53,10 +53,9 @@ export default class UpdateBookingStatusUseCase {
       return {
         status: 404,
         message: "Booking not found",
-        data: {}
+        data: {},
       };
     }
-
 
     // Update booking
     const updatedBooking = await this.bookingsRepository.updateBookingStatus(
@@ -67,7 +66,7 @@ export default class UpdateBookingStatusUseCase {
     return {
       status: 200,
       message: "Booking status updated successfully",
-      data: updatedBooking
+      data: updatedBooking,
     };
   }
 }
