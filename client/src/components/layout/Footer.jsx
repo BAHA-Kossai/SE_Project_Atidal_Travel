@@ -1,6 +1,6 @@
 import React from 'react';
 import { Facebook, Instagram, MessageCircle, QrCode, Mail } from 'lucide-react';
-import { FOOTER_SECTIONS } from "../../../../../../../Malak_src/data/constants.js";
+import { FOOTER_SECTIONS } from "../../data/constants.js";
 
 
 const Footer = () => {
