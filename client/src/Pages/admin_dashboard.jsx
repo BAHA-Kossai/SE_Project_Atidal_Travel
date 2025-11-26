@@ -20,7 +20,7 @@ import Dashboard from '../components/admin-dashboard/AdminDashboardComponents.js
 
 
 //main admin dashboard + appbar + side bar component
-export const AdminDashboard = () => {
+export const AdminDashboardPage = () => {
   return <AppBarSideBarWithContent>
     <Dashboard />
   </AppBarSideBarWithContent>;

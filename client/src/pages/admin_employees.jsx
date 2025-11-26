@@ -12,7 +12,7 @@ import ModalDialog from "../components/ModalDialog.jsx";
 import InputField from "../components/InputField.jsx";
 import ButtonSwitch from "../components/ButtonSwitch.jsx";
 
-export default function AdminEmployees() {
+export default function AdminEmployeesPage() {
     // New/Edit/Delete Employee Modals
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [isAddEmployeeModalOpen, setIsAddEmployeeModalOpen] = useState(false);

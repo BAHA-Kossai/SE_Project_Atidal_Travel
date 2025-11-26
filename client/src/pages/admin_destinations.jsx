@@ -11,7 +11,7 @@ import PagePath from "../components/PagePath.jsx";
 import ModalDialog from "../components/ModalDialog.jsx";
 import InputField from "../components/InputField.jsx";
 
-export default function AdminDestinations() {
+export default function AdminDestinationsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedImage, setSelectedImage] = useState();
 

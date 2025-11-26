@@ -27,7 +27,7 @@ const DestinationCard = ({ name, location, imageSrc }) => {
   );
 };
 
-const Destinations = () => {
+const DestinationsPage = () => {
   const navigate = useNavigate();
   const [destination, setDestination] = useState('');
   const [date, setDate] = useState('');
@@ -150,4 +150,4 @@ const Destinations = () => {
   );
 };
 
-export default Destinations;
+export default DestinationsPage;

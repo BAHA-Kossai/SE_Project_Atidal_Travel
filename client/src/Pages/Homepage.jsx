@@ -6,7 +6,7 @@ import PopularDestinations from '../components/home/PopularDestinations.jsx';
 import { UmrahHadjPacks, GroupTrips } from '../components/home/InfoSection.jsx';
 import Search from '../components/home/Search';
 
-function Homepage() {
+function HomePage() {
   return (
     <Layout>
       <Search />
@@ -19,4 +19,4 @@ function Homepage() {
   );
 }
 
-export default Homepage;
+export default HomePage;

@@ -6,7 +6,7 @@ import TabSecurity from "../components/admin-settings/TabSecurity.jsx";
 import {AppBarSideBarWithContent} from "../components/AppBarSideBarWithContent.jsx";
 import Tabs from "../components/Tabs.jsx";
 
-export default function AdminSettings() {
+export default function AdminSettingsPage() {
 
     // Change Active Tab
     const [activeTab, setActiveTab] = useState("Account");

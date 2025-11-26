@@ -98,7 +98,7 @@ function PackageCard({ packageData, onBookNow }) {
   );
 }
 
-export default function Umrah() {
+export default function UmrahPage() {
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
 

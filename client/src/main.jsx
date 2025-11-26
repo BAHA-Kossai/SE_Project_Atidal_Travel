@@ -1,14 +1,14 @@
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import AdminSettings from './pages/admin_settings.jsx';
-import AdminDestinations from "./pages/admin_destinations.jsx";
-import AdminEmployees from "./pages/admin_employees.jsx";
-import { AdminDashboard } from "./pages/admin_dashboard.jsx";
-import BookingPage from "./pages/bookings.jsx";
-import Homepage from "./pages/homepage.jsx";
-import Umrah from "./pages/umrah.jsx";
-import Destinations from "./pages/destinations.jsx";
-import Not_found from "./pages/not_found.jsx";
+import AdminSettingsPage from './pages/admin_settings.jsx';
+import AdminDestinationsPage from "./pages/admin_destinations.jsx";
+import AdminEmployeesPage from "./pages/admin_employees.jsx";
+import { AdminDashboardPage } from "./pages/admin_dashboard.jsx";
+import BookingsPage from "./pages/bookings.jsx";
+import HomePage from "./pages/homepage.jsx";
+import UmrahPage from "./pages/umrah.jsx";
+import DestinationsPage from "./pages/destinations.jsx";
+import NotFoundPage from "./pages/not_found.jsx";
 import { StrictMode } from "react";
 
 
@@ -19,16 +19,16 @@ createRoot(rootElement).render(
         <BrowserRouter>
             <Routes>
                 {/* User Side */}
-                <Route path="/" element={<Homepage/>} />
-                <Route path="/umrah" element={<Umrah/>} />
-                <Route path="/bookings" element={<BookingPage/>} />
-                <Route path="/destinations" element={<Destinations/>} />
-                <Route path="*" element={<Not_found/>} />
+                <Route path="/" element={<HomePage/>} />
+                <Route path="/umrah" element={<UmrahPage/>} />
+                <Route path="/bookings" element={<BookingsPage/>} />
+                <Route path="/destinations" element={<DestinationsPage/>} />
+                <Route path="*" element={<NotFoundPage/>} />
                 {/* Admin Side */}
-                <Route path="/admin/" element={<AdminDashboard/>} />
-                <Route path="/admin/settings" element={<AdminSettings/>} />
-                <Route path="/admin/destinations" element={<AdminDestinations/>} />
-                <Route path="/admin/employees" element={<AdminEmployees/>} />
+                <Route path="/admin/" element={<AdminDashboardPage/>} />
+                <Route path="/admin/settings" element={<AdminSettingsPage/>} />
+                <Route path="/admin/destinations" element={<AdminDestinationsPage/>} />
+                <Route path="/admin/employees" element={<AdminEmployeesPage/>} />
             </Routes>
         </BrowserRouter>
     </StrictMode>
