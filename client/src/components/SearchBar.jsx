@@ -1,6 +1,6 @@
 import {useState} from "react";
 import { X, Search } from 'lucide-react'
-import '../styles/appBar.css'
+import '../styles/app_bar_side_bar_with_content.css'
 
 export default function SearchBar({placeholder = "Search"}) {
     const [searchBar, setSearchBar] = useState('');

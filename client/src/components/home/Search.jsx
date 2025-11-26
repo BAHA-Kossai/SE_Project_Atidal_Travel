@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plane, Search, ChevronDown } from 'lucide-react';
+import { Plane, ChevronDown } from 'lucide-react';
 
 const TravelHeroSection = () => {
   const [destination, setDestination] = useState('');

@@ -1,4 +1,4 @@
-import {AppBarSideBarWithContent} from "../components/appBarSideBar.jsx";
+import {AppBarSideBarWithContent} from "../components/AppBarSideBarWithContent.jsx";
 import PagePath from "../components/PagePath.jsx";
 import WhiteContainer from "../components/WhiteContainer.jsx";
 import SearchBar from "../components/SearchBar.jsx";

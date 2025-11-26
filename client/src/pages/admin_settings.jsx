@@ -3,7 +3,7 @@ import {useState} from "react";
 import TabAccount from "../components/admin-settings/TabAccount.jsx";
 import TabNotifications from "../components/admin-settings/TabNotifications.jsx";
 import TabSecurity from "../components/admin-settings/TabSecurity.jsx";
-import {AppBarSideBarWithContent} from "../components/appBarSideBar.jsx";
+import {AppBarSideBarWithContent} from "../components/AppBarSideBarWithContent.jsx";
 import Tabs from "../components/Tabs.jsx";
 
 export default function AdminSettings() {

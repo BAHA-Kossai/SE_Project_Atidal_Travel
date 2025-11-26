@@ -1,4 +1,4 @@
-import {AppBarSideBarWithContent} from "../components/appBarSideBar.jsx";
+import {AppBarSideBarWithContent} from "../components/AppBarSideBarWithContent.jsx";
 import WhiteContainer from "../components/WhiteContainer.jsx";
 import SearchBar from "../components/SearchBar.jsx";
 import ButtonOutline from "../components/ButtonOutline.jsx";

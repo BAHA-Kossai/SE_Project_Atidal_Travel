@@ -1,5 +1,5 @@
 /**
- * File: status_cards.jsx
+ * File: StatusCards.jsx
  * Description: Handles the status cards component for the admin dashboard.
  *
  * Created By: Kossai Baha
@@ -11,8 +11,8 @@
  * Notes:
  */
 import React from "react";
-import { Camera, Plane, TrendingDown, TrendingUp } from "lucide-react";
-import "../../../styles/admin_dashboard/admin_dashboard.css";
+import { Plane, TrendingDown, TrendingUp } from "lucide-react";
+import "../../styles/admin_dashboard.css";
 
 // General card structure for status cards (compact)
 export const StatusCard = ({
