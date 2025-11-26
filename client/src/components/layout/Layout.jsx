@@ -14,8 +14,4 @@ const Layout = ({ children }) => {
   );
 };
 
-<<<<<<< HEAD
 export default Layout;
-=======
-export default Layout;
->>>>>>> 2a51f528887ff772e69306095b2b359c7186f795

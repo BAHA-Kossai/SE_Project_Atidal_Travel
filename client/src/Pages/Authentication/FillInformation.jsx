@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import userIcon from '../../assets/user.svg';
+import Layout from '../../components/layout/Layout.jsx';
 
 const FillInformation = () => {
   const navigate = useNavigate();
@@ -19,7 +20,6 @@ const FillInformation = () => {
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
@@ -54,7 +54,6 @@ const FillInformation = () => {
     e.preventDefault();
     
     if (validateForm()) {
-      // Combine with signup data if coming from signup flow
       const signupData = location.state?.signupData || {};
       const completeData = { ...signupData, ...formData };
       
@@ -64,24 +63,23 @@ const FillInformation = () => {
       // await registerUser(completeData);
       
       // Navigate to success page or login
-      navigate('/login');
+      navigate('/home');
     }
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-8">
+    <Layout>
+      <div className="min-h-screen bg-white flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-[864px] bg-white border border-[#e2e5e9] rounded-3xl overflow-hidden">
-        {/* Main content */}
+
         <div className="px-8 py-16 lg:px-20 lg:py-16">
           <div className="max-w-[716px] mx-auto">
             <form onSubmit={handleSubmit} className="space-y-12">
-              {/* Header */}
               <h1 className="text-4xl lg:text-[64px] font-normal text-[#212529] tracking-[-1.28px]">
                 Fill your information
               </h1>
 
               <div className="space-y-6">
-                {/* First Row: First Name & Last Name */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* First Name */}
                   <div className="space-y-2">
@@ -104,8 +102,6 @@ const FillInformation = () => {
                       <p className="text-sm text-red-500">{errors.firstName}</p>
                     )}
                   </div>
-
-                  {/* Last Name */}
                   <div className="space-y-2">
                     <div className="relative">
                       <div className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5">
@@ -127,10 +123,7 @@ const FillInformation = () => {
                     )}
                   </div>
                 </div>
-
-                {/* Second Row: Age & Gender */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {/* Age */}
                   <div className="space-y-2">
                     <div className="relative">
                       <div className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5">
@@ -193,7 +186,7 @@ const FillInformation = () => {
                   type="submit"
                   className="w-full bg-[#117bb8] hover:bg-[#13699f] text-white text-base font-medium tracking-[-0.32px] px-10 py-4 rounded-full transition-colors"
                 >
-                  Next
+                  Sign up
                 </button>
               </div>
             </form>
@@ -201,6 +194,7 @@ const FillInformation = () => {
         </div>
       </div>
     </div>
+    </Layout>
   );
 };
 

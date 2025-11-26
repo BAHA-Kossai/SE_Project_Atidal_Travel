@@ -1,10 +1,6 @@
 import React from 'react';
 import { Facebook, Instagram, MessageCircle, QrCode, Mail } from 'lucide-react';
-<<<<<<< HEAD
 import { FOOTER_SECTIONS } from "../../data/constants";
-=======
-import { FOOTER_SECTIONS } from "../../data/constants.js";
->>>>>>> 2a51f528887ff772e69306095b2b359c7186f795
 
 
 const Footer = () => {
@@ -92,8 +88,4 @@ const Footer = () => {
   );
 };
 
-<<<<<<< HEAD
 export default Footer;
-=======
-export default Footer;
->>>>>>> 2a51f528887ff772e69306095b2b359c7186f795

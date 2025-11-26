@@ -3,7 +3,9 @@ import { Link } from 'react-router-dom';
 import userIcon from '../../assets/user.svg';
 import loginPath from '../../assets/plane.svg';
 import "../../styles/admin_dashboard/admin_dashboard.css"
+import Layout from '../../components/layout/Layout.jsx';
 const Login = () => {
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -50,7 +52,8 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center px-4 py-8">
+    <Layout>
+      <div className="min-h-screen bg-white flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-[1312px] bg-white border border-[#e2e5e9] rounded-3xl relative" style={{ minHeight: '877px' }}>
         <div className="hidden lg:block absolute pointer-events-none" style={{ right: '15px', bottom: '180px' }}>
           <img src={loginPath} alt="" className="w-auto h-[601px] object-contain" />
@@ -147,7 +150,7 @@ const Login = () => {
               {/* Sign up link */}
               <p className="text-center text-lg lg:text-xl text-[#93999f] tracking-[-0.4px]">
                 Don't have an account ?{' '}
-                <Link to="../../pages/Authentication/Signup.jsx" className="text-[#117bb8] underline hover:text-[#13699f] transition-colors">
+                <Link to="/signup" className="text-[#117bb8] underline hover:text-[#13699f] transition-colors">
                   Sign up
                 </Link>
               </p>
@@ -156,6 +159,7 @@ const Login = () => {
         </div>
       </div>
     </div>
+    </Layout>
   );
 };
 
