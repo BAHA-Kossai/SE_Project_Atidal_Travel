@@ -1,6 +1,6 @@
 import express from "express";
 import { verifySupabaseToken, requireSuperAdmin,requireAdmin_or_SuperAdmin } from "../middlewares/authMiddleware.js";
-import { assignBranchController,updateBookingStatusController } from "../controllers/BookingController.js";
+import { assignBranchController,updateBookingStatusController } from "../controllers/bookingsController.js";
 
 const router = express.Router();
 
