@@ -52,7 +52,7 @@ const Destinations = () => {
     <Layout>
       <div className="w-full">
         {/* Search Bar Section */}
-        <div className="bg-[#FFB470] px-4 sm:px-6 lg:px-8 py-6">
+        <div className="bg-[#BFE7FF] px-4 sm:px-6 lg:px-8 py-6">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
               {/* Destination Dropdown */}

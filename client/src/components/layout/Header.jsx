@@ -1,9 +1,11 @@
 
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { Link, useLocation } from 'react-router-dom';
 
 const Header = () => {
+  const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -11,11 +13,18 @@ const Header = () => {
     { name: 'Home', href: '/' },
     { name: 'Destinations', href: '/destinations' },
     { name: 'Umrah', href: '/umrah' },
-    { name: 'Group trip', href: '#group-trip' },
-    { name: 'Branches', href: '#branches' },
+    { name: 'Group trip', href: '/group-trip' },
+    { name: 'Branches', href: '/branches' },
   ];
 
   const isActive = (href) => location.pathname === href;
+
+const handleBookNow = () => {
+    // default is destination booking; BookingForm will allow switching
+    navigate('/booking');
+  };
+
+
 
   return (
     
@@ -51,12 +60,13 @@ const Header = () => {
           </div>
 
           {/* Book Now Button */}
-          <a
-            href="#book"
+          <button
+            onClick={handleBookNow}
             className="absolute right-4 bg-[#117BB8] text-white px-8 py-3 rounded-full hover:bg-[#0f6da4] transition-colors duration-200 text-sm font-medium hidden md:block"
           >
-            Book Now
-          </a>
+            Book now
+          </button>
+     
 
           {/* Mobile Menu Button */}
           <div className="md:hidden absolute right-4">

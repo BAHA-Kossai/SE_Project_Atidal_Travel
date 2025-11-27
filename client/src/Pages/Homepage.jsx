@@ -4,12 +4,12 @@ import WhyChooseUs from '../components/home/WhyChooseUs.jsx';
 import FeedbackSection from '../components/home/Feedback.jsx';
 import PopularDestinations from '../components/home/PopularDestinations.jsx';
 import { UmrahHadjPacks, GroupTrips } from '../components/home/InfoSection.jsx';
-import Search from '../components/home/Search';
+import TravelHeroSection from '../components/home/Search.jsx';
 
 function HomePage() {
   return (
     <Layout>
-      <Search />
+<TravelHeroSection/>
       <PopularDestinations />
       <UmrahHadjPacks />
       <GroupTrips />

@@ -6,6 +6,8 @@ import AdminEmployees from "./pages/admin_employees.jsx";
 import { AdminDashboard } from "./pages/admin_dashboard/admin_dashboard.jsx";
 import BookingPage from "./Pages/BookingForm.jsx";
 import HomePage from "./Pages/Homepage.jsx";
+import GroupTrip from "./Pages/GroupTrip.jsx";
+import Branches from "./Pages/Branches.jsx";
 import UmrahPage from "./Pages/UmrahPage.jsx";
 import Destinations from "./Pages/Destinations.jsx";
 import NotFound from "./Pages/NotFound.jsx";
@@ -21,8 +23,10 @@ createRoot(rootElement).render(
                 {/* User Side */}
                 <Route path="/" element={<HomePage/>} />
                 <Route path="/umrah" element={<UmrahPage/>} />
-                <Route path="/bookings" element={<BookingPage/>} />
+                <Route path="/booking" element={<BookingPage/>} />
+                <Route path="/group-trip" element={<GroupTrip/>} />
                 <Route path="/destinations" element={<Destinations/>} />
+                <Route path="/branches" element={<Branches/>} />
                 <Route path="*" element={<NotFound/>} />
                 {/* Admin Side */}
                 <Route path="/admin-dashboard" element={<AdminDashboard/>} />

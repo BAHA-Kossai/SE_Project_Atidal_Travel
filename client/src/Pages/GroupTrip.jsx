@@ -1,19 +1,22 @@
 import { useState } from 'react';
 import Layout from '../components/layout/Layout.jsx';
-import { useNavigate } from "react-router-dom";
 import { Clock, Calendar, Home, Check } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
 import BookingForm from '../components/booking/BookingForm.jsx';
-import imgKaaba from '../assets/kaaba-image.jpeg';
+import Guided from '../assets/guided-trip.png';
+import Timgad from '../assets/timgad.png';
+import TravelHeroSection from '../components/home/Search.jsx';
 
 // Package data
 const packages = [
   {
     id: 1,
-    type: 'Classic',
-    duration: '14 days / 13 nights',
-    dates: 'from 13/09/2025 to 29/09/2025',
-    hotel: '4 stars hotels, 1km far from kaabah',
-    price: '180000DA - 200000Da',
+    image:Timgad,
+    destination: 'Timgad',
+    duration: '1 day',
+    date: '13/09/2025',
+    departure: 'Cour de la revolution, Annaba at 8:30 ',
+    price: '2000Da',
     includes: [
       'Round-trip flights',
       '4-star hotel accommodation',
@@ -23,50 +26,68 @@ const packages = [
     ],
   },
   {
-    id: 2,
-    type: 'Premium',
-    duration: '14 days / 13 nights',
-    dates: 'from 13/09/2025 to 29/09/2025',
-    hotel: '5 stars hotels, 500m far from kaabah',
-    price: '250000DA - 300000Da',
+     id: 2,
+     image:Timgad,
+    destination: 'Timgad',
+    duration: '1 day',
+    date: '13/09/2025',
+    departure: 'Cour de la revolution, Annaba at 8:30 ',
+    price: '2000Da',
     includes: [
       'Round-trip flights',
-      '5-star hotel accommodation',
+      '4-star hotel accommodation',
       'Visa processing assistance',
       'Guided Ziyarah tours',
-      'All meals included',
-      'Airport transfers',
-      'Private Ziyarah tours',
+      'Daily meals included',
     ],
   },
-  {
+   {
     id: 3,
-    type: 'Deluxe',
-    duration: '14 days / 13 nights',
-    dates: 'from 13/09/2025 to 29/09/2025',
-    hotel: '5 stars hotels, 500m far from kaabah',
-    price: '250000DA - 300000Da',
+    image:Timgad,
+    destination: 'Timgad',
+    duration: '1 day',
+    date: '13/09/2025',
+    departure: 'Cour de la revolution, Annaba at 8:30 ',
+    price: '2000Da',
     includes: [
       'Round-trip flights',
-      '5-star hotel accommodation',
+      '4-star hotel accommodation',
       'Visa processing assistance',
       'Guided Ziyarah tours',
-      'All meals included',
-      'Airport transfers',
-      'Private Ziyarah tours',
+      'Daily meals included',
     ],
   },
 ];
 
-function PackageCard({ packageData, onBookNow }) {
+function PackageCard({ packageData, onBookNow, fullWidth }) {
+
   return (
-    <div className="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col h-full transition-transform duration-300 hover:scale-105">
-     
+    
+   <div
+  className={`bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col h-full 
+  transition-transform duration-300 hover:scale-105 ${
+    fullWidth ? "lg:flex-row" : ""
+  }`}
+>
+
+
+      {/* Image Section */}
+      {packageData.image && (
+       <img
+  src={packageData.image}
+  alt={packageData.type}
+  className={`object-cover 
+    ${fullWidth ? "w-1/2 h-full" : "w-full h-56"}
+  `}
+/>
+
+      )}
+
       {/* Content */}
       <div className="flex flex-col flex-1 p-8 gap-6">
         {/* Package Title */}
         <div>
-          <h3 className="text-gray-800 mb-4">{packageData.type} package</h3>
+          <h3 className="text-gray-800 mb-4">{packageData.destination} Trip </h3>
           
           <div className="space-y-3">
             <div className="flex items-center gap-3 text-gray-600">
@@ -76,12 +97,12 @@ function PackageCard({ packageData, onBookNow }) {
             
             <div className="flex items-center gap-3 text-gray-600">
               <Calendar className="w-5 h-5 text-[#117BB8] flex-shrink-0" />
-              <p className="text-sm">{packageData.dates}</p>
+              <p className="text-sm">{packageData.date}</p>
             </div>
             
             <div className="flex items-center gap-3 text-gray-600">
               <Home className="w-5 h-5 text-[#117BB8] flex-shrink-0" />
-              <p className="text-sm">{packageData.hotel}</p>
+              <p className="text-sm">{packageData.departure}</p>
             </div>
           </div>
         </div>
@@ -116,14 +137,20 @@ function PackageCard({ packageData, onBookNow }) {
   );
 }
 
-export default function UmrahPage() {
-    const navigate = useNavigate();
-
-  const handleBookNow = (packageData) => {
-    navigate("/booking", { state: { packageData, isUmrah: true } });};
+export default function GroupTrip() {
+      const navigate = useNavigate();
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
 
+ const handleBookNow = (packageData) => {
+   navigate('/booking', {
+  state: {
+    packageData,
+    isGroupTrip: true
+  }
+});
+
+  };
 
   const handleCloseBookingForm = () => {
     setShowBookingForm(false);
@@ -133,38 +160,10 @@ export default function UmrahPage() {
   return (
     <Layout>
       {/* Hero Section */}
-      <div className="relative h-[600px] sm:h-[700px] overflow-hidden rounded-3xl mx-4 sm:mx-6 lg:mx-8 my-8">
-        {/* Background Image */}
-        <div className="absolute inset-0">
-          <img 
-            src={imgKaaba}
-            alt="Kaaba view" 
-            className="w-full h-full object-cover"
-          />
-          {/* Dark overlay for better text readability */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60"></div>
-        </div>
-
-        {/* Text Content Overlay */}
-        <div className="relative z-10 h-full flex items-center">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <div className="max-w-3xl">
-              <p className="text-sm sm:text-base mb-4 text-white/90">
-                Enjoy your travel journey
-              </p>
-              <h1 className="text-4xl sm:text-5xl lg:text-7xl mb-4 text-white font-bold">
-                Umrah packs
-              </h1>
-              <p className="text-xl sm:text-2xl lg:text-3xl mb-8 text-white/95">
-                Best spiritual experience
-              </p>
-              <button className="bg-[#117BB8] hover:bg-[#0f6da4] text-white px-10 py-4 rounded-full transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-1">
-                Explore our packages
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <TravelHeroSection
+  image={Guided}
+  title="Group Trips"
+  subtitle="Amazing adventures await"/>
 
       {/* Packages Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
@@ -203,7 +202,6 @@ export default function UmrahPage() {
 
 
   
-
     </Layout>
   );
 }
