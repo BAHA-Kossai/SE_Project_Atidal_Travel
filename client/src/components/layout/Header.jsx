@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -7,8 +6,13 @@ import { Link, useLocation } from 'react-router-dom';
 const Header = () => {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState(null); // store user info
   const location = useLocation();
-
+  // Check localStorage for user on mount
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem("user"));
+    setUser(storedUser);
+  }, []);
   const navLinks = [
     { name: 'Home', href: '/' },
     { name: 'Destinations', href: '/destinations' },
@@ -18,21 +22,20 @@ const Header = () => {
   ];
 
   const isActive = (href) => location.pathname === href;
-
-const handleBookNow = () => {
+  const handleBookNow = () => {
     // default is destination booking; BookingForm will allow switching
     navigate('/booking');
   };
 
-
-
   return (
-    
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="relative flex justify-center items-center h-16">
           {/* Logo */}
-          <Link to="/" className="absolute left-4 text-2xl font-bold text-gray-800">
+          <Link
+            to="/"
+            className="absolute left-4 text-2xl font-bold text-gray-800"
+          >
             Logo
           </Link>
 
@@ -44,19 +47,30 @@ const handleBookNow = () => {
                 to={link.href}
                 className={`transition-colors duration-200 text-sm font-medium ${
                   isActive(link.href)
-                    ? 'text-[#117BB8]'
-                    : 'text-gray-700 hover:text-[#117BB8]'
+                    ? "text-[#117BB8]"
+                    : "text-gray-700 hover:text-[#117BB8]"
                 }`}
               >
                 {link.name}
               </Link>
             ))}
-            <a
+            {/* <a
               href="/Login"
               className="text-gray-700 hover:text-[#117BB8] transition-colors duration-200 text-sm font-medium"
             >
               Sign in
-            </a>
+            </a> */}
+            {/* Sign in or Profile */}
+            <Link
+              to={user ? "/profile" : "/login"}
+              className={`transition-colors duration-200 text-sm font-medium ${
+                isActive(user ? "/profile" : "/login")
+                  ? "text-[#117BB8]"
+                  : "text-gray-700 hover:text-[#117BB8]"
+              }`}
+            >
+              {user ? "Profile" : "Sign in"}
+            </Link>
           </div>
 
           {/* Book Now Button */}
@@ -79,7 +93,7 @@ const handleBookNow = () => {
           </div>
         </div>
 
-     {/* Mobile Navigation */}
+        {/* Mobile Navigation */}
         {isMenuOpen && (
           <div className="md:hidden pb-4">
             <div className="flex flex-col space-y-3">
@@ -89,21 +103,21 @@ const handleBookNow = () => {
                   to={link.href}
                   className={`transition-colors duration-200 text-sm font-medium py-2 ${
                     isActive(link.href)
-                      ? 'text-[#117BB8]'
-                      : 'text-gray-700 hover:text-[#117BB8]'
+                      ? "text-[#117BB8]"
+                      : "text-gray-700 hover:text-[#117BB8]"
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >
                   {link.name}
                 </Link>
               ))}
-              <a
+              {/* <a
                 href="#signin"
                 className="text-gray-700 hover:text-cyan-600 transition-colors duration-200 text-sm font-medium py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Sign in
-              </a>
+              </a> */}
               <a
                 href="#book"
                 className="bg-cyan-600 text-white px-6 py-2 rounded-full hover:bg-cyan-700 transition-colors duration-200 text-sm font-medium text-center"

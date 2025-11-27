@@ -1,3 +1,4 @@
+
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import GroupTrip from "./Pages/group_trips.jsx";
@@ -53,3 +54,4 @@ createRoot(rootElement).render(
         </BrowserRouter>
     </StrictMode>
 );
+

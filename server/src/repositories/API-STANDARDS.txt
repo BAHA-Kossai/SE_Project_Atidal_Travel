@@ -1,0 +1,78 @@
+------------------------------------------------------------
+Standard API Response Format
+------------------------------------------------------------
+
+All data returned from repository or route functions should follow this structure:
+
+{
+    status: "success" | "error"    // "success" if operation succeeded, "error" if there was a failure
+    data: {                        // object containing the requested data, preserving original types
+        ...
+    }
+    message?: "Error message if status is 'error'" // optional, only present on errors
+}
+
+Notes:
+- The 'data' object should preserve native types from the database:
+    - Numbers as numbers
+    - Booleans as booleans
+    - Strings as strings
+    - Dates as ISO strings or date objects (depending on agreement)
+- The 'message' field is only included on errors.
+- This ensures consistency for all API consumers and simplifies front-end handling.
+
+Example Success Response:
+{
+    status: "success",
+    data: {
+        id: 123,
+        name: "Alice",
+        balance: 12.99,
+        isActive: true
+    }
+}
+
+Example Error Response:
+{
+    status: "error",
+    data: {},
+    message: "User not found"
+}
+
+
+ * Error Status Codes Reference
+ *
+ * 400 - Bad Request
+ *      - Input validation failed
+ *      - Required fields missing or invalid
+ *      - Example: Missing email, invalid password format
+ *
+ * 401 - Unauthorized
+ *      - Authentication failed
+ *      - Example: Invalid login credentials, token missing or invalid
+ *
+ * 403 - Forbidden
+ *      - User does not have permission to perform the action
+ *      - Example: Regular user trying to access admin-only endpoint
+ *
+ * 404 - Not Found
+ *      - Requested resource does not exist
+ *      - Example: User with given ID does not exist in database
+ *
+ * 409 - Conflict
+ *      - Resource already exists
+ *      - Example: Email already in use during signup
+ *
+ * 422 - Unprocessable Entity
+ *      - Input format is correct but semantic errors exist
+ *      - Example: Booking date in the past
+ *
+ * 500 - Internal Server Error
+ *      - Unexpected server/database error
+ *      - Example: Supabase query fails, server crashes
+ *
+ * Usage Example in SignUpUseCase:
+ * 
+ * throw { status: 400, message: "Email is invalid" };
+ * throw { status: 409, message: "Email already in use" };
+
