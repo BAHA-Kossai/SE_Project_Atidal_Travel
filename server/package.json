@@ -11,7 +11,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-<<<<<<< HEAD
+
     "@supabase/supabase-js": "^2.49.1",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
@@ -23,9 +23,7 @@
     "validator": "^13.15.23"
   },
   "devDependencies": {
-    "nodemon": "^3.1.7"
-=======
+    "nodemon": "^3.1.7",
     "express": "^5.1.0"
->>>>>>> origin/frontend
   }
 }
