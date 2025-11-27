@@ -11,6 +11,7 @@ import Login from "./Pages/Authentication/Login.jsx";
 import Signup from './Pages/Authentication/Signup.jsx'; 
 import Profile from './Pages/Profile.jsx'; 
 import AdminBranches from './Pages/AdminBranches.jsx';
+import AdminBookingsPage from "./pages/admin_bookings.jsx";
 import FillInformation from "./Pages/Authentication/FillInformation.jsx";
 import ResetPassword from "./Pages/Authentication/ResetPassword.jsx"
 import ForgotPassword from './Pages/Authentication/ForgotPassword.jsx';
@@ -30,16 +31,17 @@ createRoot(rootElement).render(
                 <Route path="/umrah" element={<UmrahPage/>} />
                 <Route path="/bookings" element={<BookingsPage/>} />
                 <Route path="/destinations" element={<DestinationsPage/>} />
-                <Route path="*" element={<NotFoundPage/>} />
-                <Route path="/Login" element={<Login/>} />
-                <Route path="/reset-password" element={<ResetPassword/>} />
+                <Route path="/login" element={<Login/>} />
+                <Route path="/signup" element={<Signup/>} />
                 <Route path="/forgot-password" element={<ForgotPassword/>} />
-                <Route path="/Signup" element={<Signup/>} />
+                <Route path="/reset-password" element={<ResetPassword/>} />
                 <Route path="/fill-information" element={<FillInformation/>} />
                 <Route path="/profile" element={<Profile/>} />
+                <Route path="*" element={<NotFoundPage/>} />
                 {/* Admin Side */}
                 <Route path="/admin/" element={<AdminDashboardPage/>} />
                 <Route path="/admin/settings" element={<AdminSettingsPage/>} />
+                <Route path="/admin/bookings" element={<AdminBookingsPage/>} />
                 <Route path="/admin/destinations" element={<AdminDestinationsPage/>} />
                 <Route path="/admin/employees" element={<AdminEmployeesPage/>} />
                 <Route path="/admin/branches" element={<AdminBranches/>} />

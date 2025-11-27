@@ -107,7 +107,7 @@ export default function AdminEmployeesPage() {
 
             <WhiteContainer>
                     <div className="flex flex-col">
-                        {/* Search / Sort / Filter/ New Destination */}
+                        {/* Search / Sort / Filter/ New Employee */}
                         <div className="flex flex-row justify-between items-center mb-5">
                             <SearchBar placeholder={"Search for an employee"}/>
                             <div className="flex flex-row justify-between w-100">
