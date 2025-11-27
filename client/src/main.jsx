@@ -33,8 +33,7 @@ createRoot(rootElement).render(
                 <Route path="/umrah" element={<UmrahPage/>} />
                 <Route path="/group-trip" element={<GroupTrip/>} />
                 <Route path="/branches" element={<Branches/>} />
-                <Route path="*" element={<NotFound/>} />
-                <Route path="/bookings" element={<BookingsPage/>} />
+                <Route path="/booking" element={<BookingsPage/>} />
                 <Route path="/destinations" element={<DestinationsPage/>} />
                 <Route path="/login" element={<Login/>} />
                 <Route path="/signup" element={<Signup/>} />
