@@ -100,6 +100,91 @@ const BookingsTable = () => {
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [isEditBookingModalOpen, setIsEditBookingModalOpen] = useState(false);
     const [isDeleteBookingModalOpen, setIsDeleteBookingModalOpen] = useState(false);
+    const handleDelete = (id) => {
+        setBookings(bookings.filter(booking => booking["booking_id"] !== id));
+        setIsDeleteBookingModalOpen(false);
+    };
+
+    const [bookings, setBookings] = useState([
+        {
+            "booking_id": "01KB1E794CXVKGYF6G2B2AKCGQ",
+            "username": "Perrine",
+            "destination": {
+                "country": "Egypt",
+                "city": "Al Qanāyāt"
+            },
+            "date": "19-09-2025",
+            "phone_number": "7644115704",
+            "branch": "Terrell",
+            "payment_status": true
+        }, {
+            "booking_id": "01KB1E794DJXNN5GDDTZC542PC",
+            "username": "Heddie",
+            "destination": {
+                "country": "Indonesia",
+                "city": "Bancak Wetan"
+            },
+            "date": "10-11-2025",
+            "phone_number": "4863746258",
+            "branch": "Siward",
+            "payment_status": false
+        }, {
+            "booking_id": "01KB1E794E36CYYWCD84J2ZZWK",
+            "username": "Elysia",
+            "destination": {
+                "country": "United States",
+                "city": "Minneapolis"
+            },
+            "date": "28-09-2025",
+            "phone_number": "6125025358",
+            "branch": "Ruggiero",
+            "payment_status": false
+        }, {
+            "booking_id": "01KB1E794F3VZWP3889SEAFJSK",
+            "username": "Bertrando",
+            "destination": {
+                "country": "China",
+                "city": "Zhifang"
+            },
+            "date": "20-08-2025",
+            "phone_number": "9995796892",
+            "branch": "Derby",
+            "payment_status": false
+        }, {
+            "booking_id": "01KB1E794GCZT7Y6BNFHGEJEM6",
+            "username": "Consalve",
+            "destination": {
+                "country": "Tunisia",
+                "city": "Al ‘Āliyah"
+            },
+            "date": "31-01-2025",
+            "phone_number": "9676380182",
+            "branch": "Gram",
+            "payment_status": false
+        }, {
+            "booking_id": "01KB1E794JTV87ZW06SZQ49R5X",
+            "username": "Mycah",
+            "destination": {
+                "country": "Portugal",
+                "city": "Malhou"
+            },
+            "date": "12-10-2025",
+            "phone_number": "6098765518",
+            "branch": "Kahaleel",
+            "payment_status": true
+        }, {
+            "booking_id": "01KB1E794JZS449HK46CB35ERE",
+            "username": "Amitie",
+            "destination": {
+                "country": "Serbia",
+                "city": "Boljevci"
+            },
+            "date": "10-11-2025",
+            "phone_number": "5581824171",
+            "branch": "Currie",
+            "payment_status": false
+        }
+    ]);
 
     return (
         <>
@@ -178,14 +263,29 @@ const BookingsTable = () => {
                         },
                     ]
                 }
-                data={mock_bookings}
+                data={bookings}
             />
 
-            <DeleteModal
-                isModalOpen={isDeleteBookingModalOpen}
-                setIsModalOpen={setIsDeleteBookingModalOpen}
-                selectedBooking={selectedBooking}
-            />
+            {/* Delete Modal */}
+            <ModalDialog
+                open={isDeleteBookingModalOpen}
+            >
+                <div className={"text-center text-xl"}>
+                    <h1>
+                        Are you sure that you want to delete the booking with ID
+                    </h1>
+                    <span className={"text-(--color-text-secondary)"}>
+                    {selectedBooking?.["booking_id"]}
+                    </span>
+                    <h1>
+                        This action cannot be undone
+                    </h1>
+                </div>
+                <div className={"grid grid-cols-2 gap-4 mt-8"}>
+                    <ButtonFill onClick={() => handleDelete(selectedBooking?.["booking_id"])}>Yes</ButtonFill>
+                    <ButtonOutline onClick={() => setIsDeleteBookingModalOpen(false)}>No</ButtonOutline>
+                </div>
+            </ModalDialog>
             <EditModal
                 isModalOpen={isEditBookingModalOpen}
                 setIsModalOpen={setIsEditBookingModalOpen}
@@ -195,30 +295,6 @@ const BookingsTable = () => {
     );
 }
 
-// Edit / Delete Modals
-const DeleteModal = ({isModalOpen, setIsModalOpen, selectedBooking}) => {
-    return (
-        <ModalDialog
-            open={isModalOpen}
-        >
-            <div className={"text-center text-xl"}>
-                <h1>
-                    Are you sure that you want to delete the booking with ID
-                </h1>
-                <span className={"text-(--color-text-secondary)"}>
-                    {selectedBooking?.["booking_id"]}
-                    </span>
-                <h1>
-                    This action cannot be undone
-                </h1>
-            </div>
-            <div className={"grid grid-cols-2 gap-4 mt-8"}>
-                <ButtonFill>Yes</ButtonFill>
-                <ButtonOutline onClick={() => setIsModalOpen(false)}>No</ButtonOutline>
-            </div>
-        </ModalDialog>
-    )
-}
 const EditModal = ({isModalOpen, setIsModalOpen, selectedBooking}) => {
     useEffect(() => {
         if (selectedBooking) {
@@ -733,6 +809,7 @@ const TravelersTable = () => {
                         },
                     ]
                 }
+                data={travelers_data}
             />
         </>
     );
