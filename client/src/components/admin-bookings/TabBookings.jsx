@@ -14,7 +14,7 @@ export const TabBookings = () => {
             <div className="flex flex-col">
                 {/* Search / Sort / Filter */}
                 <div className="flex flex-row justify-between items-center mb-3">
-                    <SearchBar placeholder={"Search for an employee"}/>
+                    <SearchBar placeholder={"Search for a booking"}/>
                     <div className="grid grid-cols-2 gap-2">
                         <ButtonOutline>Sort<ArrowUpDown size={18} className={"ml-2"}/></ButtonOutline>
                         <ButtonOutline>Filter<SlidersHorizontal size={18} className={"ml-2"}/></ButtonOutline>
