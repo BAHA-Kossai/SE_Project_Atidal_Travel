@@ -1,7 +1,7 @@
 import {AppBarSideBarWithContent} from "../components/AppBarSideBarWithContent.jsx";
 import PagePath from "../components/PagePath.jsx";
 import WhiteContainer from "../components/WhiteContainer.jsx";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import SearchBar from "../components/SearchBar.jsx";
 import ButtonOutline from "../components/ButtonOutline.jsx";
 import Tabs from "../components/Tabs.jsx";
@@ -60,9 +60,42 @@ const TabBookings = () => {
         </WhiteContainer>
     )
 }
-const TabPayer = () => {}
-const TabTraveler = () => {}
+const TabPayer = () => {
+    return (
+        <WhiteContainer>
+            <div className="flex flex-col">
+                {/* Search / Sort / Filter */}
+                <div className="flex flex-row justify-between items-center mb-3">
+                    <SearchBar placeholder={"Search for an employee"}/>
+                    <div className="grid grid-cols-2 gap-2">
+                        <ButtonOutline>Sort<ArrowUpDown size={18} className={"ml-2"}/></ButtonOutline>
+                        <ButtonOutline>Filter<SlidersHorizontal size={18} className={"ml-2"}/></ButtonOutline>
+                    </div>
+                </div>
+                <PayersTable/>
+            </div>
+        </WhiteContainer>
+    )
+}
+const TabTraveler = () => {
+    return (
+        <WhiteContainer>
+            <div className="flex flex-col">
+                {/* Search / Sort / Filter */}
+                <div className="flex flex-row justify-between items-center mb-3">
+                    <SearchBar placeholder={"Search for an employee"}/>
+                    <div className="grid grid-cols-2 gap-2">
+                        <ButtonOutline>Sort<ArrowUpDown size={18} className={"ml-2"}/></ButtonOutline>
+                        <ButtonOutline>Filter<SlidersHorizontal size={18} className={"ml-2"}/></ButtonOutline>
+                    </div>
+                </div>
+                <TravelersTable/>
+            </div>
+        </WhiteContainer>
+    )
+}
 
+// Tables
 const BookingsTable = () => {
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [isEditBookingModalOpen, setIsEditBookingModalOpen] = useState(false);
@@ -107,7 +140,7 @@ const BookingsTable = () => {
                             title: 'Destination',
                             format: (item) => (
                                 <td className={"text-center text-gray-400"}>
-                                    {item["Destination"]["country"]}, {item["Destination"]["city"]}
+                                    {item["destination"]["country"]}, {item["destination"]["city"]}
                                 </td>
                             )
                         },
@@ -136,10 +169,10 @@ const BookingsTable = () => {
                             )
                         },
                         {
-                            title: 'Payment',
+                            title: 'Payment status',
                             format: (item) => (
                                 <td className={"text-center text-gray-400"}>
-                                    {item["payment"]}
+                                    {item["payment_status"]}
                                 </td>
                             )
                         },
@@ -148,14 +181,22 @@ const BookingsTable = () => {
                 data={mock_bookings}
             />
 
-            {DeleteBookingModal(isDeleteBookingModalOpen, setIsDeleteBookingModalOpen, selectedBooking)}
-            {EditBookingModal(isEditBookingModalOpen, setIsDeleteBookingModalOpen, selectedBooking)}
+            <DeleteModal
+                isModalOpen={isDeleteBookingModalOpen}
+                setIsModalOpen={setIsDeleteBookingModalOpen}
+                selectedBooking={selectedBooking}
+            />
+            <EditModal
+                isModalOpen={isEditBookingModalOpen}
+                setIsModalOpen={setIsEditBookingModalOpen}
+                selectedBooking={selectedBooking}
+            />
         </>
     );
 }
 
-
-const DeleteBookingModal = (isModalOpen, setIsModalOpen, selectedBooking) => {
+// Edit / Delete Modals
+const DeleteModal = ({isModalOpen, setIsModalOpen, selectedBooking}) => {
     return (
         <ModalDialog
             open={isModalOpen}
@@ -178,46 +219,521 @@ const DeleteBookingModal = (isModalOpen, setIsModalOpen, selectedBooking) => {
         </ModalDialog>
     )
 }
-
-const EditBookingModal = (isModalOpen, setIsModalOpen, selectedBooking) => {
+const EditModal = ({isModalOpen, setIsModalOpen, selectedBooking}) => {
+    useEffect(() => {
+        if (selectedBooking) {
+            setFormData({
+                username: selectedBooking["username"],
+                destinationCity: selectedBooking["destination"]["city"],
+                destinationCountry: selectedBooking["destination"]["country"],
+                date: selectedBooking["date"],
+                phoneNumber: selectedBooking["phone_number"],
+                branch: selectedBooking["branch"],
+                payment: selectedBooking["payment"],
+            });
+        }
+    }, [selectedBooking, isModalOpen]);
+    const [formData, setFormData] = useState({
+        username: '',
+        destinationCity: '',
+        destinationCountry: '',
+        date: '',
+        phoneNumber: '',
+        branch: '',
+        payment: ''
+    })
     return (
         <ModalDialog
-            title={`Edit Employee ${selectedBooking?.id ?? ""}`}
+            title={`Edit Booking ${selectedBooking?.["booking_id"] ?? ""}`}
             open={isModalOpen}
         >
             <div className={"grid grid-cols-2 gap-4"}>
                 <InputField
-                    label={"First name"}
+                    label={"Username"}
                     disabled={false}
-                    value={selectedBooking?.["first_name"]}
+                    value={formData.username}
+                    onChange={(e) => setFormData({...formData, username:e.target.value})}
                 />
                 <InputField
-                    label={"Last name"}
+                    label={"Branch"}
                     disabled={false}
-                    value={selectedBooking?.["last_name"]}
+                    value={formData.branch}
+                    onChange={(e) => setFormData({...formData, branch:e.target.value})}
+                />
+                <InputField
+                    label={"Destination City"}
+                    disabled={false}
+                    value={formData.destinationCity}
+                    onChange={(e) => setFormData({...formData, destinationCity:e.target.value})}
+                />
+                <InputField
+                    label={"Destination Country"}
+                    disabled={false}
+                    value={formData.destinationCountry}
+                    onChange={(e) => setFormData({...formData, destinationCountry:e.target.value})}
                 />
                 <InputField
                     label={"Phone number"}
                     disabled={false}
-                    value={selectedBooking?.["phone_number"]}
+                    value={formData.phoneNumber}
+                    onChange={(e) => setFormData({...formData, phoneNumber:e.target.value})}
                 />
                 <InputField
-                    label={"Role"}
+                    label={"Payment"}
                     disabled={false}
-                    value={selectedBooking?.["role"]}
+                    type={"select"}
+                    options={["Delivered", "Confirmed", "Pending", "Sent", "Cancelled", "Returned"]}
+                    onChange={(e) => setFormData({...formData, payment:e.target.value})}
                 />
                 <InputField
-                    label={"Hire date"}
+                    className={"col-span-2"}
+                    label={"Date"}
                     disabled={false}
-                    value={selectedBooking?.["hire_date"]}
-                />
-                <InputField
-                    label={"Availability"}
-                    disabled={false}
-                    value={selectedBooking?.["availability"]}
+                    value={formData.date}
+                    type={"date"}
+                    onChange={(e) => setFormData({...formData, date:e.target.value})}
                 />
             </div>
             <ButtonOutline onClick={() => setIsModalOpen(false)}>Cancel</ButtonOutline>
         </ModalDialog>
     )
+}
+
+const PayersTable = () => {
+    const [selectedPayer, setSelectedPayer] = useState(null);
+    // const [isEditBookingModalOpen, setIsEditBookingModalOpen] = useState(false);
+    // const [isDeleteBookingModalOpen, setIsDeleteBookingModalOpen] = useState(false);
+
+    return (
+        <>
+            <Table
+                onEdit={
+                    (payer) =>
+                    {
+                        setSelectedPayer(payer);
+                        // setIsEditBookingModalOpen(true);
+                    }
+                }
+                onDelete={
+                    (payer) =>
+                    {
+                        setSelectedPayer(payer);
+                        // setIsDeleteBookingModalOpen(true);
+                    }
+                }
+                columns={
+                    [
+                        {
+                            title: 'Payer ID',
+                            format: (item) => (
+                                <td className={"text-center text-(--color-text-secondary) cursor-pointer hover:underline"}>
+                                    {item["payer_id"]}
+                                </td>
+                            )
+                        },
+                        {
+                            title: 'Booking ID',
+                            format: (item) => (
+                                <td className={"text-center text-(--color-text-secondary) cursor-pointer hover:underline"}>
+                                    {item["booking_id"]}
+                                </td>
+                            )
+                        },
+                        {
+                            title: 'User ID',
+                            format: (item) => (
+                                <td className={"text-center text-(--color-text-secondary) cursor-pointer hover:underline"}>
+                                    {item["user_id"]}
+                                </td>
+                            )
+                        },
+                        {
+                            title: 'Payer Name',
+                            format: (item) => (
+                                <td className={"text-center text-gray-400"}>
+                                    {item["payer_name"]}
+                                </td>
+                            )
+                        },
+                        {
+                            title: 'Phone Number',
+                            format: (item) => (
+                                <td className={"text-center text-gray-400"}>
+                                    {item["phone_number"]}
+                                </td>
+                            )
+                        },
+                    ]
+                }
+                data={[
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                    {
+                        payer_id: "#CR000123",
+                        booking_id: "#CR000123",
+                        user_id: "#CR000123",
+                        payer_name: "Mohammed",
+                        phone_number: "0544444444",
+                    },
+                ]}
+            />
+        </>
+    );
+}
+const TravelersTable = () => {
+    const [selectedTraveler, setSelectedTraveler] = useState(null);
+    const travelers_data = [
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+        {
+            payer_id: "#CR000123",
+            booking_id: "#CR000123",
+            user_id: "#CR000123",
+            payer_name: "Mohammed",
+            phone_number: "0544444444",
+        },
+    ]
+    // const [isEditBookingModalOpen, setIsEditBookingModalOpen] = useState(false);
+    // const [isDeleteBookingModalOpen, setIsDeleteBookingModalOpen] = useState(false);
+
+    return (
+        <>
+            <Table
+                onEdit={
+                    (traveler) =>
+                    {
+                        setSelectedTraveler(traveler);
+                        // setIsEditBookingModalOpen(true);
+                    }
+                }
+                onDelete={
+                    (traveler) =>
+                    {
+                        setSelectedTraveler(traveler);
+                        // setIsDeleteBookingModalOpen(true);
+                    }
+                }
+                columns={
+                    [
+                        {
+                            title: 'Traveler ID',
+                            format: (item) => (
+                                <td className={"text-center text-(--color-text-secondary) cursor-pointer hover:underline"}>
+                                    {item["payer_id"]}
+                                </td>
+                            )
+                        },
+                        {
+                            title: 'Booking ID',
+                            format: (item) => (
+                                <td className={"text-center text-(--color-text-secondary) cursor-pointer hover:underline"}>
+                                    {item["booking_id"]}
+                                </td>
+                            )
+                        },
+                        {
+                            title: 'User ID',
+                            format: (item) => (
+                                <td className={"text-center text-(--color-text-secondary) cursor-pointer hover:underline"}>
+                                    {item["user_id"]}
+                                </td>
+                            )
+                        },
+                        {
+                            title: 'Payer Name',
+                            format: (item) => (
+                                <td className={"text-center text-gray-400"}>
+                                    {item["payer_name"]}
+                                </td>
+                            )
+                        },
+                        {
+                            title: 'Phone Number',
+                            format: (item) => (
+                                <td className={"text-center text-gray-400"}>
+                                    {item["phone_number"]}
+                                </td>
+                            )
+                        },
+                    ]
+                }
+            />
+        </>
+    );
 }
