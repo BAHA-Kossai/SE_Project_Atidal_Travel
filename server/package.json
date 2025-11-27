@@ -2,17 +2,16 @@
   "name": "server",
   "version": "1.0.0",
   "description": "",
-  "main": "src/server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "module",
+  "type": "commonjs",
   "dependencies": {
+<<<<<<< HEAD
     "@supabase/supabase-js": "^2.49.1",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.3",
@@ -25,5 +24,8 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.7"
+=======
+    "express": "^5.1.0"
+>>>>>>> origin/frontend
   }
 }
