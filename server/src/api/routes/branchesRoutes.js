@@ -1,5 +1,6 @@
 /**
  * @file        branchesRoutes.js
+<<<<<<< HEAD
  * @description Routes for branch API endpoints
  * 
  * @author      Abderahim
@@ -7,30 +8,33 @@
  * @date        2025-11-21
  */
 
-import express from 'express';
-import { createBranch, getAllBranches, getBranchById, updateBranch, deleteBranch } from '../controllers/branchController.js';
-import { validateBranch } from '../validators/branchValidator.js';
+import express from "express";
+import {
+  createBranch,
+  getAllBranches,
+  getBranchById,
+  updateBranch,
+  deleteBranch,
+} from "../controllers/branchController.js";
+import { validateBranch } from "../validators/branchValidator.js";
 
-export function setupBranchRoutes(app, supabaseClient) {
-  const router = express.Router();
+const router = express.Router();
 
-  // CREATE - Post a new branch
-  router.post('/', validateBranch, createBranch);
+// CREATE - Post a new branch
+router.post("/", validateBranch, createBranch);
 
-  // READ - Get all branches with filters
-  router.get('/', getAllBranches);
+// READ - Get all branches with filters
+router.get("/", getAllBranches);
 
-  // READ - Get branch by ID
-  router.get('/:id', getBranchById);
+// READ - Get branch by ID
+router.get("/:id", getBranchById);
 
-  // UPDATE - Update branch by ID
-  router.put('/:id', validateBranch, updateBranch);
+// UPDATE - Update branch by ID
+router.put("/:id", validateBranch, updateBranch);
 
-  // DELETE - Delete branch by ID
-  router.delete('/:id', deleteBranch);
+// DELETE - Delete branch by ID
+router.delete("/:id", deleteBranch);
 
-  app.use('/api/branches', router);
-}
+router.get("/active", branchesController.getActiveBranches);
 
 export default router;
-

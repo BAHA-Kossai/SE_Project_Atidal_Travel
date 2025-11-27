@@ -7,9 +7,11 @@
  * @version     1.0.0
  * @date        2025-11-22
  */
-
-import GuidedTripsRepository from '../repositories/GuidedTrips.js';
+import GetGuidedTripsByTypeUseCase from '../../core/usecases/GuidedTrips/GetGuidedTripsByTypeUseCase.js';
+import GuidedTripsRepository from '../../repositories/GuidedTripsRepository.js';
 import supabase from '../../config/supabase.js';
+
+
 
 // READ - Get all guided trips
 export const getAllGuidedTrips = async (req, res) => {
@@ -74,4 +76,39 @@ export const getGuidedTripById = async (req, res) => {
     });
   }
 };
+
+
+
+
+const guidedTripsRepository = new GuidedTripsRepository(supabase);
+
+class GuidedTripsController {
+
+    async getTripsByType(req, res) {
+        try {
+            const { type } = req.params;
+            const { limit } = req.query;
+            
+            const useCase = new GetGuidedTripsByTypeUseCase(guidedTripsRepository);
+            const trips = await useCase.execute(
+                type, 
+                limit ? parseInt(limit) : null
+            );
+            
+            res.json({
+                status: "success",
+                data: trips,
+                message: `Guided trips of type ${type} retrieved successfully`
+            });
+        } catch (error) {
+            res.status(400).json({
+                status: "error",
+                data: null,
+                message: error.message
+            });
+        }
+    }
+}
+
+export default new GuidedTripsController();
 

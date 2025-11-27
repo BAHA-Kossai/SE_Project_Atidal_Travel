@@ -1,5 +1,23 @@
-import GetAllDestinationsUseCase from '../../core/usecases/GetAllDestinationsUseCase.js';
-import SearchDestinationsUseCase from '../../core/usecases/SearchDestinationsUseCase.js';
+/**
+ * @file        destinationsController.js
+ * @description Defines controller functions for handling destinations-related requests.
+ *              Controllers receive HTTP request data, invoke UseCases, and return JSON results.
+ *              No business logic is implemented here.
+ *
+ * @requires    GetAllDestinationsUseCase       - Handles retrieval of all destinations
+ * @requires    SearchDestinationsUseCase       - Handles destination search logic  
+ * @requires    GetFeaturedDestinationsUseCase  - Handles featured destinations retrieval
+ * @requires    DestinationsRepository          - Access to destinations database operations
+ *
+ * @author      Ahlem Toubrinet
+ * @version     1.0.0
+ * @date        2025-11-17
+ * @lastModified 2025-11-25
+ */
+
+import GetAllDestinationsUseCase from '../../core/usecases/Destinations/GetAllDestinationsUseCase.js';
+import SearchDestinationsUseCase from '../../core/usecases/Destinations/SearchDestinationsUseCase.js';
+import GetFeaturedDestinationsUseCase from '../../core/usecases/Destinations/GetFeaturedDestinationsUseCase.js'; 
 import DestinationsRepository from '../../repositories/DestinationsRepository.js';
 import supabase from '../../config/supabase.js';
 
@@ -27,7 +45,7 @@ class DestinationsController {
 
   async searchDestinations(req, res) {
     try {
-      const { q } = req.query; // Search term from query params
+      const { q } = req.query; 
       
       if (!q) {
         return res.status(400).json({
@@ -48,6 +66,26 @@ class DestinationsController {
     } catch (error) {
       res.status(500).json({
         status: "error",
+        data: null,
+        message: error.message
+      });
+    }
+  }
+
+  async getFeaturedDestinations(req, res) {
+    try {
+      const { limit } = req.query;
+      const useCase = new GetFeaturedDestinationsUseCase(destinationsRepository);
+      const featuredDestinations = await useCase.execute(parseInt(limit) || 3);
+      
+      res.json({
+        status: "success",
+        data: featuredDestinations,
+        message: "Featured destinations retrieved successfully"
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error", 
         data: null,
         message: error.message
       });

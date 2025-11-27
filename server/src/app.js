@@ -2,39 +2,45 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 
-// Import routes
 import destinationsRoutes from './api/routes/destinationsRoutes.js';
 import bookingsRoutes from './api/routes/bookingsRoutes.js';
+import guidedTripsRoutes from './api/routes/guidedTripsRoutes.js';
+import branchesRoutes from './api/routes/branchesRoutes.js';
 
 const app = express();
 
-// Global middlewares
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Mount API routes
 app.use('/api/destinations', destinationsRoutes);
 app.use('/api/bookings', bookingsRoutes);
+app.use('/api/guided-trips', guidedTripsRoutes);
+app.use('/api/branches', branchesRoutes);
 
-// Health check route
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', timestamp: new Date().toISOString() });
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error('Error:', err.stack);
-  res.status(500).json({ 
-    error: 'Something went wrong!',
-    message: process.env.NODE_ENV === 'development' ? err.message : undefined
+  res.json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString()
   });
 });
 
-// 404 handler
+app.use((err, req, res, next) => {
+  console.error('Error:', err.stack);
+  res.status(500).json({ 
+    error: 'Something went wrong!'
+  });
+});
+
 app.use((req, res) => {
-  res.status(404).json({ error: 'Route not found' });
+  res.status(404).json({ 
+    error: 'Route not found'
+  });
 });
 
 export default app;

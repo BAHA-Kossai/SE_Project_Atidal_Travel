@@ -3,18 +3,19 @@
  * @description Repository class for the "bookings" table.
  *              Extends BaseRepository and provides generic CRUD operations
  *              along with entity-specific methods for different booking types.
- * 
+ *              Contains only database access logic for Bookings entity.
+ *
  * @extends     BaseRepository
- * 
- * @author      Ahlem
+ * @requires    BaseRepository - Base repository class for common operations
+ *
+ * @author      Ahlem Toubrinet
  * @version     1.0.0
  * @date        2025-11-17
- * @lastModified 2025-11-17
- * 
- * @notes       - This repository contains only database access logic for Bookings.
- *              - Business logic (validation, operational rules, etc.) should be placed in service layer.
- *              - Bookings are independent from destinations (no joins needed).
- * 
+ * @lastModified 2025-11-25
+ *
+ * @notes       - This repository contains only database access logic for Bookings
+ *              - Business logic should be placed in service/use case layer
+ *
  * Usage Example:
  * 
  * import BookingsRepository from './BookingsRepository.js';
@@ -25,8 +26,6 @@
  * 
  * // Fetch bookings by type
  * const normalBookings = await bookingRepo.findBookingsByType('normal');
- * const guidedTrips = await bookingRepo.findBookingsByType('guided_trip');
- * const umrahTrips = await bookingRepo.findBookingsByType('umrah_trip');
  */
 
 import BaseRepository from './baseRepository.js';
@@ -105,40 +104,6 @@ class BookingsRepository extends BaseRepository {
     return data;
   }
 
-  // Find bookings within a date range
-  async findBookingsByDateRange(startDate, endDate) {
-    const { data, error } = await this.supabase
-      .from(this.table)
-      .select('*')
-      .gte('departure_time', startDate)
-      .lte('returning_time', endDate);
-    if (error) throw error;
-    return data;
-  }
-
-  // Find upcoming bookings (future check-ins)
-  async getUpcomingBookings() {
-    const today = new Date().toISOString().split('T')[0];
-    const { data, error } = await this.supabase
-      .from(this.table)
-      .select('*')
-      .gte('departure_time', today);
-    if (error) throw error;
-    return data;
-  }
-
-  // Find upcoming bookings by type
-  async getUpcomingBookingsByType(bookingType) {
-    const today = new Date().toISOString().split('T')[0];
-    const { data, error } = await this.supabase
-      .from(this.table)
-      .select('*')
-      .eq('_type', bookingType)
-      .gte('departure_time', today);
-    if (error) throw error;
-    return data;
-  }
-
   // Update booking status
   async updateBookingStatus(id, status) {
     const { data, error } = await this.supabase
@@ -181,6 +146,10 @@ class BookingsRepository extends BaseRepository {
     if (error) throw error;
     return { data, totalCount: count };
   }
+
+
+
+
 }
 
 export default BookingsRepository;

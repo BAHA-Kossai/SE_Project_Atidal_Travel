@@ -2,32 +2,59 @@
  * @file        bookingsRoutes.js
  * @description Routes for booking API endpoints (Read-only)
  * 
- * @author      Abderahim 
+ * @author      Abderahim ,Ahlem Toubrient,kossai BAHA
  * @version     1.0.0
  * @date        2025-11-22
+igin/feature/ahlem-api-integration
  */
 
-import express from 'express';
-import bookingsController from '../controllers/bookingsController.js';
-import { getAllBookings, getBookingById } from '../controllers/bookingController.js';
+import express from "express";
 
+import {
+  verifySupabaseToken,
+  requireSuperAdmin,
+  requireAdmin_or_SuperAdmin,
+} from "../middlewares/authMiddleware.js";
+import {
+  assignBranchController,
+  updateBookingStatusController,
+} from "../controllers/bookingsController.js";
 
+import bookingsController from "../controllers/bookingsController.js";
+import {
+  getAllBookings,
+  getBookingById,
+} from "../controllers/bookingsController.js";
 
+const router = express.Router();
 
+// READ - Get all bookings with filters
+router.get("/", getAllBookings);
 
-export function setupBookingRoutes(app, supabaseClient) {
-  const router = express.Router();
+// READ - Get booking by ID
+router.get("/:id", getBookingById);
 
-  // READ - Get all bookings with filters
-  router.get('/', getAllBookings);
+app.use("/api/bookings", router);
+router.post("/", bookingsController.createBooking);
 
-  // READ - Get booking by ID
-  router.get('/:id', getBookingById);
+router.post("/create", bookingsController.createBooking);
 
-  app.use('/api/bookings', router);
-  router.post('/', bookingsController.createBooking);
-router.get('/user/:userId', bookingsController.getUserBookings);
-}
+router.get("/user/:userId", bookingsController.getUserBookings);
+
+// PATCH /bookings/assign-branch
+router.patch(
+  "/assign-branch",
+  verifySupabaseToken,
+  requireSuperAdmin,
+  assignBranchController
+);
+
+// PATCH /bookings/update-status
+router.patch(
+  "/update-status",
+  verifySupabaseToken,
+  requireAdmin_or_SuperAdmin,
+  updateBookingStatusController
+);
 
 export default router;
-

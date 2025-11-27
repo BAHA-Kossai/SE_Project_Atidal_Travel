@@ -1,8 +1,8 @@
-import { validateBookingInput } from '../../../api/validators/bookingValidator.js';
-import { validateTripInfoPayload } from '../../../api/validators/tripInfoValidator.js';
-import { buildBookingResponse } from './helpers.js';
+import { validateBookingInput } from "../../../api/validators/bookingValidator.js";
+import { validateTripInfoPayload } from "../../../api/validators/tripInfoValidator.js";
+import { buildBookingResponse } from "./helpers.js";
 
-const DEFAULT_STATUS = 'pending';
+const DEFAULT_STATUS = "pending";
 
 export class CreateBookingUseCase {
   constructor({
@@ -11,7 +11,7 @@ export class CreateBookingUseCase {
     travelerRepository,
     statusHistoryRepository,
     tripInfoRepository,
-    guidedTripsRepository
+    guidedTripsRepository,
   }) {
     this.bookingRepository = bookingRepository;
     this.payerRepository = payerRepository;
@@ -25,7 +25,7 @@ export class CreateBookingUseCase {
     try {
       const { valid, errors, payload } = validateBookingInput(input);
       if (!valid) {
-        return { success: false, error: errors.join(', '), status: 400 };
+        return { success: false, error: errors.join(", "), status: 400 };
       }
 
       const travelers = Array.isArray(payload.travelers)
@@ -42,11 +42,14 @@ export class CreateBookingUseCase {
       const guidedTrip = await this.guidedTripsRepository.getTripByInfoId(
         infoId
       );
-      if (guidedTrip && Number(guidedTrip.available_seats ?? 0) < travelerCount) {
+      if (
+        guidedTrip &&
+        Number(guidedTrip.available_seats ?? 0) < travelerCount
+      ) {
         return {
           success: false,
-          error: 'Not enough available seats for this guided trip',
-          status: 400
+          error: "Not enough available seats for this guided trip",
+          status: 400,
         };
       }
 
@@ -56,7 +59,7 @@ export class CreateBookingUseCase {
         payerCreated: false,
         guidedTrip,
         seatsDelta: 0,
-        customTripInfoId: created ? infoId : null
+        customTripInfoId: created ? infoId : null,
       };
 
       try {
@@ -68,7 +71,7 @@ export class CreateBookingUseCase {
           booking_status: payload.booking_status || DEFAULT_STATUS,
           needs_visa_assistance: Boolean(payload.needs_visa_assistance),
           created_at: now,
-          updated_at: now
+          updated_at: now,
         });
         rollbackState.booking = booking;
 
@@ -88,7 +91,7 @@ export class CreateBookingUseCase {
           confirmed_at: payload.payer.confirmed_at || null,
           cancelled_at: payload.payer.cancelled_at || null,
           booking_notes: payload.payer.booking_notes || null,
-          created_at: payload.payer.created_at || now
+          created_at: payload.payer.created_at || now,
         });
         rollbackState.payerCreated = true;
 
@@ -104,9 +107,11 @@ export class CreateBookingUseCase {
             traveler_contact: travelerInput.traveler_contact,
             passport_number: travelerInput.passport_number,
             gender: travelerInput.gender,
-            created_at: now
+            created_at: now,
           });
-          rollbackState.travelerIds.push(traveler.traveler_id ?? traveler.travler_id);
+          rollbackState.travelerIds.push(
+            traveler.traveler_id ?? traveler.travler_id
+          );
           travelerRecords.push(traveler);
         }
 
@@ -114,13 +119,12 @@ export class CreateBookingUseCase {
           booking_id: booking.booking_id,
           status: booking.booking_status,
           changed_at: now,
-          changed_by: payload.user_id || null
+          changed_by: payload.user_id || null,
         });
 
-        const history =
-          await this.statusHistoryRepository.getHistoryForBooking(
-            booking.booking_id
-          );
+        const history = await this.statusHistoryRepository.getHistoryForBooking(
+          booking.booking_id
+        );
 
         const response = buildBookingResponse({
           booking,
@@ -128,7 +132,7 @@ export class CreateBookingUseCase {
           travelers: travelerRecords,
           history,
           trip: guidedTrip,
-          tripInfo
+          tripInfo,
         });
 
         return { success: true, data: response, status: 201 };
@@ -147,37 +151,38 @@ export class CreateBookingUseCase {
         payload.info_id
       );
       if (!existing) {
-        throw new Error('Referenced trip info not found');
+        throw new Error("Referenced trip info not found");
       }
       return {
         tripInfo: existing,
         infoId: existing.info_id ?? existing.infoId,
-        created: false
+        created: false,
       };
     }
 
     if (!payload.trip_info) {
-      throw new Error('trip_info payload is required for custom bookings');
+      throw new Error("trip_info payload is required for custom bookings");
     }
 
-    const { payload: tripInfoPayload, valid, errors } = validateTripInfoPayload(
-      payload.trip_info,
-      { isUpdate: false }
-    );
+    const {
+      payload: tripInfoPayload,
+      valid,
+      errors,
+    } = validateTripInfoPayload(payload.trip_info, { isUpdate: false });
     if (!valid) {
-      throw new Error(errors.join(', '));
+      throw new Error(errors.join(", "));
     }
 
     const created = await this.tripInfoRepository.createTripInfo({
       ...tripInfoPayload,
       created_at: timestamp,
-      updated_at: timestamp
+      updated_at: timestamp,
     });
 
     return {
       tripInfo: created,
       infoId: created.info_id ?? created.infoId,
-      created: true
+      created: true,
     };
   }
 
@@ -187,7 +192,7 @@ export class CreateBookingUseCase {
     payerCreated,
     guidedTrip,
     seatsDelta,
-    customTripInfoId
+    customTripInfoId,
   }) {
     try {
       for (const travelerId of travelerIds) {
@@ -216,7 +221,7 @@ export class CreateBookingUseCase {
       }
     } catch (rollbackError) {
       // eslint-disable-next-line no-console
-      console.error('Booking rollback failed', rollbackError);
+      console.error("Booking rollback failed", rollbackError);
     }
   }
 }

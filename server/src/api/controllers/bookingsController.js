@@ -1,3 +1,22 @@
+/**
+ * @file        bookingsController.js
+ * @description Defines controller functions for handling booking-related requests.
+ *              Controllers receive HTTP request data, invoke UseCases, and return JSON results.
+ *              No business logic is implemented here.
+ *
+ * @requires    CreateBookingUseCase    - Handles booking creation logic
+ * @requires    GetUserBookingsUseCase  - Handles user bookings retrieval logic
+ * @requires    BookingsRepository      - Access to booking database operations
+ * @requires    PayerRepository         - Access to payer database operations
+ * @requires    TravelersRepository     - Access to travelers database operations
+ * @requires    TripInfoRepository      - Access to trip info database operations
+ *
+ * @author      Ahlem Toubrinet , Kossai baha, Abderahim
+ * @version     1.0.0
+ * @date        2025-11-17
+ * @lastModified 2025-11-25
+ */
+
 import AssignBranchUseCase from "../../core/usecases/bookings/AssignBranchUseCase.js";
 import UpdateBookingStatusUseCase from "../../core/usecases/bookings/UpdateBookingStatusUseCase.js";
 import CreateBookingUseCase from "../../core/usecases/CreateBookingUseCase.js";
@@ -6,21 +25,39 @@ import BookingsRepository from "../../repositories/BookingsRepository.js";
 import BranchRepository from "../../repositories/branchRepository.js";
 import supabase from "../../config/supabase.js";
 
+import CreateBookingUseCase from "../../core/usecases/Booking/CreateBookingUseCase.js";
+import GetUserBookingsUseCase from "../../core/usecases/Booking/GetUserBookingsUseCase.js";
+import BookingsRepository from "../../repositories/BookingsRepository.js";
+import PayerRepository from "../../repositories/PayerRepository.js";
+import TravelersRepository from "../../repositories/TravelersRepository.js";
+import TripInfoRepository from "../../repositories/TripInfoRepository.js";
+import supabase from "../../config/supabase.js";
+
 const bookingsRepository = new BookingsRepository(supabase);
+const payerRepository = new PayerRepository(supabase);
+const travelersRepository = new TravelersRepository(supabase);
+const tripInfoRepository = new TripInfoRepository(supabase);
 
 class BookingsController {
   async createBooking(req, res) {
     try {
-      const useCase = new CreateBookingUseCase(bookingsRepository);
+      const useCase = new CreateBookingUseCase(
+        bookingsRepository,
+        payerRepository,
+        travelersRepository,
+        tripInfoRepository
+      );
       const newBooking = await useCase.execute(req.body);
+      const result = await useCase.execute(req.body);
 
       res.status(201).json({
         status: "success",
-        data: newBooking,
-        message: "Booking created successfully",
+        data: result,
+        message:
+          "Booking created successfully with trip info, payer, and traveler information",
       });
     } catch (error) {
-      res.status(500).json({
+      res.status(400).json({
         status: "error",
         data: null,
         message: error.message,
@@ -31,6 +68,7 @@ class BookingsController {
   async getUserBookings(req, res) {
     try {
       const { userId } = req.params;
+
       const { type } = req.query;
 
       const useCase = new GetUserBookingsUseCase(bookingsRepository);
@@ -101,3 +139,4 @@ export const updateBookingStatusController = async (req, res) => {
     });
   }
 };
+

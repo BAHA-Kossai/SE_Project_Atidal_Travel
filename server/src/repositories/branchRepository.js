@@ -5,11 +5,12 @@
  *              along with entity-specific methods like findBranchesByCity.
  * 
  * @extends     BaseRepository
+ * @requires    BaseRepository - Base repository class for common operations
  * 
- * @author      Kossai Baha
+ * @author      Kossai Baha, Ahlem Toubrinet
  * @version     1.0.0
  * @date        2025-11-17
- * @lastModified 2025-11-17
+ * @lastModified 2025-11-25
  * 
  * @notes       - This repository contains only database access logic for Branches.
  *              - Business logic (validation, operational rules, etc.) should be placed in service layer.
@@ -52,7 +53,6 @@ class BranchesRepository extends BaseRepository {
   }
 
   updateBranch(id, updates) {
-    // Optional: add updated_at if you have such a column
     const updatedRecord = {
       ...updates,
       updated_at: new Date().toISOString(),
@@ -91,16 +91,32 @@ class BranchesRepository extends BaseRepository {
  * @param {number} branch_id
  * @returns {boolean} true if exists, false otherwise
  */
-async exists(branch_id) {
-  const { data, error } = await this.supabase
-    .from(this.table)
-    .select('branch_id')
-    .eq(this.primaryKey, branch_id)
-    .maybeSingle();
+  async exists(branch_id) {
+    const { data, error } = await this.supabase
+      .from(this.table)
+      .select('branch_id')
+      .eq(this.primaryKey, branch_id)
+      .maybeSingle();
 
-  if (error) throw error;
-  return !!data; // true if branch exists
-}
+    if (error) throw error;
+    return !!data; // true if branch exists
+  }
+
+  // Get active branches with limit
+  async getActiveBranchesWithLimit(limit = null) {
+    let query = this.supabase
+      .from(this.table)
+      .select('*')
+      .eq('is_active', true);
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return data;
+  }
 }
 
 export default BranchesRepository;
