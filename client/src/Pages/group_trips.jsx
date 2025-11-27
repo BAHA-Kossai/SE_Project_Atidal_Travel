@@ -143,7 +143,7 @@ export default function GroupTrip() {
   const [showBookingForm, setShowBookingForm] = useState(false);
 
  const handleBookNow = (packageData) => {
-   navigate('/booking', {
+   navigate('/bookings', {
   state: {
     packageData,
     isGroupTrip: true
@@ -163,7 +163,7 @@ export default function GroupTrip() {
       <TravelHeroSection
   image={Guided}
   title="Group Trips"
-  subtitle="Amazing adventures await"/>
+  subtitle="Enjoy traveling with a group!"/>
 
       {/* Packages Section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
