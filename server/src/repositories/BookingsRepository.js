@@ -3,18 +3,19 @@
  * @description Repository class for the "bookings" table.
  *              Extends BaseRepository and provides generic CRUD operations
  *              along with entity-specific methods for different booking types.
- * 
+ *              Contains only database access logic for Bookings entity.
+ *
  * @extends     BaseRepository
- * 
- * @author      Ahlem
+ * @requires    BaseRepository - Base repository class for common operations
+ *
+ * @author      Ahlem Toubrinet
  * @version     1.0.0
  * @date        2025-11-17
- * @lastModified 2025-11-17
- * 
- * @notes       - This repository contains only database access logic for Bookings.
- *              - Business logic (validation, operational rules, etc.) should be placed in service layer.
- *              - Bookings are independent from destinations (no joins needed).
- * 
+ * @lastModified 2025-11-25
+ *
+ * @notes       - This repository contains only database access logic for Bookings
+ *              - Business logic should be placed in service/use case layer
+ *
  * Usage Example:
  * 
  * import BookingsRepository from './BookingsRepository.js';
@@ -25,8 +26,6 @@
  * 
  * // Fetch bookings by type
  * const normalBookings = await bookingRepo.findBookingsByType('normal');
- * const guidedTrips = await bookingRepo.findBookingsByType('guided_trip');
- * const umrahTrips = await bookingRepo.findBookingsByType('umrah_trip');
  */
 
 import BaseRepository from './baseRepository.js';
@@ -148,38 +147,6 @@ class BookingsRepository extends BaseRepository {
     return { data, totalCount: count };
   }
 
-  // Get bookings by type with status filter and limit
-  async getBookingsByTypeAndStatus(bookingType, status = 'draft', limit = null) {
-    let query;
-    
-    // For guided_trip type, join with guided_trips table
-    if (bookingType === 'guided_trip' || bookingType === 'umrah') {
-      query = this.supabase
-        .from(this.table)
-        .select(`
-          *,
-          Guided_trips (*)
-        `)
-        .eq('type', bookingType)
-        .eq('booking_status', status);
-    } else {
-      // For other booking types, use normal select
-      query = this.supabase
-        .from(this.table)
-        .select('*')
-        .eq('type', bookingType)
-        .eq('booking_status', status);
-    }
-
-    // Add limit if specified
-    if (limit) {
-      query = query.limit(limit);
-    }
-
-    const { data, error } = await query;
-    if (error) throw error;
-    return data;
-  }
 
 
 

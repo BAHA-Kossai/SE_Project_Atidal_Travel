@@ -5,8 +5,9 @@
  *              along with entity-specific methods like findDestinationsByCountry.
  * 
  * @extends     BaseRepository
+ * @requires    BaseRepository - Base repository class for common operations
  * 
- * @author      Ahlem
+ * @author      Ahlem Toubrient
  * @version     1.0.0
  * @date        2025-11-17
  * @lastModified 2025-11-17
@@ -25,9 +26,6 @@
  * 
  * // Fetch a destination by ID
  * const destination = await destinationRepo.getDestinationById(1);
- * 
- * // Find destinations by country
- * const countryDestinations = await destinationRepo.findDestinationsByCountry('France');
  * 
  * // Search destinations by city
  * const cityDestinations = await destinationRepo.searchDestinationsByCity('Paris');
@@ -88,6 +86,7 @@ class DestinationsRepository extends BaseRepository {
     if (error) throw error;
     return data;
   }
+  
   // Get limited number of destinations
   async getDestinationsWithLimit(limit = 3) {
     const { data, error } = await this.supabase

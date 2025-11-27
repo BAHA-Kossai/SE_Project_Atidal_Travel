@@ -1,6 +1,6 @@
 import AssignBranchUseCase from "../../core/usecases/Booking/AssignBranchUseCase.js";
 import BookingsRepository from "../../repositories/BookingsRepository.js";
-import BranchRepository from "../../repositories/branchRepository.js";
+import BranchRepository from "../../repositories/BranchRepository.js";
 import supabase from '../../config/supabase.js';
 const bookingsRepository = new BookingsRepository(supabase);
 const branchRepository = new BranchRepository(supabase);
