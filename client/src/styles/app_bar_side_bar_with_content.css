@@ -1,10 +1,11 @@
-@import "tailwindcss";
-@import "./themes.css";
 /**
  * File: admin_dashboard.css
  * Description: Component styles for admin dashboard
  * Uses global CSS variables for theming
  */
+
+@import "tailwindcss";
+@import "./global_theme.css";
 
 @layer components {
     /* AppBar Styles */

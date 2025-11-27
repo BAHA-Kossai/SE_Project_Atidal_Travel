@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { ChevronDown, MapPin, Calendar, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout.jsx';
-import { DESTINATIONS } from '../data/constants';
+import { DESTINATIONS } from '../data/constants.js';
 
 const DestinationCard = ({ name, location, imageSrc }) => {
   return (
@@ -27,7 +27,7 @@ const DestinationCard = ({ name, location, imageSrc }) => {
   );
 };
 
-const Destinations = () => {
+const DestinationsPage = () => {
   const navigate = useNavigate();
   const [destination, setDestination] = useState('');
   const [date, setDate] = useState('');
@@ -150,4 +150,4 @@ const Destinations = () => {
   );
 };
 
-export default Destinations;
+export default DestinationsPage;

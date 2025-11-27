@@ -6,14 +6,14 @@ export default function InputField(props) {
 
             {
                 props.type === "select" ?
-                    <select name="select" className={`flex flex-col text-gray-700 ${props.className}`} style={props.style}>
+                    <select name="select" className={`border-1 py-3 px-3 border-gray-500 rounded-lg w-${props.width} max-w-${props.fieldMaxWidth}`} style={props.style}>
                         {
                             props.options.map((option, index) => (
                                 <option
                                     key={index}
-                                    value={option["value"]}
+                                    value={option.toString()}
                                 >
-                                    {option["name"]}
+                                    {option}
                                 </option>
                             ))
                         }

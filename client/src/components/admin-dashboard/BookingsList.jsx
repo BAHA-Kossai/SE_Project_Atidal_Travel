@@ -1,4 +1,4 @@
-import "../../../styles/admin_dashboard/admin_dashboard.css";
+import "../../styles/admin_dashboard.css";
 import { ArrowUpRight } from "lucide-react";
 // BookingRow Component
 const BookingRow = ({ id, user, destination, date, status, statusColor }) => (

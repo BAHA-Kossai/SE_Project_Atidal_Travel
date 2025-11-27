@@ -14,13 +14,13 @@
  * - Refactored to use semantic CSS classes for better maintainability.
  */
 
-import  {AppBarSideBarWithContent} from "../commons/components/appBarSideBar.jsx";
-import Dashboard from './components/adminDashboardCompoents.jsx';
+import  {AppBarSideBarWithContent} from "../components/AppBarSideBarWithContent.jsx";
+import Dashboard from '../components/admin-dashboard/AdminDashboardComponents.jsx';
 
 
 
-//main admin dashboard + apbar + side bar component
-export const AdminDashboard = ({ children }) => {
+//main admin dashboard + appbar + side bar component
+export const AdminDashboardPage = () => {
   return <AppBarSideBarWithContent>
     <Dashboard />
   </AppBarSideBarWithContent>;

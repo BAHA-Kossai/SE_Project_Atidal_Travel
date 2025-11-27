@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import Header from '../components/layout/Header.jsx';
 import Footer from '../components/layout/Footer.jsx';
 
-const NotFound = () => {
+const NotFoundPage = () => {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
@@ -24,4 +24,4 @@ const NotFound = () => {
   );
 };
 
-export default NotFound;
+export default NotFoundPage;

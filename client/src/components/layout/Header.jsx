@@ -52,7 +52,7 @@ const handleBookNow = () => {
               </Link>
             ))}
             <a
-              href="#signin"
+              href="/Login"
               className="text-gray-700 hover:text-[#117BB8] transition-colors duration-200 text-sm font-medium"
             >
               Sign in
