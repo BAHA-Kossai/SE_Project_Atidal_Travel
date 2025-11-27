@@ -1,3 +1,4 @@
+
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import GroupTrip from "./Pages/group_trips.jsx";
@@ -42,7 +43,6 @@ createRoot(rootElement).render(
                 <Route path="/reset-password" element={<ResetPassword/>} />
                 <Route path="/fill-information" element={<FillInformation/>} />
                 <Route path="/profile" element={<Profile/>} />
-                <Route path="*" element={<NotFoundPage/>} />
                 {/* Admin Side */}
                 <Route path="/admin/" element={<AdminDashboardPage/>} />
                 <Route path="/admin/settings" element={<AdminSettingsPage/>} />
