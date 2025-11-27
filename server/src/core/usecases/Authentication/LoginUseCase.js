@@ -18,6 +18,7 @@ import { comparePassword } from "../../../utils/formValidation.js";
 import { LogInValidator } from "../../../api/validators/auth/LogInValidator.js";
 
 
+
 class LoginUseCase {
   constructor(userRepository) {
     this.userRepository = userRepository;
@@ -34,7 +35,7 @@ class LoginUseCase {
 
     // Check password method
     if (user.password_hash === "authByGoogle") {
-      return { status: 403, message: "Error: user must log in with Google." };
+      return { status: 403, message: "user must log in with Google." };
     }
 
     // Verify password
@@ -56,14 +57,19 @@ class LoginUseCase {
 
     // Return token and user info
     return {
+      status: 200,
       token: {
         access: supabaseSession.session.access_token,
         refresh: supabaseSession.session.refresh_token
       },
       user: {
         id: user.user_id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        date_of_birth : user.date_of_birth,
         supabase_id: user.supabase_id,
-        email: user.email
+        email: user.email,
+        phone:user.phone
       }
     };
   }

@@ -46,12 +46,12 @@ class SignUpWithEmailValidator {
     //set of checks must be validated
     //map  of  {valid : (true/false) msg : "error message"}
     const rules = [
-      { valid: validateFirstName(data.first_name), msg: `Error-Sign up: First name [${data.first_name}] is invalid.` },
-      { valid: validateLastName(data.last_name), msg: `Error-Sign up: Last name [${data.last_name}] is invalid.` },
-      { valid: validateEmail(data.email), msg: `Error-Sign up: Invalid Email [${data.email}].` },
-      { valid: validateBirthDate(data.date_of_birth), msg: `Error-Sign up: Invalid Birth date [${data.date_of_birth}].` },
-      { valid: validatePassword(data.password), msg: `Error-Sign up: Invalid Password.` },
-      { valid: validatePhoneNumber(data.phone), msg: `Error-Sign up: Invalid Phone number [${data.phone}].` },
+      { valid: validateFirstName(data.first_name), msg: `First name [${data.first_name}] is invalid.` },
+      { valid: validateLastName(data.last_name), msg: `Last name [${data.last_name}] is invalid.` },
+      { valid: validateEmail(data.email), msg: `Invalid Email [${data.email}].` },
+      { valid: validateBirthDate(data.date_of_birth), msg: `Invalid Birth date [${data.date_of_birth}].` },
+      { valid: validatePassword(data.password), msg: `Invalid Password.` },
+      { valid: validatePhoneNumber(data.phone), msg: `Invalid Phone number [${data.phone}].` },
     ];
 
     rules.forEach(rule => {

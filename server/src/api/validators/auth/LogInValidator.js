@@ -29,8 +29,8 @@ class LogInValidator {
     const errors = [];
 
     const rules = [
-      { valid: validateEmail(data.email), msg: `Error-Login: Invalid Email [${data.email}].` },
-      { valid: validatePassword(data.password), msg: `Error-Login: Invalid Password.` }
+      { valid: validateEmail(data.email), msg: `Invalid Email [${data.email}].` },
+      { valid: validatePassword(data.password), msg: `Invalid Password.` }
     ];
 
     rules.forEach(rule => {

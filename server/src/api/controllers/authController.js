@@ -84,24 +84,51 @@ export const signUpController = async (req, res) => {
  * On Failure:
  *  { error: "message" }
  */
+// export const signInController = async (req, res) => {
+//     try {
+//         const login = new LoginUseCase(userRepo);
+//         const result = await login.loginWithEmail(req.body);
+
+//         return res.status(200).json({
+//             status: "success",
+//             data: result
+//         });
+//     } catch (err) {
+//         return res.status(err.status || 401).json({
+//             status: "error",
+//             data: {},
+//             message: err.message
+//         });
+//     }
+// };
+
+
 export const signInController = async (req, res) => {
     try {
         const login = new LoginUseCase(userRepo);
         const result = await login.loginWithEmail(req.body);
 
+        if (result.status !== 200) {
+            return res.status(result.status).json({
+                status: "error",
+                message: result.message,
+                data: {}
+            });
+        }
+  // Remove the inner status
+        const { status, ...cleanResult } = result;
         return res.status(200).json({
-            status: "success",
-            data: result
+            message: "Login successful",
+            data: cleanResult
         });
     } catch (err) {
-        return res.status(err.status || 401).json({
+        return res.status(err.status || 500).json({
             status: "error",
-            data: {},
-            message: err.message
+            message: err.message || "Server error",
+            data: {}
         });
     }
 };
-
 /**
  * @function forgotPasswordController
  * @description Handles "forgot password" requests.
