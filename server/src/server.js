@@ -4,7 +4,7 @@ import authRouter from "./api/routes/authRoutes.js";
 import adminRouter from "./api/routes/adminRoutes.js";
 import userRouter from "./api/routes/userRoutes.js";
 import guideRouter from "./api/routes/guideRoutes.js";
-import BookingRouter from "./api/routes/BookingRoute.js";
+import BookingRouter from "./api/routes/bookingsRoutes.js";
 import cors from "cors";
 const app = express();
 
