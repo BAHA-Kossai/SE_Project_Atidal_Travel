@@ -6,7 +6,12 @@ export default function InputField(props) {
 
             {
                 props.type === "select" ?
-                    <select name="select" className={`border-1 py-3 px-3 border-gray-500 rounded-lg w-${props.width} max-w-${props.fieldMaxWidth}`} style={props.style}>
+                    <select
+                        name="select"
+                        value={props.value}
+                        onChange={props.onChange}
+                        className={`border-1 py-3 px-3 border-gray-500 rounded-lg w-${props.width} max-w-${props.fieldMaxWidth}`}
+                        style={props.style}>
                         {
                             props.options.map((option, index) => (
                                 <option
@@ -30,9 +35,7 @@ export default function InputField(props) {
             }
             {
                 props.error &&
-                <h1 className={"text-red-600"}>
-                    {props.error}
-                </h1>
+                <p className="text-red-500 text-xs mt-1">{props.error}</p>
             }
         </main>
     )

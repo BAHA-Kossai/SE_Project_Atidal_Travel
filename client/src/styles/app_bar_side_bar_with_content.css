@@ -113,6 +113,10 @@
         background-color: color-mix(in srgb, var(--color-primary) 10%, white);
         color: var(--color-primary);
     }
+    .sidebar-item-active:hover {
+        background-color: color-mix(in srgb, var(--color-primary) 10%, white);
+        color: var(--color-primary);
+    }
 
     .sidebar-item-icon {
         @apply w-5 h-5;

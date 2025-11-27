@@ -1,16 +1,30 @@
-import { useState, useEffect } from 'react';
-import { MapPin, Hotel, User, Phone, Mail, MapPinned, Users, CheckCircle2, Plane, Package, Calendar as CalendarIcon, X } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { useLocation } from "react-router-dom";
+import { MapPin, Hotel, User, Phone, Mail, MapPinned, Users, CheckCircle2, Plane, Package, Calendar as CalendarIcon, X, Map } from 'lucide-react';
 import DatePicker from './DatePicker.jsx';
 import TimePicker from './TimePicker.jsx';
 
-export default function BookingForm({ packageData = null, onClose = null }) {
-  // Determine if this is an Umrah booking
-  const isUmrahBooking = packageData !== null;
-  
+export default function BookingForm() {
+  const location = useLocation();
+  const { packageData, isUmrah, isGroupTrip, groupTripData } = location.state || {};
+
+  // Determine booking type
+  const isUmrahBooking = isUmrah === true;
+  const isGroupTripBooking = isGroupTrip === true;
+  const isSpecialBooking = isUmrahBooking || isGroupTripBooking;
+
   // Step 1 state
-  const [currentStep, setCurrentStep] = useState(isUmrahBooking ? 2 : 1);
-  const [destinationCountry, setDestinationCountry] = useState(isUmrahBooking ? 'Saudi Arabia' : '');
-  const [destinationCity, setDestinationCity] = useState(isUmrahBooking ? 'Mecca' : '');
+  const [currentStep, setCurrentStep] = useState(isSpecialBooking ? 2 : 1);
+  const [destinationCountry, setDestinationCountry] = useState(
+    isUmrahBooking ? 'Saudi Arabia' : 
+    isGroupTripBooking ? 'Algeria' : 
+    ''
+  );
+  const [destinationCity, setDestinationCity] = useState(
+    isUmrahBooking ? 'Mecca' : 
+    isGroupTripBooking ? (groupTripData?.destination || '') : 
+    ''
+  );
   const [hotelStars, setHotelStars] = useState('');
   const [noHotelNeeded, setNoHotelNeeded] = useState(false);
   const [needsVisaAssistance, setNeedsVisaAssistance] = useState(false);
@@ -33,30 +47,48 @@ export default function BookingForm({ packageData = null, onClose = null }) {
   // Form errors
   const [errors, setErrors] = useState({});
 
+  // Fix for input bug: Use ref to prevent useEffect from overwriting during typing
+  const isInitialMount = useRef(true);
+  const lastNumberOfPersons = useRef(numberOfPersons);
+  const lastIsTraveler = useRef(isTraveler);
+
   // Calculate date constraints
   const today = new Date().toISOString().split('T')[0];
   const oneYearFromNow = new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toISOString().split('T')[0];
 
-  // Update travelers array when number of persons or isTraveler changes
+  // FIX: Update travelers array only when numberOfPersons or isTraveler actually changes
   useEffect(() => {
-    if (numberOfPersons) {
-      const numPersons = parseInt(numberOfPersons);
-      const numTravelers = isTraveler ? numPersons - 1 : numPersons;
-      
-      if (numTravelers > 0) {
-        const newTravelers = [];
-        for (let i = 0; i < numTravelers; i++) {
-          newTravelers.push(travelers[i] || {
-            firstName: '',
-            lastName: '',
-            age: '',
-            phoneNumber: '',
-            email: '',
-          });
+    // Skip on initial mount
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    // Only update if numberOfPersons or isTraveler actually changed
+    if (numberOfPersons !== lastNumberOfPersons.current || isTraveler !== lastIsTraveler.current) {
+      lastNumberOfPersons.current = numberOfPersons;
+      lastIsTraveler.current = isTraveler;
+
+      if (numberOfPersons) {
+        const numPersons = parseInt(numberOfPersons);
+        const numTravelers = isTraveler ? numPersons - 1 : numPersons;
+        
+        if (numTravelers > 0) {
+          const newTravelers = [];
+          for (let i = 0; i < numTravelers; i++) {
+            // Preserve existing data if available
+            newTravelers.push(travelers[i] || {
+              firstName: '',
+              lastName: '',
+              age: '',
+              phoneNumber: '',
+              email: '',
+            });
+          }
+          setTravelers(newTravelers);
+        } else {
+          setTravelers([]);
         }
-        setTravelers(newTravelers);
-      } else {
-        setTravelers([]);
       }
     }
   }, [numberOfPersons, isTraveler]);
@@ -102,8 +134,8 @@ export default function BookingForm({ packageData = null, onClose = null }) {
   const validateStep1 = () => {
     const newErrors = {};
 
-    // Only validate country/city if not Umrah booking
-    if (!isUmrahBooking) {
+    // Only validate country/city if not special booking
+    if (!isSpecialBooking) {
       if (!destinationCountry) newErrors.destinationCountry = 'Please select a destination country';
       if (!destinationCity) newErrors.destinationCity = 'Please select a destination city';
     }
@@ -209,7 +241,9 @@ export default function BookingForm({ packageData = null, onClose = null }) {
     e.preventDefault();
     if (validateStep2()) {
       console.log({
+        bookingType: isUmrahBooking ? 'Umrah' : isGroupTripBooking ? 'GroupTrip' : 'Regular',
         packageInfo: packageData,
+        groupTripInfo: groupTripData,
         destination: {
           country: destinationCountry,
           city: destinationCity,
@@ -235,8 +269,14 @@ export default function BookingForm({ packageData = null, onClose = null }) {
           travelers,
         },
       });
-      alert(isUmrahBooking ? 'Umrah booking submitted successfully!' : 'Form submitted successfully!');
-      if (onClose) onClose();
+      
+      const successMessage = isUmrahBooking 
+        ? 'Umrah booking submitted successfully!' 
+        : isGroupTripBooking 
+        ? 'Group trip booking submitted successfully!' 
+        : 'Booking submitted successfully!';
+      
+      alert(successMessage);
     }
   };
 
@@ -277,7 +317,7 @@ export default function BookingForm({ packageData = null, onClose = null }) {
     }
   };
 
-  const availableCities = destinationCountry && !isUmrahBooking
+  const availableCities = destinationCountry && !isSpecialBooking
     ? destinations[destinationCountry]?.cities || []
     : Object.values(destinations).flatMap(country => country.cities);
 
@@ -304,19 +344,33 @@ export default function BookingForm({ packageData = null, onClose = null }) {
     }
   };
 
+  // Get booking title
+  const getBookingTitle = () => {
+    if (isUmrahBooking) return 'Umrah Booking Form';
+    if (isGroupTripBooking) return 'Group Trip Booking Form';
+    return 'Destination Booking Form';
+  };
+
+  // Get booking subtitle
+  const getBookingSubtitle = () => {
+    if (isUmrahBooking) return 'Complete your spiritual journey booking';
+    if (isGroupTripBooking) return 'Join an amazing group adventure';
+    return 'Plan your perfect getaway with us';
+  };
+
   // Wrapper component - conditionally renders modal or normal form
   const FormContent = () => (
     <div className="max-w-6xl mx-auto px-4 py-12 sm:py-16">
       {/* Header Section */}
       <div className="text-center mb-12">
-        <h1 className="text-gray-800 mb-3">
-          {isUmrahBooking ? 'Umrah Booking Form' : 'Destination Booking Form'}
+        <h1 className="text-gray-800 mb-3 text-3xl font-bold">
+          {getBookingTitle()}
         </h1>
         <p className="text-gray-600 mb-8">
-          {isUmrahBooking ? 'Complete your spiritual journey booking' : 'Plan your perfect getaway with us'}
+          {getBookingSubtitle()}
         </p>
         
-        {/* Package Information Display - Only for Umrah */}
+        {/* Package Information Display - For Umrah */}
         {isUmrahBooking && packageData && (
           <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 mb-8">
             <div className="flex flex-col gap-4">
@@ -341,9 +395,35 @@ export default function BookingForm({ packageData = null, onClose = null }) {
             </div>
           </div>
         )}
+
+        {/* Group Trip Information Display - For Group Trips */}
+        {isGroupTripBooking && groupTripData && (
+          <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 mb-8">
+            <div className="flex flex-col gap-4">
+              {/* Group Trip Label */}
+              <div className="flex items-center justify-center gap-2 bg-[#f1f9fe] rounded-xl px-4 py-3">
+                <Users className="w-5 h-5 text-[#495057]" />
+                <p className="text-[#495057] font-semibold">Group Trip</p>
+              </div>
+              
+              {/* Destination and Dates */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="flex items-center justify-center gap-2 bg-[#f1f9fe] rounded-xl px-4 py-3">
+                  <Map className="w-5 h-5 text-[#495057]" />
+                  <p className="text-[#495057]">{groupTripData.destination}</p>
+                </div>
+                
+                <div className="flex items-center justify-center gap-2 bg-[#f1f9fe] rounded-xl px-4 py-3">
+                  <CalendarIcon className="w-5 h-5 text-[#495057]" />
+                  <p className="text-[#495057]">{groupTripData.date}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Step Indicator - Only for regular booking */}
-        {!isUmrahBooking && (
+        {!isSpecialBooking && (
           <div className="flex items-center justify-center gap-4 mb-8">
             <div className="flex items-center">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
@@ -371,92 +451,68 @@ export default function BookingForm({ packageData = null, onClose = null }) {
         {currentStep === 1 && (
           <form onSubmit={handleNextStep} className="space-y-6">
             <div className="mb-8">
-              <h2 className="text-[#117BB8] mb-2">Destination Details</h2>
+              <h2 className="text-[#117BB8] mb-2 text-2xl font-semibold">Destination Details</h2>
               <p className="text-gray-500">
-                {isUmrahBooking ? 'Your journey to the holy city' : "Tell us where you'd like to go"}
+                Tell us where you'd like to go
               </p>
             </div>
 
-            {/* Destination Display - Conditional based on Umrah or regular booking */}
-            {isUmrahBooking ? (
-              // Locked Destination Display for Umrah
-              <div className="bg-gradient-to-br from-blue-50 to-gray-50 rounded-xl p-6 border-2 border-[#117BB8]">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3">
-                    <MapPin className="w-5 h-5 text-[#117BB8]" />
-                    <div>
-                      <p className="text-sm text-gray-600">Destination Country</p>
-                      <p className="text-gray-800">{destinationCountry}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <MapPin className="w-5 h-5 text-[#117BB8]" />
-                    <div>
-                      <p className="text-sm text-gray-600">Destination City</p>
-                      <p className="text-gray-800">{destinationCity}</p>
-                    </div>
-                  </div>
-                </div>
+            {/* Editable Country and City for regular bookings */}
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div className="relative">
+                <label className="block text-gray-700 mb-2 font-medium">
+                  Destination Country <span className="text-red-500">*</span>
+                </label>
+                <MapPin className="absolute left-4 bottom-5 text-gray-400 w-5 h-5 pointer-events-none" />
+                <select
+                  value={destinationCountry}
+                  onChange={(e) => handleCountryChange(e.target.value)}
+                  className={`w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border ${
+                    errors.destinationCountry ? 'border-red-500' : 'border-gray-200'
+                  } text-gray-700 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent focus:bg-white transition-all`}
+                >
+                  <option value="">Select country</option>
+                  <option value="france">France</option>
+                  <option value="spain">Spain</option>
+                  <option value="italy">Italy</option>
+                  <option value="greece">Greece</option>
+                  <option value="turkey">Turkey</option>
+                  <option value="morocco">Morocco</option>
+                </select>
+                {errors.destinationCountry && (
+                  <p className="text-red-500 text-sm mt-2">{errors.destinationCountry}</p>
+                )}
               </div>
-            ) : (
-              // Editable Country and City for regular bookings
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div className="relative">
-                  <label className="block text-gray-700 mb-2">
-                    Destination Country <span className="text-red-500">*</span>
-                  </label>
-                  <MapPin className="absolute left-4 bottom-5 text-gray-400 w-5 h-5 pointer-events-none" />
-                  <select
-                    value={destinationCountry}
-                    onChange={(e) => handleCountryChange(e.target.value)}
-                    className={`w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border ${
-                      errors.destinationCountry ? 'border-red-500' : 'border-gray-200'
-                    } text-gray-700 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent focus:bg-white transition-all`}
-                  >
-                    <option value="">Select country</option>
-                    <option value="france">France</option>
-                    <option value="spain">Spain</option>
-                    <option value="italy">Italy</option>
-                    <option value="greece">Greece</option>
-                    <option value="turkey">Turkey</option>
-                    <option value="morocco">Morocco</option>
-                  </select>
-                  {errors.destinationCountry && (
-                    <p className="text-red-500 text-sm mt-2">{errors.destinationCountry}</p>
-                  )}
-                </div>
-                
-                <div className="relative">
-                  <label className="block text-gray-700 mb-2">
-                    Destination City <span className="text-red-500">*</span>
-                  </label>
-                  <MapPin className="absolute left-4 bottom-5 text-gray-400 w-5 h-5 pointer-events-none" />
-                  <select
-                    value={destinationCity}
-                    onChange={(e) => handleCityChange(e.target.value)}
-                    className={`w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border ${
-                      errors.destinationCity ? 'border-red-500' : 'border-gray-200'
-                    } text-gray-700 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent focus:bg-white transition-all`}
-                  >
-                    <option value="">Select city</option>
-                    {availableCities.map(city => (
-                      <option key={city} value={city}>
-                        {city}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.destinationCity && (
-                    <p className="text-red-500 text-sm mt-2">{errors.destinationCity}</p>
-                  )}
-                </div>
+              
+              <div className="relative">
+                <label className="block text-gray-700 mb-2 font-medium">
+                  Destination City <span className="text-red-500">*</span>
+                </label>
+                <MapPin className="absolute left-4 bottom-5 text-gray-400 w-5 h-5 pointer-events-none" />
+                <select
+                  value={destinationCity}
+                  onChange={(e) => handleCityChange(e.target.value)}
+                  className={`w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border ${
+                    errors.destinationCity ? 'border-red-500' : 'border-gray-200'
+                  } text-gray-700 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent focus:bg-white transition-all`}
+                >
+                  <option value="">Select city</option>
+                  {availableCities.map(city => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
+                </select>
+                {errors.destinationCity && (
+                  <p className="text-red-500 text-sm mt-2">{errors.destinationCity}</p>
+                )}
               </div>
-            )}
+            </div>
 
             {/* Row 2: Hotel and Options */}
             <div className="grid sm:grid-cols-2 gap-6">
               <div className="relative">
-                <label className="block text-gray-700 mb-2">
+                <label className="block text-gray-700 mb-2 font-medium">
                   Hotel Rating {!noHotelNeeded && <span className="text-red-500">*</span>}
                 </label>
                 <Hotel className="absolute left-4 bottom-5 text-gray-400 w-5 h-5 pointer-events-none" />
@@ -479,7 +535,7 @@ export default function BookingForm({ packageData = null, onClose = null }) {
               </div>
               
               <div className="flex flex-col gap-4">
-                <label className="block text-gray-700 mb-2">
+                <label className="block text-gray-700 mb-2 font-medium">
                   Additional Options
                 </label>
                 <label className="flex items-center bg-gray-50 px-5 py-4 rounded-xl border border-gray-200 cursor-pointer hover:bg-blue-50 hover:border-[#117BB8] transition-all group">
@@ -931,27 +987,6 @@ export default function BookingForm({ packageData = null, onClose = null }) {
     </div>
   );
 
-  // Return modal wrapper for Umrah, regular content for standard form
-  if (isUmrahBooking) {
-    return (
-      <div className="fixed inset-0 bg-black/50 z-50 overflow-y-auto">
-        <div className="min-h-screen px-4 py-8">
-          <div className="max-w-6xl mx-auto">
-            {/* Close Button */}
-            <div className="flex justify-end mb-4">
-              <button
-                onClick={onClose}
-                className="bg-white rounded-full p-2 shadow-lg hover:bg-gray-100 transition-colors"
-              >
-                <X className="w-6 h-6 text-gray-600" />
-              </button>
-            </div>
-            <FormContent />
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return <FormContent />;
 }
