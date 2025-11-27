@@ -5,9 +5,9 @@ import Table from "../components/Table.jsx";
 import {ArrowUpDown, Plus, SlidersHorizontal, UploadCloud, UploadIcon} from "lucide-react";
 import mock_destinations from '../mock-destinations.json'
 import {useState} from "react";
-import BranchTable from "./Table.jsx";
+import BranchesTable from "../components/admin-branches/BranchesTable.jsx";
 
-export default function AdminBranches() {
+export default function Admin_branches() {
     return (
         <AppBarSideBarWithContent>
             <div className={"mb-4"}>
@@ -15,7 +15,7 @@ export default function AdminBranches() {
                     Destinations
                 </h1>
         </div>
-            <BranchTable />
+            <BranchesTable />
         </AppBarSideBarWithContent>
     );
 }

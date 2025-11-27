@@ -10,7 +10,7 @@ import UmrahPage from "./pages/umrah.jsx";
 import Login from "./Pages/Authentication/Login.jsx";
 import Signup from './Pages/Authentication/Signup.jsx'; 
 import Profile from './Pages/Profile.jsx'; 
-import AdminBranches from './Pages/AdminBranches.jsx';
+import AdminBranchesPage from './pages/admin_branches.jsx';
 import AdminBookingsPage from "./pages/admin_bookings.jsx";
 import FillInformation from "./Pages/Authentication/FillInformation.jsx";
 import ResetPassword from "./Pages/Authentication/ResetPassword.jsx"
@@ -44,7 +44,7 @@ createRoot(rootElement).render(
                 <Route path="/admin/bookings" element={<AdminBookingsPage/>} />
                 <Route path="/admin/destinations" element={<AdminDestinationsPage/>} />
                 <Route path="/admin/employees" element={<AdminEmployeesPage/>} />
-                <Route path="/admin/branches" element={<AdminBranches/>} />
+                <Route path="/admin/branches" element={<AdminBranchesPage/>} />
             </Routes>
         </BrowserRouter>
     </StrictMode>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search, X, Edit2, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 
-const BranchTable = () => {
+const BranchesTable = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
@@ -643,4 +643,4 @@ const BranchTable = () => {
   );
 };
 
-export default BranchTable;
+export default BranchesTable;
