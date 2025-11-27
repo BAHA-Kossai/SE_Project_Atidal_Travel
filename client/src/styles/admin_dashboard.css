@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "../themes.css";
+@import "./global_theme.css";
 
 
   .card {
@@ -44,12 +44,12 @@
   }
 
   .btn-filter-active {
-    background: var(--secondary-color);
+    background: var(--color-secondary);
     color: white;
   }
 
   .btn-filter-inactive {
-    background: var(--background-color);;
+    background: var(--color-background);;
     color: #6b7280;
   }
 
@@ -67,7 +67,7 @@
   .section-title {
     font-size: 1.125rem;
     font-weight: 600;
-    color: var(--text-color);;
+    color: var(--color-text);;
   }
 
   .destination-item {
@@ -97,18 +97,18 @@
 
   .destination-name {
     font-weight: 500;
-    color: var(--text-color);
+    color: var(--color-text);
   }
 
   .destination-city {
     font-size: 0.875rem;
-    color: var( --text-secondary-color);
+    color: var(--color-text-secondary);
   }
 
   .destination-count {
     font-size: 1.125rem;
     font-weight: 600;
-    color: var(--secondary-color);
+    color: var(--color-secondary);
   }
 
   .table-container {

@@ -1,4 +1,4 @@
-import {AppBarSideBarWithContent} from "../components/appBarSideBar.jsx";
+import {AppBarSideBarWithContent} from "../components/AppBarSideBarWithContent.jsx";
 import PagePath from "../components/PagePath.jsx";
 import WhiteContainer from "../components/WhiteContainer.jsx";
 import SearchBar from "../components/SearchBar.jsx";
@@ -12,7 +12,7 @@ import ModalDialog from "../components/ModalDialog.jsx";
 import InputField from "../components/InputField.jsx";
 import ButtonSwitch from "../components/ButtonSwitch.jsx";
 
-export default function AdminEmployees() {
+export default function AdminEmployeesPage() {
     // New/Edit/Delete Employee Modals
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [isAddEmployeeModalOpen, setIsAddEmployeeModalOpen] = useState(false);
@@ -107,7 +107,7 @@ export default function AdminEmployees() {
 
             <WhiteContainer>
                     <div className="flex flex-col">
-                        {/* Search / Sort / Filter/ New Destination */}
+                        {/* Search / Sort / Filter/ New Employee */}
                         <div className="flex flex-row justify-between items-center mb-5">
                             <SearchBar placeholder={"Search for an employee"}/>
                             <div className="flex flex-row justify-between w-100">

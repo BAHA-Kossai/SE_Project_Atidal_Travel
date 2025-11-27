@@ -1,7 +1,7 @@
 
 import { ArrowUpRight} from 'lucide-react';
 
-import "../../../styles/admin_dashboard/admin_dashboard.css";
+import "../../styles/admin_dashboard.css";
 
 
 // DestinationItem Component

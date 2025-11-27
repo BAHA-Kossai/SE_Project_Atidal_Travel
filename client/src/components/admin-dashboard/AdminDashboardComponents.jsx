@@ -1,17 +1,12 @@
 
 import  { useState } from 'react';
 import {  Users } from 'lucide-react';
-import { StatusCard,DecoratedCard } from './status_cards';
-import "../../../styles/admin_dashboard/admin_dashboard.css";
-import {RecentBookings} from './bookingList.jsx';
-import {DestinationsList} from './destinationList.jsx';
-import { SalesChart } from './salesChart.jsx';
-import { UsersGrowthMap } from './userGrowthMap.jsx';
-
-
-
-
-
+import { StatusCard,DecoratedCard } from './StatusCards.jsx';
+import "../../styles/admin_dashboard.css";
+import {RecentBookings} from './BookingsList.jsx';
+import {DestinationsList} from './DestinationsList.jsx';
+import { SalesChart } from './SalesChart.jsx';
+import { UsersGrowthMap } from './UserGrowthMap.jsx';
 
 // Main Dashboard Component
 const Dashboard = () => {

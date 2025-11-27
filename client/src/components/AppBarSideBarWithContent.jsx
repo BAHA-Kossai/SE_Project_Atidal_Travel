@@ -1,6 +1,6 @@
 import React, { useState ,useEffect } from 'react';
 import { Menu, X, Bell, Search, Home, Calendar, Users, UserCheck, Plane, Building2 } from 'lucide-react';
-import '../styles/appBar.css';
+import '../styles/app_bar_side_bar_with_content.css';
 
 
 // AppBar Component

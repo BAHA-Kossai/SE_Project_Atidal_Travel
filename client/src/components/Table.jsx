@@ -15,7 +15,7 @@ export default function Table({columns = [],  data = [], onEdit, onDelete}) {
     const iconClass = "hover:text-gray-600 duration-100 cursor-pointer"
 
     // Pagination
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(0);
     const pageSize = 7
     const paginatedRows = useMemo(
         () =>
@@ -26,7 +26,7 @@ export default function Table({columns = [],  data = [], onEdit, onDelete}) {
         , [data, currentPage, pageSize]
     );
 
-    const totalPages = Math.ceil(data.length / pageSize);
+    const totalPages = Math.ceil(data.length / pageSize) ?? 0;
 
 
     return (
@@ -52,66 +52,80 @@ export default function Table({columns = [],  data = [], onEdit, onDelete}) {
                 {/* Table Rows */}
                 <tbody className={"text-center"}>
 
-                        {
-                            paginatedRows.map((item) => (
-                                <tr className={"h-17 border-1 border-gray-200 relative"}>
-                                    {/* Row Checkbox */}
-                                    <td className="p-3 text-left">
-                                        <input type="checkbox"/>
-                                    </td>
+                {
+                    data.length === 0 &&
+                    <td colSpan={columns.length + 2} className={"text-xl py-4"}>
+                        No Data Found
+                    </td>
+                }
+                {
+                    paginatedRows.map((item) => (
+                        <tr className={"h-17 border-1 border-gray-200 relative"}>
+                            {/* Row Checkbox */}
+                            <td className="p-3 text-left">
+                                <input type="checkbox"/>
+                            </td>
 
-                                    {/* Dynamic Rendering of each column */}
+                            {/* Dynamic Rendering of each column */}
+                            {
+                                columns.map((column, index) => (
+                                    <td key={index}>
+                                        {column.format ? column.format(item) : null}
+                                    </td>
+                                ))
+                            }
+
+                            {/* Actions */}
+                            <td className={"text-gray-400 text-center"}>
+                                <div className={"flex flex-row justify-around"}>
                                     {
-                                        columns.map((column, index) => (
-                                            <td key={index}>
-                                                {column.format ? column.format(item) : null}
-                                            </td>
-                                        ))
+                                        onEdit &&
+                                        <Edit
+                                            onClick={
+                                                () => onEdit(item) // pass the object so that it gets stored by the parent component
+                                            }
+                                            className={iconClass}
+                                        />
                                     }
-
-                                    {/* Actions */}
-                                    <td className={"text-gray-400 text-center"}>
-                                        <div className={"flex flex-row justify-around"}>
-                                            <Edit
-                                                onClick={
-                                                    () => onEdit(item) // pass the object so that it gets stored by the parent component
-                                                }
-                                                className={iconClass}
-                                            />
-                                            <Trash2
-                                                onClick={
-                                                    () => onDelete(item) // pass the object so that it gets stored by the parent component
-                                                }
-                                                className={`${iconClass} hover:text-red-700`}
-                                            />
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))
-
-                        }
+                                    {
+                                        onDelete &&
+                                        <Trash2
+                                            onClick={
+                                                () => onDelete(item) // pass the object so that it gets stored by the parent component
+                                            }
+                                            className={`${iconClass} hover:text-red-700`}
+                                        />
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    ))
+                }
 
                 </tbody>
             </table>
 
             {/* Pagination */}
-            <div className="flex justify-center w-full items-center gap-3">
-                <button
-                    className={`rounded-lg p-2 disabled:opacity-30 cursor-pointer duration-100 hover:text-(--color-primary)`}
-                    disabled={currentPage === 0}
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                >
-                    <ChevronLeft/>
-                </button>
-                {currentPage+1}/{totalPages}
-                <button
-                    className={`rounded-lg p-2 disabled:opacity-30 cursor-pointer duration-100 hover:text-(--color-primary)`}
-                    disabled={currentPage === totalPages - 1}
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                >
-                    <ChevronRight/>
-                </button>
-            </div>
+            {
+                data.length > 0 &&
+                <div className="flex justify-center w-full items-center gap-3">
+                    <button
+                        className={`rounded-lg p-2 disabled:opacity-30 cursor-pointer duration-100 hover:text-(--color-primary)`}
+                        disabled={currentPage === 0}
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                    >
+                        <ChevronLeft/>
+                    </button>
+                    {currentPage+1}/{totalPages}
+                    <button
+                        className={`rounded-lg p-2 disabled:opacity-30 cursor-pointer duration-100 hover:text-(--color-primary)`}
+                        disabled={currentPage === totalPages - 1}
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                    >
+                        <ChevronRight/>
+                    </button>
+                </div>
+            }
         </>
     )
 }

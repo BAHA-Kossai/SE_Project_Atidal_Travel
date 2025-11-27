@@ -60,6 +60,3 @@ export const GroupTrips = () => {
     />
   );
 };
-
-// Export InfoSection as default
-export default InfoSection;
