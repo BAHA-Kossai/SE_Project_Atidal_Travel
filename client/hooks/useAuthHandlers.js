@@ -32,23 +32,31 @@ export function useAuthHandlers() {
 };
 
 
-  const handleSignUp = async (data) => {
-    try {
-      const res = await signUp(data);
+const handleSignUp = async (data) => {
+  try {
+    const res = await signUp(data);
 
-      if (res.status !== 200) {
-        setMessage(res.message || "Signup failed");
-        throw new Error(res.message || "Signup failed");
-      }
-
-      setMessage("Signup successful");
-      return res;
-    } catch (err) {
-      setMessage(err.message);
-      throw err;
+    // Only access tokens if signup is successful
+    if (res.status !== 200) {
+      setMessage(res.message || "Signup failed");
+      throw new Error(res.message || "Signup failed");
     }
-  };
 
+    // Safe to store tokens now
+    localStorage.setItem("accessToken", res.data.token.access);
+    localStorage.setItem("refreshToken", res.data.token.refresh);
+    localStorage.setItem("user", JSON.stringify(res.data.user));
+
+    // Optional: clear message
+    setMessage("");
+
+    // Return response in case you need it
+    return res;
+  } catch (err) {
+    setMessage(err.message);
+    throw err;
+  }
+};
   const handleForgotPassword = async (data) => {
     try {
       const res = await forgotPassword(data);

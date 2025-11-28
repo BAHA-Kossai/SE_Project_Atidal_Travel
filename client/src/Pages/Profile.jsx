@@ -21,7 +21,7 @@ export default function Profile() {
     phone: "",
     date_of_birth: "",
   };
-  console.log(storedProfile);
+  // console.log(storedProfile);
   const [profileData, setProfileData] = useState(storedProfile);
   const [feedbackName, setFeedbackName] = useState("");
   const [feedbackList, setFeedbackList] = useState([]);
