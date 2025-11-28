@@ -17,12 +17,12 @@
  * @lastModified 2025-11-25
  */
 
-import AssignBranchUseCase from "../../core/usecases/bookings/AssignBranchUseCase.js";
-import UpdateBookingStatusUseCase from "../../core/usecases/bookings/UpdateBookingStatusUseCase.js";
+import AssignBranchUseCase from "../../core/usecases/Booking/AssignBranchUseCase.js";
+import UpdateBookingStatusUseCase from "../../core/usecases/Booking/UpdateBookingStatusUseCase.js";
 import BookingsRepository from "../../repositories/BookingsRepository.js";
 import BranchRepository from "../../repositories/BranchRepository.js";
-import CreateBookingUseCase from "../../core/usecases/bookings/CreateBookingUseCase.js";
-import GetUserBookingsUseCase from "../../core/usecases/bookings/GetBookingUseCase.js";
+import CreateBookingUseCase from "../../core/usecases/Booking/CreateBookingUseCase.js";
+import GetUserBookingsUseCase from "../../core/usecases/Booking/GetBookingUseCase.js";
 import PayerRepository from "../../repositories/PayerRepository.js";
 import TravelersRepository from "../../repositories/TravelersRepository.js";
 import TripInfoRepository from "../../repositories/TripInfoRepository.js";
