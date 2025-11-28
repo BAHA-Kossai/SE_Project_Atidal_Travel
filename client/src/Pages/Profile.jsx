@@ -1,16 +1,19 @@
-import React, { useState,useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Search, ArrowUpDown, Filter, Edit2, Star, Save } from "lucide-react";
 import Layout from "../components/layout/Layout";
-import { useAuthHandlers } from "../../hooks/useAuthHandlers";
+import { useAuthHandlers } from "../../hooks/useAuthHandlers.js";
+import { useUserHandlers } from "../../hooks/useUserHandlers.js";
+import Swal from 'sweetalert2';
+
 export default function Profile() {
   //init hook for sign out
   const { handleSignOut, handleFetchProfile } = useAuthHandlers();
-
+  const { handleUpdateUser,handleDeleteUser, message } = useUserHandlers();
   const storedProfile = JSON.parse(localStorage.getItem("user")) || null;
 
   const [profileData, setProfileData] = useState(
     storedProfile || {
-      email:"",
+      email: "",
       first_name: "",
       last_name: "",
       phone: "",
@@ -19,22 +22,22 @@ export default function Profile() {
   );
 
   useEffect(() => {
-  if (!storedProfile) {
-    const hash = window.location.hash; // "#access_token=..."
-    const params = new URLSearchParams(hash.replace("#", ""));
-    const accessToken = params.get("access_token"); // notice the underscore
-    const refreshToken = params.get("refresh_token");
+    if (!storedProfile) {
+      const hash = window.location.hash; // "#access_token=..."
+      const params = new URLSearchParams(hash.replace("#", ""));
+      const accessToken = params.get("access_token"); // notice the underscore
+      const refreshToken = params.get("refresh_token");
 
-    if (accessToken) {
-      localStorage.setItem("accessToken", accessToken);
-      if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+      if (accessToken) {
+        localStorage.setItem("accessToken", accessToken);
+        if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
 
-      handleFetchProfile(accessToken)
-        .then((user) => setProfileData(user))
-        .catch((err) => console.error(err));
+        handleFetchProfile(accessToken)
+          .then((user) => setProfileData(user))
+          .catch((err) => console.error(err));
+      }
     }
-  }
-}, []);
+  }, []);
 
   const [activeTab, setActiveTab] = useState("bookings");
   const [searchQuery, setSearchQuery] = useState("");
@@ -254,9 +257,19 @@ export default function Profile() {
     }
   };
 
-  const handleEditToggle = () => {
+  const handleEditToggle = async () => {
     if (isEditMode) {
-      console.log("Saving profile data:", profileData);
+      try {
+        // call update API
+
+        const updatedUser = await handleUpdateUser(profileData);
+
+        setProfileData(updatedUser); // update local state
+        alert("Profile updated successfully!");
+      } catch (err) {
+        console.error("Update failed:", err.message);
+        alert(err.message || "Failed to update profile");
+      }
     }
     setIsEditMode(!isEditMode);
   };
@@ -422,16 +435,16 @@ export default function Profile() {
                       type="text"
                       value={profileData.first_name}
                       onChange={(e) =>
-                        handleProfileChange("firstName", e.target.value)
+                        handleProfileChange("first_name", e.target.value)
                       }
-                      onFocus={() => setFocusedField("firstName")}
+                      onFocus={() => setFocusedField("first_name")}
                       onBlur={() => setFocusedField(null)}
                       disabled={!isEditMode}
                       style={{
                         width: "100%",
                         padding: "0.625rem 1rem",
                         border: `1px solid ${
-                          focusedField === "firstName" && isEditMode
+                          focusedField === "first_name" && isEditMode
                             ? "#212529"
                             : "#dee2e6"
                         }`,
@@ -445,6 +458,7 @@ export default function Profile() {
                       }}
                     />
                   </div>
+
                   <div style={{ display: "flex", flexDirection: "column" }}>
                     <label
                       style={{
@@ -461,16 +475,16 @@ export default function Profile() {
                       type="text"
                       value={profileData.last_name}
                       onChange={(e) =>
-                        handleProfileChange("lastName", e.target.value)
+                        handleProfileChange("last_name", e.target.value)
                       }
-                      onFocus={() => setFocusedField("lastName")}
+                      onFocus={() => setFocusedField("last_name")}
                       onBlur={() => setFocusedField(null)}
                       disabled={!isEditMode}
                       style={{
                         width: "100%",
                         padding: "0.625rem 1rem",
                         border: `1px solid ${
-                          focusedField === "lastName" && isEditMode
+                          focusedField === "last_name" && isEditMode
                             ? "#212529"
                             : "#dee2e6"
                         }`,
@@ -484,6 +498,43 @@ export default function Profile() {
                       }}
                     />
                   </div>
+                  {/* {isEditMode && (
+                    <div style={{ display: "flex", flexDirection: "column" }}>
+                      <label
+                        style={{
+                          display: "block",
+                          fontSize: "0.875rem",
+                          fontWeight: "500",
+                          color: "#495057",
+                          marginBottom: "0.5rem",
+                        }}
+                      >
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        value={profileData.email}
+                        onChange={(e) =>
+                          handleProfileChange("email", e.target.value)
+                        }
+                        onFocus={() => setFocusedField("email")}
+                        onBlur={() => setFocusedField(null)}
+                        style={{
+                          width: "100%",
+                          padding: "0.625rem 1rem",
+                          border: `1px solid ${
+                            focusedField === "email" ? "#212529" : "#dee2e6"
+                          }`,
+                          borderRadius: "0.5rem",
+                          fontSize: "1rem",
+                          color: "#212529",
+                          backgroundColor: "white",
+                          cursor: "text",
+                          transition: "border-color 0.2s",
+                        }}
+                      />
+                    </div>
+                  )} */}
                 </div>
 
                 <div
@@ -1135,11 +1186,83 @@ export default function Profile() {
                   onMouseLeave={(e) =>
                     (e.currentTarget.style.backgroundColor = "#117BB8")
                   }
+                  
                 >
                   Submit feedback
                 </button>
               </div>
+             
             </div>
+             <div style={{marginTop:"20px"}}>
+                <button
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    backgroundColor: "#dc3545",
+                    color: "white",
+                    padding: "0.625rem 1.5rem",
+                    border: "none",
+                    borderRadius: "0.5rem",
+                    fontSize: "1rem",
+                    fontWeight: "500",
+                    cursor: "pointer",
+                    transition: "background-color 0.2s",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#b02a37")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.backgroundColor = "#dc3545")
+                  }
+onClick={async () => {
+  const result = await Swal.fire({
+    title: "Are you sure?",
+    text: "This action will permanently delete your account.",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#dc3545",
+    cancelButtonColor: "#3085d6",
+    confirmButtonText: "Yes, delete my account",
+    cancelButtonText: "Cancel",
+  });
+
+  if (result.isConfirmed) {
+    try {
+      const accessToken = localStorage.getItem("accessToken");
+
+      if (!accessToken) throw new Error("No access token found");
+
+      // Call your delete API
+      await handleDeleteUser(accessToken);
+
+      // Clear local storage
+      localStorage.removeItem("user");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+
+      Swal.fire(
+        "Deleted!",
+        "Your account has been deleted successfully.",
+        "success"
+      );
+
+      // Redirect user to homepage or login
+      window.location.href = "/";
+    } catch (err) {
+      Swal.fire(
+        "Error!",
+        err.message || "Failed to delete your account.",
+        "error"
+      );
+    }
+  }
+}}
+
+                >
+                  Delete Account
+                </button>
+              </div>
           </div>
         </main>
       </div>
