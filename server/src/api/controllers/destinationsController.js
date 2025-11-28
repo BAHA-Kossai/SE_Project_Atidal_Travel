@@ -1,5 +1,5 @@
 /**
- * @file        destinationsController.js
+ * @file        DestinationsController.js
  * @description Defines controller functions for handling destinations-related requests.
  *              Controllers receive HTTP request data, invoke UseCases, and return JSON results.
  *              No business logic is implemented here.
@@ -9,7 +9,7 @@
  * @requires    GetFeaturedDestinationsUseCase  - Handles featured destinations retrieval
  * @requires    DestinationsRepository          - Access to destinations database operations
  *
- * @author      Ahlem Toubrinet
+ * @author      Ahlem Toubrinet, Abderahim
  * @version     1.0.0
  * @date        2025-11-17
  * @lastModified 2025-11-25
@@ -86,6 +86,144 @@ class DestinationsController {
     } catch (error) {
       res.status(500).json({
         status: "error", 
+        data: null,
+        message: error.message
+      });
+    }
+  }
+
+  async createDestination(req, res) {
+    try {
+      const { destination_pic, destination_country, description, destination_city } = req.body;
+
+      if (!destination_country || !destination_city) {
+        return res.status(400).json({
+          status: "error",
+          data: null,
+          message: "Missing required fields: destination_country, destination_city"
+        });
+      }
+
+      const existingDestination = await destinationsRepository.searchDestinationsByCountry(destination_country);
+      const duplicate = existingDestination.find(
+        d => d.destination_city.toLowerCase() === destination_city.toLowerCase()
+      );
+
+      if (duplicate) {
+        return res.status(409).json({
+          status: "error",
+          data: null,
+          message: "Destination with this country and city combination already exists"
+        });
+      }
+
+      const destination = await destinationsRepository.createDestination({
+        destination_pic,
+        destination_country,
+        description,
+        destination_city
+      });
+
+      res.status(201).json({
+        status: "success",
+        data: destination,
+        message: "Destination created successfully"
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        data: null,
+        message: error.message
+      });
+    }
+  }
+
+  async getDestinationById(req, res) {
+    try {
+      const { id } = req.params;
+
+      const destination = await destinationsRepository.getDestinationById(id);
+
+      if (!destination) {
+        return res.status(404).json({
+          status: "error",
+          data: null,
+          message: "Destination not found"
+        });
+      }
+
+      res.json({
+        status: "success",
+        data: destination,
+        message: "Destination retrieved successfully"
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        data: null,
+        message: error.message
+      });
+    }
+  }
+
+  async updateDestination(req, res) {
+    try {
+      const { id } = req.params;
+      const { destination_pic, destination_country, description, destination_city } = req.body;
+
+      const existingDestination = await destinationsRepository.getDestinationById(id);
+      if (!existingDestination) {
+        return res.status(404).json({
+          status: "error",
+          data: null,
+          message: "Destination not found"
+        });
+      }
+
+      const destination = await destinationsRepository.updateDestination(id, {
+        destination_pic,
+        destination_country,
+        description,
+        destination_city
+      });
+
+      res.json({
+        status: "success",
+        data: destination,
+        message: "Destination updated successfully"
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        data: null,
+        message: error.message
+      });
+    }
+  }
+
+  async deleteDestination(req, res) {
+    try {
+      const { id } = req.params;
+
+      const existingDestination = await destinationsRepository.getDestinationById(id);
+      if (!existingDestination) {
+        return res.status(404).json({
+          status: "error",
+          data: null,
+          message: "Destination not found"
+        });
+      }
+
+      await destinationsRepository.deleteDestination(id);
+
+      res.json({
+        status: "success",
+        data: null,
+        message: "Destination deleted successfully"
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
         data: null,
         message: error.message
       });

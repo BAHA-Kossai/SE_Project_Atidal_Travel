@@ -13,7 +13,7 @@ import CreateGuideUseCase from "../../core/usecases/Guide/GuideCreateUseCase.js"
 import UpdateGuideUseCase from "../../core/usecases/Guide/GuideUpdateUseCase.js";
 import GuideDeleteUseCase from "../../core/usecases/Guide/GuideDeleteUseCase.js";
 import GuideReadUseCase from "../../core/usecases/Guide/GuideReadUseCase.js";
-import GuideRepository from "../../repositories/guideRepository.js";
+import GuideRepository from "../../repositories/GuideRepository.js";
 import supabase from "../../config/supabase.js";
 // Initialize repository and use case
 const guideRepo = new GuideRepository(supabase);
