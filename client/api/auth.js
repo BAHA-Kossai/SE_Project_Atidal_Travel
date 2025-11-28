@@ -17,3 +17,9 @@ export const resetPassword = (data, token) =>
   });
 
 export const signOut = () => request("/api/auth/signout", { method: "POST" });
+
+export const fetchUserProfile = (accessToken) =>
+  request("/api/user/me", {
+    method: "GET",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });

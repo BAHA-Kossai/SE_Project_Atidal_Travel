@@ -1,11 +1,40 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Search, ArrowUpDown, Filter, Edit2, Star, Save } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import { useAuthHandlers } from "../../hooks/useAuthHandlers";
 export default function Profile() {
-  //init hook for sign out 
-  const { handleSignOut } = useAuthHandlers();
+  //init hook for sign out
+  const { handleSignOut, handleFetchProfile } = useAuthHandlers();
 
+  const storedProfile = JSON.parse(localStorage.getItem("user")) || null;
+
+  const [profileData, setProfileData] = useState(
+    storedProfile || {
+      email:"",
+      first_name: "",
+      last_name: "",
+      phone: "",
+      date_of_birth: "",
+    }
+  );
+
+  useEffect(() => {
+  if (!storedProfile) {
+    const hash = window.location.hash; // "#access_token=..."
+    const params = new URLSearchParams(hash.replace("#", ""));
+    const accessToken = params.get("access_token"); // notice the underscore
+    const refreshToken = params.get("refresh_token");
+
+    if (accessToken) {
+      localStorage.setItem("accessToken", accessToken);
+      if (refreshToken) localStorage.setItem("refreshToken", refreshToken);
+
+      handleFetchProfile(accessToken)
+        .then((user) => setProfileData(user))
+        .catch((err) => console.error(err));
+    }
+  }
+}, []);
 
   const [activeTab, setActiveTab] = useState("bookings");
   const [searchQuery, setSearchQuery] = useState("");
@@ -15,14 +44,9 @@ export default function Profile() {
   const [focusedField, setFocusedField] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [isEditMode, setIsEditMode] = useState(false);
-  const storedProfile = JSON.parse(localStorage.getItem("user")) || {
-    first_name: "",
-    last_name: "",
-    phone: "",
-    date_of_birth: "",
-  };
+
   // console.log(storedProfile);
-  const [profileData, setProfileData] = useState(storedProfile);
+
   const [feedbackName, setFeedbackName] = useState("");
   const [feedbackList, setFeedbackList] = useState([]);
   const rowsPerPage = 7;
@@ -341,30 +365,31 @@ export default function Profile() {
                         margin: "0",
                       }}
                     >
-                      khadija@gmail.com
+                      {profileData.email}
                     </p>
                   </div>
-                  
                 </div>
                 <button
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "0.5rem",
-                      backgroundColor: "#117BB8",
-                      color: "white",
-                      padding: "0.625rem 1.5rem",
-                      border: "none",
-                      borderRadius: "0.5rem",
-                      fontSize: "1rem",
-                      fontWeight: "500",
-                      cursor: "pointer",
-                      transition: "background-color 0.2s",
-                    }}
-                    onClick={()=>{handleSignOut();}}
-                  >
-                    Sign out
-                  </button>
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.5rem",
+                    backgroundColor: "#117BB8",
+                    color: "white",
+                    padding: "0.625rem 1.5rem",
+                    border: "none",
+                    borderRadius: "0.5rem",
+                    fontSize: "1rem",
+                    fontWeight: "500",
+                    cursor: "pointer",
+                    transition: "background-color 0.2s",
+                  }}
+                  onClick={() => {
+                    handleSignOut();
+                  }}
+                >
+                  Sign out
+                </button>
               </div>
 
               <div

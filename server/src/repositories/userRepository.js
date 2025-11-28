@@ -129,7 +129,7 @@ class UserRepository extends BaseRepository {
       email: userData.email,
       password: userData.password,
       options: {
-        emailRedirectTo: "http://localhost:5173/",
+        emailRedirectTo: "http://localhost:5173/profile",
         data: userWithoutpass, // store full user object in metadata
       },
     });
