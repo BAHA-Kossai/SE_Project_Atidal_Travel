@@ -2,7 +2,7 @@ import supabase from '../../config/supabase.js';
 import TripInfoRepository from '../../repositories/TripInfoRepository.js';
 import GuidedTripsRepository from '../../repositories/GuidedTrips.js';
 import DestinationsRepository from '../../repositories/DestinationsRepository.js';
-import BranchesRepository from '../../repositories/branchRepository.js';
+import BranchesRepository from '../../repositories/BranchRepository.js';
 import GuideRepository from '../../repositories/GuideRepository.js';
 import BookingsRepository from '../../repositories/BookingsRepository.js';
 import { CreateTripInfoUseCase } from '../../core/usecases/tripInfo/CreateTripInfoUseCase.js';
