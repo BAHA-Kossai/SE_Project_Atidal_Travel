@@ -2,8 +2,20 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import userIcon from '../../assets/user.svg';
 import Layout from '../../components/layout/Layout';
+import { useAuthHandlers } from '../../../hooks/useAuthHandlers.js';
+import { useSearchParams } from 'react-router-dom';
+
+
 
 const ResetPassword = () => {
+// Extract token from URL hash
+const hash = window.location.hash; // "#access_token=eyJhbGc...&expires_at=..."
+const token = new URLSearchParams(hash.replace('#', '?')).get('access_token');
+
+  //for api req
+  const { handleResetPassword, message } = useAuthHandlers();
+//------
+
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email;
@@ -53,22 +65,19 @@ const ResetPassword = () => {
 
     setLoading(true);
 
-    try {
-      // Replace with your actual API call
-      // await resetPassword(email, formData.password);
-      console.log('Password reset for:', email);
-      console.log('New password:', formData.password);
-
-      // Show success message and navigate to login
-      setTimeout(() => {
-        alert('Password reset successful! Please login with your new password.');
-        navigate('/login');
-      }, 1000);
-    } catch (err) {
-      console.error('Reset password error:', err);
-      setErrors({ submit: 'Failed to reset password. Please try again.' });
-      setLoading(false);
-    }
+   try {
+    console.log(formData.password);
+    console.log(token);
+    await handleResetPassword(formData.password , token);
+    
+    // Show success message and navigate to login
+    alert('Password reset successful! Please login with your new password.');
+    navigate('/login');
+  } catch (err) {
+    console.error('Reset password error:', err);
+    setErrors({ submit: err.message || 'Failed to reset password. Please try again.' });
+    setLoading(false);
+  }
   };
 
   return (

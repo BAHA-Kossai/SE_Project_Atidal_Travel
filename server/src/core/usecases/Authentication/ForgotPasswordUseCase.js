@@ -60,7 +60,7 @@ class ForgotPasswordUseCase {
     // Use Supabase Auth to send password reset email
     const { data: resetData, error } =
       await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: "http://localhost:5173/", // frontend page to handle password reset
+        redirectTo: "http://localhost:5173/reset-password", // frontend page to handle password reset
       });
 
     if (error) throw { status: 500, message: error.message };
@@ -82,6 +82,8 @@ class ResetPasswordUseCase {
       throw { status: 400, message: "Token and new password are required." };
     }
 
+
+  
     const email = decodeEmailFromToken(token);
     if (!email) throw { status: 400, message: "Invalid token." };
 
@@ -92,13 +94,13 @@ class ResetPasswordUseCase {
 
     const user = listData.users.find((u) => u.email === email);
     if (!user) throw { status: 404, message: "User not found" };
-
+ 
     // Update password
     const { data: updatedUser, error: updateError } =
       await supabaseAdmin.auth.admin.updateUserById(user.id, {
         password: newPassword,
       });
-    if (updateError) throw { status: 500, message: updateError.message };
+    if (updateError) throw { status: 500, message: updateError.message }; 
 
     // Hash and update in DB
     const password_hash = await hashPassword(newPassword);
@@ -106,7 +108,8 @@ class ResetPasswordUseCase {
     if (userInDb) {
       await this.userRepository.updateUser(userInDb.user_id, { password_hash });
     }
-
+    // Force all sessions to expire
+    // await supabaseAdmin.auth.admin.deleteUserSessions(user.id);
     return { status: 200, message: "Password reset successful." };
   }
 }
