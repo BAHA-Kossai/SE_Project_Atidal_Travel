@@ -1,6 +1,7 @@
 import React, { useState ,useEffect } from 'react';
 import { Menu, X, Bell, Search, Home, Calendar, Users, UserCheck, Plane, Building2 } from 'lucide-react';
 import '../styles/app_bar_side_bar_with_content.css';
+import {useNavigate} from "react-router-dom";
 
 
 // AppBar Component
@@ -139,14 +140,16 @@ const AppBar = ({ onMenuClick }) => {
 
 // Sidebar Component
 const Sidebar = ({ isOpen, onClose }) => {
+    const [isActive, setIsActive] = useState(false);
+    const navigate = useNavigate();
     const menuItems = [
-        { icon: Home, label: 'Dashboard', active: true },
-        { icon: Calendar, label: 'Bookings' },
-        { icon: Users, label: 'Users' },
-        { icon: UserCheck, label: 'Employees' },
-        { icon: Calendar, label: 'Umrah' },
-        { icon: Plane, label: 'Destinations' },
-        { icon: Building2, label: 'Branches' }
+        { icon: Home, label: 'Dashboard', route: "/admin/", active: true },
+        { icon: Calendar, label: 'Bookings', route: "/admin/bookings", active: true },
+        // { icon: Users, label: 'Users' },
+        { icon: UserCheck, label: 'Employees', route: "/admin/employees", active: true },
+        // { icon: Calendar, label: 'Umrah' },
+        { icon: Plane, label: 'Destinations', route: "/admin/destinations", active: true },
+        { icon: Building2, label: 'Branches', route: "/admin/branches", active: true }
     ];
 
     return (
@@ -177,7 +180,8 @@ const Sidebar = ({ isOpen, onClose }) => {
                         {menuItems.map((item, index) => (
                             <button
                                 key={index}
-                                className={`sidebar-item ${item.active ? 'sidebar-item-active' : ''}`}
+                                className={`sidebar-item ${location.pathname === item.route ? 'sidebar-item-active' : ''}`}
+                                onClick={() => navigate(item.route)}
                             >
                                 <item.icon className="sidebar-item-icon" />
                                 <span className="sidebar-item-label">{item.label}</span>

@@ -15,7 +15,7 @@ export default function Table({columns = [],  data = [], onEdit, onDelete}) {
     const iconClass = "hover:text-gray-600 duration-100 cursor-pointer"
 
     // Pagination
-    const [currentPage, setCurrentPage] = useState(1);
+    const [currentPage, setCurrentPage] = useState(0);
     const pageSize = 7
     const paginatedRows = useMemo(
         () =>
