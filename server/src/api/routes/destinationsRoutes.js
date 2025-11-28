@@ -1,45 +1,30 @@
 /**
-<<<<<<< HEAD
  * @file        destinationRoutes.js
  * @description Routes for destination API endpoints
  *
- * @author      Abderahim
+ * @author      Ahlem Toubrinet, Abderahim
  * @version     1.0.0
  * @date        2025-11-20
  */
-import express from "express";
-import destinationsController from "../controllers/destinationsController.js";
-import {
-  createDestination,
-  getAllDestinations,
-  getDestinationById,
-  updateDestination,
-  deleteDestination,
-} from "../controllers/destinationController.js";
-import { validateDestination } from "../validators/destinationValidator.js";
-import express from "express";
-import destinationsController from "../controllers/destinationsController.js";
 
+import express from "express";
+import destinationsController from "../controllers/destinationsController.js";
+console.log('Destinations routes loaded'); 
 const router = express.Router();
+
+// GET routes
 router.get("/", destinationsController.getAllDestinations);
 router.get("/featured", destinationsController.getFeaturedDestinations);
 router.get("/search", destinationsController.searchDestinations);
+router.get("/:id", destinationsController.getDestinationById);
 
-// CREATE - Post a new destination
-router.post("/", validateDestination, createDestination);
+// POST route
+router.post("/", destinationsController.createDestination);
 
-// READ - Get all destinations with filters
-router.get("/", getAllDestinations);
+// PUT route
+router.put("/:id", destinationsController.updateDestination);
 
-// READ - Get destination by ID
-router.get("/:id", getDestinationById);
-
-// UPDATE - Update destination by ID
-router.put("/:id", validateDestination, updateDestination);
-
-// DELETE - Delete destination by ID
-router.delete("/:id", deleteDestination);
-router.get("/", destinationsController.getAllDestinations);
-router.get("/search", destinationsController.searchDestinations);
+// DELETE route
+router.delete("/:id", destinationsController.deleteDestination);
 
 export default router;
