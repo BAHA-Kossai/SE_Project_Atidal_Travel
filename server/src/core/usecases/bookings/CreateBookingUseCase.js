@@ -1,227 +1,129 @@
-import { validateBookingInput } from "../../../api/validators/bookingValidator.js";
-import { validateTripInfoPayload } from "../../../api/validators/tripInfoValidator.js";
-import { buildBookingResponse } from "./helpers.js";
+/**
+ * @file        CreateBookingUseCase.js
+ * @description Use case for creating bookings with payer, travelers, and trip information.
+ *              Orchestrates the creation of booking, trip info, payer, and traveler records.
+ *              Handles validation and maintains data integrity across related entities.
+ *
+ * @requires    CreateBookingValidator - Validation for booking data
+ * @requires    BookingsRepository     - Access to booking database operations
+ * @requires    PayerRepository        - Access to payer database operations
+ * @requires    TravelersRepository    - Access to travelers database operations
+ * @requires    TripInfoRepository     - Access to trip info database operations
+ *
+ * @author      Ahlem Toubrinet
+ * @version     1.0.0
+ * @date        2025-11-17
+ * @lastModified 2025-11-25
+ */
 
-const DEFAULT_STATUS = "pending";
+import { CreateBookingValidator } from '../../../api/validators/Booking/CreateBookingValidator.js';
 
-export class CreateBookingUseCase {
-  constructor({
-    bookingRepository,
-    payerRepository,
-    travelerRepository,
-    statusHistoryRepository,
-    tripInfoRepository,
-    guidedTripsRepository,
-  }) {
-    this.bookingRepository = bookingRepository;
+class CreateBookingUseCase {
+  constructor(bookingsRepository, payerRepository, travelersRepository, tripInfoRepository) {
+    this.bookingsRepository = bookingsRepository;
     this.payerRepository = payerRepository;
-    this.travelerRepository = travelerRepository;
-    this.statusHistoryRepository = statusHistoryRepository;
+    this.travelersRepository = travelersRepository;
     this.tripInfoRepository = tripInfoRepository;
-    this.guidedTripsRepository = guidedTripsRepository;
   }
 
-  async execute(input) {
+  async execute(bookingData) {
+    const validationErrors = CreateBookingValidator.validate(bookingData);
+    if (validationErrors.length > 0) {
+      throw new Error(validationErrors.join(' '));
+    }
+
+    const { payer_info, travelers_info = [] } = bookingData;
+
     try {
-      const { valid, errors, payload } = validateBookingInput(input);
-      if (!valid) {
-        return { success: false, error: errors.join(", "), status: 400 };
+      const tripInfoToCreate = {
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        price: bookingData.price || 0,
+        trip_date: bookingData.trip_date,
+        returning_date: bookingData.returning_date || bookingData.trip_date,
+        departure_time: bookingData.departure_time,
+        returning_time: bookingData.returning_time,
+        destination_country: bookingData.destination_country,
+        destination_city: bookingData.destination_city || 'none',
+        no_hotel_needed: bookingData.no_hotel_needed || false,
+        hotel_stars: bookingData.hotel_stars || null,
+        duration: bookingData.duration_days || 7
+      };
+
+      const newTripInfo = await this.tripInfoRepository.createTripInfo(tripInfoToCreate);
+
+      const bookingToCreate = {
+        created_at: new Date().toISOString(),
+        user_id: bookingData.user_id || null,
+        booking_status: bookingData.booking_status || 'pending',
+        type: bookingData.type,
+        info_id: newTripInfo.info_id, 
+        branch_id: bookingData.branch_id || null,
+        guide_id: bookingData.guide_id || null,
+        needs_visa_assistance: bookingData.needs_visa_assistance || false,
+        updated_at: new Date().toISOString()
+      };
+
+      const newBooking = await this.bookingsRepository.createBooking(bookingToCreate);
+
+      const payerToCreate = {
+        booking_id: newBooking.booking_id, 
+        first_name: payer_info.first_name,
+        last_name: payer_info.last_name,
+        phone: payer_info.phone,
+        confirmed_at: payer_info.confirmed_at || null,
+        canceled_at: payer_info.canceled_at || null,
+        created_at: new Date().toISOString(),
+        booking_notes: payer_info.booking_notes || null      
+      };
+
+      const newPayer = await this.payerRepository.createPayer(payerToCreate);
+
+      let createdTravelers = [];
+      if (travelers_info.length > 0) {
+        const travelersToCreate = travelers_info.map(traveler => ({
+          created_at: new Date().toISOString(),
+          payer_id: newPayer.booking_id, 
+          first_name: traveler.first_name,
+          last_name: traveler.last_name,
+          age: traveler.age,
+          identity_number: traveler.identity_number,
+          travler_contact: traveler.travler_contact,
+          passport_number: traveler.passport_number,
+          gender: traveler.gender,
+        }));
+
+        createdTravelers = await this.travelersRepository.createTravelersBatch(travelersToCreate);
       }
 
-      const travelers = Array.isArray(payload.travelers)
-        ? payload.travelers
-        : [];
-      const travelerCount = travelers.length;
-
-      const now = new Date().toISOString();
-      const { tripInfo, infoId, created } = await this.resolveTripInfo(
-        payload,
-        now
-      );
-
-      const guidedTrip = await this.guidedTripsRepository.getTripByInfoId(
-        infoId
-      );
-      if (
-        guidedTrip &&
-        Number(guidedTrip.available_seats ?? 0) < travelerCount
-      ) {
-        return {
-          success: false,
-          error: "Not enough available seats for this guided trip",
-          status: 400,
+      if (payer_info.is_traveler) {
+        const payerAsTraveler = {
+          created_at: new Date().toISOString(),
+          payer_id: newPayer.booking_id,
+          first_name: payer_info.first_name,
+          last_name: payer_info.last_name,
+          age: payer_info.age, 
+          identity_number: payer_info.identity_number, 
+          travler_contact: payer_info.phone, 
+          passport_number: payer_info.passport_number,
+          gender: payer_info.gender,
         };
+
+        const payerTraveler = await this.travelersRepository.createTraveler(payerAsTraveler);
+        createdTravelers.push(payerTraveler);
       }
 
-      const rollbackState = {
-        booking: null,
-        travelerIds: [],
-        payerCreated: false,
-        guidedTrip,
-        seatsDelta: 0,
-        customTripInfoId: created ? infoId : null,
-      };
-
-      try {
-        const booking = await this.bookingRepository.createBooking({
-          info_id: infoId,
-          user_id: payload.user_id || null,
-          branch_id: payload.branch_id || null,
-          guide_id: payload.guide_id || guidedTrip?.guide_id || null,
-          booking_status: payload.booking_status || DEFAULT_STATUS,
-          needs_visa_assistance: Boolean(payload.needs_visa_assistance),
-          created_at: now,
-          updated_at: now,
-        });
-        rollbackState.booking = booking;
-
-        if (guidedTrip) {
-          await this.guidedTripsRepository.adjustAvailableSeats(
-            guidedTrip.trip_id,
-            -travelerCount
-          );
-          rollbackState.seatsDelta = travelerCount;
-        }
-
-        const payer = await this.payerRepository.createPayer({
-          booking_id: booking.booking_id,
-          first_name: payload.payer.first_name,
-          last_name: payload.payer.last_name,
-          phone: payload.payer.phone,
-          confirmed_at: payload.payer.confirmed_at || null,
-          cancelled_at: payload.payer.cancelled_at || null,
-          booking_notes: payload.payer.booking_notes || null,
-          created_at: payload.payer.created_at || now,
-        });
-        rollbackState.payerCreated = true;
-
-        const travelerRecords = [];
-        for (const travelerInput of travelers) {
-          const traveler = await this.travelerRepository.createTravler({
-            payer_id: booking.booking_id,
-            first_name: travelerInput.first_name,
-            last_name: travelerInput.last_name,
-            age: travelerInput.age,
-            email: travelerInput.email,
-            identity_number: travelerInput.identity_number,
-            traveler_contact: travelerInput.traveler_contact,
-            passport_number: travelerInput.passport_number,
-            gender: travelerInput.gender,
-            created_at: now,
-          });
-          rollbackState.travelerIds.push(
-            traveler.traveler_id ?? traveler.travler_id
-          );
-          travelerRecords.push(traveler);
-        }
-
-        await this.statusHistoryRepository.addHistory({
-          booking_id: booking.booking_id,
-          status: booking.booking_status,
-          changed_at: now,
-          changed_by: payload.user_id || null,
-        });
-
-        const history = await this.statusHistoryRepository.getHistoryForBooking(
-          booking.booking_id
-        );
-
-        const response = buildBookingResponse({
-          booking,
-          payer,
-          travelers: travelerRecords,
-          history,
-          trip: guidedTrip,
-          tripInfo,
-        });
-
-        return { success: true, data: response, status: 201 };
-      } catch (creationError) {
-        await this.rollback(rollbackState);
-        throw creationError;
-      }
-    } catch (error) {
-      return { success: false, error: error.message };
-    }
-  }
-
-  async resolveTripInfo(payload, timestamp) {
-    if (payload.info_id) {
-      const existing = await this.tripInfoRepository.getTripInfoById(
-        payload.info_id
-      );
-      if (!existing) {
-        throw new Error("Referenced trip info not found");
-      }
       return {
-        tripInfo: existing,
-        infoId: existing.info_id ?? existing.infoId,
-        created: false,
+        booking: newBooking,
+        trip_info: newTripInfo,
+        payer: newPayer,
+        travelers: createdTravelers,
+        total_travelers: createdTravelers.length
       };
-    }
 
-    if (!payload.trip_info) {
-      throw new Error("trip_info payload is required for custom bookings");
-    }
-
-    const {
-      payload: tripInfoPayload,
-      valid,
-      errors,
-    } = validateTripInfoPayload(payload.trip_info, { isUpdate: false });
-    if (!valid) {
-      throw new Error(errors.join(", "));
-    }
-
-    const created = await this.tripInfoRepository.createTripInfo({
-      ...tripInfoPayload,
-      created_at: timestamp,
-      updated_at: timestamp,
-    });
-
-    return {
-      tripInfo: created,
-      infoId: created.info_id ?? created.infoId,
-      created: true,
-    };
-  }
-
-  async rollback({
-    booking,
-    travelerIds = [],
-    payerCreated,
-    guidedTrip,
-    seatsDelta,
-    customTripInfoId,
-  }) {
-    try {
-      for (const travelerId of travelerIds) {
-        if (travelerId) {
-          await this.travelerRepository.deleteTravler(travelerId);
-        }
-      }
-
-      if (payerCreated && booking) {
-        await this.payerRepository.deletePayer(booking.booking_id);
-      }
-
-      if (booking) {
-        await this.bookingRepository.deleteBooking(booking.booking_id);
-      }
-
-      if (guidedTrip && seatsDelta) {
-        await this.guidedTripsRepository.adjustAvailableSeats(
-          guidedTrip.trip_id,
-          seatsDelta
-        );
-      }
-
-      if (customTripInfoId) {
-        await this.tripInfoRepository.deleteTripInfo(customTripInfoId);
-      }
-    } catch (rollbackError) {
-      // eslint-disable-next-line no-console
-      console.error("Booking rollback failed", rollbackError);
+    } catch (error) {
+      console.error('Error creating booking:', error);
+      throw new Error(`Failed to create booking: ${error.message}`);
     }
   }
 }
