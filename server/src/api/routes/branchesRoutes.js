@@ -1,40 +1,30 @@
 /**
  * @file        branchesRoutes.js
-<<<<<<< HEAD
- * @description Routes for branch API endpoints
+ * @description Routes for branches API endpoints
  * 
- * @author      Abderahim
+ * @author      Abderahim, Ahlem Toubrient, Kossai BAHA
  * @version     1.0.0
- * @date        2025-11-21
+ * @date        2025-11-22
  */
 
 import express from "express";
 import {
-  createBranch,
-  getAllBranches,
-  getBranchById,
-  updateBranch,
-  deleteBranch,
-} from "../controllers/branchController.js";
-import { validateBranch } from "../validators/branchValidator.js";
+  verifySupabaseToken,
+  requireSuperAdmin,
+  requireAdmin_or_SuperAdmin,
+} from "../middlewares/authMiddleware.js";
+import branchesController from "../controllers/branchesController.js"; 
 
 const router = express.Router();
 
-// CREATE - Post a new branch
-router.post("/", validateBranch, createBranch);
-
-// READ - Get all branches with filters
-router.get("/", getAllBranches);
-
-// READ - Get branch by ID
-router.get("/:id", getBranchById);
-
-// UPDATE - Update branch by ID
-router.put("/:id", validateBranch, updateBranch);
-
-// DELETE - Delete branch by ID
-router.delete("/:id", deleteBranch);
-
+// Public routes
 router.get("/active", branchesController.getActiveBranches);
+router.get("/", branchesController.getAllBranches);
+router.get("/:id", branchesController.getBranchById);
+
+// Protected routes - require authentication
+router.post("/", verifySupabaseToken, requireSuperAdmin, branchesController.createBranch);
+router.put("/:id", verifySupabaseToken, requireSuperAdmin, branchesController.updateBranch);
+router.delete("/:id", verifySupabaseToken, requireSuperAdmin, branchesController.deleteBranch);
 
 export default router;
