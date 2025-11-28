@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 const TravelHeroSection = ({
   image = DefaultImage,
   title = "Get the best sejour",
-  subtitle = "with us",
+  subtitle = "Enjoy your travel journey",
   hideSearch = false
 }) => {
   const [destination, setDestination] = useState('');

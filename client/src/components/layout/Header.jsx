@@ -24,7 +24,7 @@ const Header = () => {
   const isActive = (href) => location.pathname === href;
   const handleBookNow = () => {
     // default is destination booking; BookingForm will allow switching
-    navigate('/booking');
+    navigate('/bookings');
   };
 
   return (

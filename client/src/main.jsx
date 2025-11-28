@@ -34,7 +34,8 @@ createRoot(rootElement).render(
                 <Route path="/umrah" element={<UmrahPage/>} />
                 <Route path="/group-trip" element={<GroupTrip/>} />
                 <Route path="/branches" element={<Branches/>} />
-                <Route path="/booking" element={<BookingsPage/>} />
+                <Route path="*" element={<NotFoundPage/>} />
+                <Route path="/bookings" element={<BookingsPage/>} />
                 <Route path="/destinations" element={<DestinationsPage/>} />
                 <Route path="/login" element={<Login/>} />
                 <Route path="/signup" element={<Signup/>} />
@@ -42,7 +43,6 @@ createRoot(rootElement).render(
                 <Route path="/reset-password" element={<ResetPassword/>} />
                 <Route path="/fill-information" element={<FillInformation/>} />
                 <Route path="/profile" element={<Profile/>} />
-                <Route path="*" element={<NotFoundPage/>} />
                 {/* Admin Side */}
                 <Route path="/admin/" element={<AdminDashboardPage/>} />
                 <Route path="/admin/settings" element={<AdminSettingsPage/>} />
@@ -54,4 +54,3 @@ createRoot(rootElement).render(
         </BrowserRouter>
     </StrictMode>
 );
-

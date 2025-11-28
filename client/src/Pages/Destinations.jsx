@@ -39,7 +39,7 @@ const DestinationsPage = () => {
     if (destination) params.append('destination', destination);
     if (date) params.append('date', date);
     if (persons) params.append('persons', persons);
-    navigate(`/booking?${params.toString()}`);
+    navigate(`/bookings?${params.toString()}`);
   };
 
   const handleShowMore = () => {

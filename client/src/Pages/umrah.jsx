@@ -120,7 +120,7 @@ export default function UmrahPage() {
     const navigate = useNavigate();
 
   const handleBookNow = (packageData) => {
-    navigate("/booking", { state: { packageData, isUmrah: true } });};
+    navigate("/bookings", { state: { packageData, isUmrah: true } });};
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
 
