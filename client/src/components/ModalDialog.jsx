@@ -1,16 +1,16 @@
-import ReactDom from "react-dom";
+import {createPortal} from "react-dom";
 
 export default function ModalDialog({title, description, children, open}) {
 
     if (!open) return null;
 
-    return ReactDom.createPortal(
+    return createPortal(
         <>
             {/* Overlay */}
             <div className={`fixed inset-0 z-50 flex items-center justify-center bg-black/50`}>
                 {/* Modal */}
                 <div
-                    className={`bg-white rounded-xl shadow-xl px-10 py-8 max-w-3xl w-full overflow-y-auto relative`}>
+                    className={`bg-white rounded-xl shadow-xl px-10 py-8 max-h-195 max-w-3xl w-full overflow-y-scroll relative`}>
 
                     {/* Title and Description */}
                     <div className={"mb-5"}>

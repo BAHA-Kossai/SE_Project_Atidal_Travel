@@ -3,7 +3,6 @@ import { Search, ArrowUpDown, Filter, Edit2, Star, Save } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import { useAuthHandlers } from "../../hooks/useAuthHandlers.js";
 import { useUserHandlers } from "../../hooks/useUserHandlers.js";
-import Swal from 'sweetalert2';
 
 export default function Profile() {
   //init hook for sign out

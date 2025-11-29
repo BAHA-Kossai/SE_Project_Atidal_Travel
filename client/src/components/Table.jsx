@@ -60,7 +60,7 @@ export default function Table({columns = [],  data = [], onEdit, onDelete}) {
                 }
                 {
                     paginatedRows.map((item) => (
-                        <tr className={"h-17 border-1 border-gray-200 relative"}>
+                        <tr className={"h-17 border-1 border-gray-200 relative hover:bg-gray-100 duration-100 cursor-pointer"}>
                             {/* Row Checkbox */}
                             <td className="p-3 text-left">
                                 <input type="checkbox"/>
@@ -101,7 +101,6 @@ export default function Table({columns = [],  data = [], onEdit, onDelete}) {
                         </tr>
                     ))
                 }
-
                 </tbody>
             </table>
 

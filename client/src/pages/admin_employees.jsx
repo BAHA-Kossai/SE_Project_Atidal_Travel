@@ -13,11 +13,170 @@ import InputField from "../components/InputField.jsx";
 import ButtonSwitch from "../components/ButtonSwitch.jsx";
 
 export default function AdminEmployeesPage() {
+    const [employees, setEmployees] = useState([
+        {
+            "id": "01KAQRHT7S4FXYR5MD9WAN1NWN",
+            "first_name": "Sol",
+            "last_name": "Bunkle",
+            "phone_number": "751-753-0641",
+            "role": "Estimator",
+            "hire_date": "21-02-2025",
+            "availability": true
+        }, {
+            "id": "01KAQRHT7V8N7EWAN31VR2XV0Y",
+            "first_name": "Barrie",
+            "last_name": "Cluet",
+            "phone_number": "621-678-6290",
+            "role": "Surveyor",
+            "hire_date": "27-10-2025",
+            "availability": true
+        }, {
+            "id": "01KAQRHT7WWHW0FQC4P92VXEAJ",
+            "first_name": "Kizzee",
+            "last_name": "Bartholomew",
+            "phone_number": "330-928-2308",
+            "role": "Architect",
+            "hire_date": "15-05-2025",
+            "availability": false
+        }, {
+            "id": "01KAQRHT7XEXPB1KECF05VNNJM",
+            "first_name": "Keeley",
+            "last_name": "Jakuszewski",
+            "phone_number": "162-528-5144",
+            "role": "Construction Expeditor",
+            "hire_date": "08-01-2025",
+            "availability": false
+        }, {
+            "id": "01KAQRHT7X8RPH76T00EKH90AY",
+            "first_name": "Leonard",
+            "last_name": "Trumper",
+            "phone_number": "155-596-7402",
+            "role": "Supervisor",
+            "hire_date": "28-11-2024",
+            "availability": true
+        }, {
+            "id": "01KAQRHT7Y5N6THG39P6C3XTPN",
+            "first_name": "Elene",
+            "last_name": "Follen",
+            "phone_number": "487-194-2958",
+            "role": "Project Manager",
+            "hire_date": "17-07-2025",
+            "availability": true
+        }, {
+            "id": "01KAQRHT7Z5KRECS3BQ2KCZRTC",
+            "first_name": "Adiana",
+            "last_name": "Slane",
+            "phone_number": "416-772-2069",
+            "role": "Architect",
+            "hire_date": "30-12-2024",
+            "availability": false
+        }, {
+            "id": "01KAQRHT80HE8P5TKEDN3EEJBM",
+            "first_name": "Mel",
+            "last_name": "Rosensaft",
+            "phone_number": "780-285-2871",
+            "role": "Surveyor",
+            "hire_date": "09-06-2025",
+            "availability": true
+        }, {
+            "id": "01KAQRHT81KSGHBE3W23VJB5TK",
+            "first_name": "Tabitha",
+            "last_name": "Moyne",
+            "phone_number": "847-471-0392",
+            "role": "Supervisor",
+            "hire_date": "23-08-2025",
+            "availability": true
+        }, {
+            "id": "01KAQRHT82CKN5YXNVGKXM327K",
+            "first_name": "Dud",
+            "last_name": "Fishly",
+            "phone_number": "615-933-1490",
+            "role": "Construction Manager",
+            "hire_date": "18-07-2025",
+            "availability": true
+        }, {
+            "id": "01KAQRHT83V71AYXYTFHHZGMP4",
+            "first_name": "Delbert",
+            "last_name": "Folliott",
+            "phone_number": "186-187-1368",
+            "role": "Project Manager",
+            "hire_date": "13-03-2025",
+            "availability": false
+        }, {
+            "id": "01KAQRHT83BBZ69JAN7ZWVW8S4",
+            "first_name": "Marwin",
+            "last_name": "Brims",
+            "phone_number": "400-228-3631",
+            "role": "Estimator",
+            "hire_date": "19-02-2025",
+            "availability": false
+        }, {
+            "id": "01KAQRHT85Z52EHV3SNH8Z605Y",
+            "first_name": "Austin",
+            "last_name": "Skirven",
+            "phone_number": "805-240-4178",
+            "role": "Project Manager",
+            "hire_date": "02-12-2024",
+            "availability": true
+        }, {
+            "id": "01KAQRHT85F521MP3S14FV5JDH",
+            "first_name": "Simona",
+            "last_name": "Plaister",
+            "phone_number": "987-187-7274",
+            "role": "Estimator",
+            "hire_date": "04-04-2025",
+            "availability": true
+        }, {
+            "id": "01KAQRHT86E32FF5B0CH5YRA4C",
+            "first_name": "Brander",
+            "last_name": "Trood",
+            "phone_number": "176-281-4816",
+            "role": "Engineer",
+            "hire_date": "27-11-2024",
+            "availability": false
+        }, {
+            "id": "01KAQRHT87T48WXMB092RYD9JX",
+            "first_name": "Shaina",
+            "last_name": "Arbor",
+            "phone_number": "309-311-4454",
+            "role": "Subcontractor",
+            "hire_date": "10-01-2025",
+            "availability": false
+        }, {
+            "id": "01KAQRHT88Z0K82JT0JN37W8D0",
+            "first_name": "Duffy",
+            "last_name": "Tenman",
+            "phone_number": "164-505-5178",
+            "role": "Construction Manager",
+            "hire_date": "18-07-2025",
+            "availability": true
+        }, {
+            "id": "01KAQRHT8A5MWFBY5K6VEQHEEJ",
+            "first_name": "Mick",
+            "last_name": "O'Heneghan",
+            "phone_number": "323-690-0180",
+            "role": "Subcontractor",
+            "hire_date": "10-08-2025",
+            "availability": false
+        }
+    ]);
+
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const filteredEmployees = employees.filter(employee => {
+        return (
+            employee.first_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            employee.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            employee.phone_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            employee.role.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+    })
     // New/Edit/Delete Employee Modals
     const [selectedEmployee, setSelectedEmployee] = useState(null);
     const [isAddEmployeeModalOpen, setIsAddEmployeeModalOpen] = useState(false);
     const [isEditEmployeeModalOpen, setIsEditEmployeeModalOpen] = useState(false);
     const [isDeleteEmployeeModalOpen, setIsDeleteEmployeeModalOpen] = useState(false);
+
     // Employee Form Credentials
     const [employeeForm, setEmployeeForm] = useState({
         first_name: "",
@@ -109,7 +268,12 @@ export default function AdminEmployeesPage() {
                     <div className="flex flex-col">
                         {/* Search / Sort / Filter/ New Employee */}
                         <div className="flex flex-row justify-between items-center mb-5">
-                            <SearchBar placeholder={"Search for an employee"}/>
+                            <SearchBar
+                                placeholder={"Search for an employee"}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                onClear={() => setSearchQuery('')}
+                                searchQuery={searchQuery}
+                            />
                             <div className="flex flex-row justify-between w-100">
                                 <ButtonOutline>Sort<ArrowUpDown size={18} className={"ml-2"}/></ButtonOutline>
                                 <ButtonOutline>Filter<SlidersHorizontal size={18} className={"ml-2"}/></ButtonOutline>
@@ -184,7 +348,7 @@ export default function AdminEmployeesPage() {
                             )
                         },
                     ]}
-                    data={mock_employees}
+                    data={filteredEmployees}
                 />
             </WhiteContainer>
 
