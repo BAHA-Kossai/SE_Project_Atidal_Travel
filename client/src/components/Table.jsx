@@ -1,8 +1,8 @@
 import {Edit, Trash2, ChevronLeft, ChevronRight} from "lucide-react";
 import {useMemo, useState} from "react";
 
-export default function Table({columns = [],  data = [], onEdit, onDelete}) {
-    /*
+export default function Table({columns = [],  data = [], onSelect, onEdit, onDelete}) {
+    /**
     Dynamic Table component:
 
     @param columns
@@ -60,7 +60,10 @@ export default function Table({columns = [],  data = [], onEdit, onDelete}) {
                 }
                 {
                     paginatedRows.map((item) => (
-                        <tr className={"h-17 border-1 border-gray-200 relative hover:bg-gray-100 duration-100 cursor-pointer"}>
+                        <tr
+                            className={"h-17 border-1 border-gray-200 relative hover:bg-gray-100 duration-100 cursor-pointer"}
+                            onClick={() => onSelect(item)}
+                        >
                             {/* Row Checkbox */}
                             <td className="p-3 text-left">
                                 <input type="checkbox"/>
@@ -82,7 +85,10 @@ export default function Table({columns = [],  data = [], onEdit, onDelete}) {
                                         onEdit &&
                                         <Edit
                                             onClick={
-                                                () => onEdit(item) // pass the object so that it gets stored by the parent component
+                                                (e) => {
+                                                    e.stopPropagation() // prevent row select
+                                                    onEdit(item) // pass the object so that it gets stored by the parent component
+                                                }
                                             }
                                             className={iconClass}
                                         />
@@ -91,7 +97,10 @@ export default function Table({columns = [],  data = [], onEdit, onDelete}) {
                                         onDelete &&
                                         <Trash2
                                             onClick={
-                                                () => onDelete(item) // pass the object so that it gets stored by the parent component
+                                                (e) => {
+                                                    e.stopPropagation() // prevent row select
+                                                    onDelete(item) // pass the object so that it gets stored by the parent component
+                                                }
                                             }
                                             className={`${iconClass} hover:text-red-700`}
                                         />

@@ -8,172 +8,61 @@ import ModalDialog from "../ModalDialog.jsx";
 import ButtonFill from "../ButtonFill.jsx";
 
 export const TabPayers = () => {
+    const [searchQuery, setSearchQuery] = useState("");
     return (
         <WhiteContainer>
             <div className="flex flex-col">
                 {/* Search / Sort / Filter */}
                 <div className="flex flex-row justify-between items-center mb-3">
-                    <SearchBar placeholder={"Search for a payer"}/>
+                    <SearchBar
+                        searchQuery={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onClear={() => setSearchQuery('')}
+                        placeholder={"Search for a payer"}
+                    />
                     <div className="grid grid-cols-2 gap-2">
                         <ButtonOutline>Sort<ArrowUpDown size={18} className={"ml-2"}/></ButtonOutline>
                         <ButtonOutline>Filter<SlidersHorizontal size={18} className={"ml-2"}/></ButtonOutline>
                     </div>
                 </div>
-                <PayersTable/>
+                <PayersTable
+                    searchQuery={searchQuery}
+                />
             </div>
         </WhiteContainer>
     )
 }
 
-const PayersTable = () => {
+const PayersTable = ({searchQuery}) => {
     const [payers, setPayers] = useState([
         {
             traveler_id: "#CR000123",
             booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000124",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000125",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000126",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000127",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000128",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000129",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000130",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000131",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000132",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000133",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000134",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000135",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000136",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000137",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000138",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000139",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000140",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000141",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000142",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
+            first_name: "Mohammed",
+            last_name: "Hamid",
+            phone: "0544444444",
+            confirmed_at: "2025-02-14T13:45:30.123+00:00",
+            cancelled_at: "2025-02-14T13:45:30.123+00:00",
+            booking_notes: "placeholder text",
+            created_at: "2025-02-14T13:45:30.123+00:00",
         },
     ]);
     const [selectedPayer, setSelectedPayer] = useState(null);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const handleDelete = (id) => {
-        setPayers(payers.filter(payer => payer["payer_id"] !== id));
+        setPayers(payers.filter(payer => payer["booking_id"] !== id));
         setIsDeleteModalOpen(false);
     };
+
+    const filteredPayers = payers.filter(payer => {
+        const query = searchQuery.toLowerCase();
+        return (
+            payer.first_name.toLowerCase().includes(query) ||
+            payer.last_name.toLowerCase().includes(query) ||
+            payer.phone.toLowerCase().includes(query)
+        )
+    })
 
     return (
         <>
@@ -185,6 +74,12 @@ const PayersTable = () => {
                         setIsDeleteModalOpen(true);
                     }
                 }
+                onEdit={(payer) =>
+                    {
+                        setSelectedPayer(payer);
+                        setIsEditModalOpen(true);
+                    }
+            }
                 columns={
                     [
                         {
@@ -204,18 +99,18 @@ const PayersTable = () => {
                             )
                         },
                         {
-                            title: 'User ID',
+                            title: 'First Name',
                             format: (item) => (
-                                <td className={"text-center text-(--color-text-secondary) cursor-pointer hover:underline"}>
-                                    {item["user_id"]}
+                                <td className={"text-center text-gray-400"}>
+                                    {item["first_name"]}
                                 </td>
                             )
                         },
                         {
-                            title: 'Payer Name',
+                            title: 'Last Name',
                             format: (item) => (
                                 <td className={"text-center text-gray-400"}>
-                                    {item["payer_name"]}
+                                    {item["last_name"]}
                                 </td>
                             )
                         },
@@ -223,13 +118,13 @@ const PayersTable = () => {
                             title: 'Phone Number',
                             format: (item) => (
                                 <td className={"text-center text-gray-400"}>
-                                    {item["phone_number"]}
+                                    {item["phone"]}
                                 </td>
                             )
                         },
                     ]
                 }
-                data={payers}
+                data={filteredPayers}
             />
 
             {/* Delete Modal */}
@@ -241,15 +136,25 @@ const PayersTable = () => {
                         Are you sure that you want to delete the payer with ID
                     </h1>
                     <span className={"text-(--color-text-secondary)"}>
-                    {selectedPayer?.["traveler_id"]}
+                    {selectedPayer?.["booking_id"]}
                     </span>
                     <h1>
                         This action cannot be undone
                     </h1>
                 </div>
                 <div className={"grid grid-cols-2 gap-4 mt-8"}>
-                    <ButtonFill onClick={() => handleDelete(selectedPayer?.["traveler_id"])}>Yes</ButtonFill>
+                    <ButtonFill onClick={() => handleDelete(selectedPayer?.["booking_id"])}>Yes</ButtonFill>
                     <ButtonOutline onClick={() => setIsDeleteModalOpen(false)}>No</ButtonOutline>
+                </div>
+            </ModalDialog>
+
+            {/* Delete Modal */}
+            <ModalDialog
+                open={isEditModalOpen}
+            >
+                <div className={"grid grid-cols-2 gap-4 mt-8"}>
+                    <ButtonFill>Yes</ButtonFill>
+                    <ButtonOutline onClick={() => setIsEditModalOpen(false)}>No</ButtonOutline>
                 </div>
             </ModalDialog>
         </>

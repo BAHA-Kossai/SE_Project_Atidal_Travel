@@ -263,6 +263,7 @@ export default function AdminGuidedTripsPage() {
             {/* Add Modal */}
             <ModalDialog
                 open={isAddModalOpen}
+                className={"overflow-y-scroll"}
             >
                 {/* Image Dropzone */}
                 <FileDropzone

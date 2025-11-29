@@ -9,7 +9,7 @@ import {TabTravelers} from "../components/admin-bookings/TabTravelers.jsx";
 export default function AdminBookingsPage() {
     // Change Active Tab
     const [activeTab, setActiveTab] = useState("Bookings");
-    const tabs = ["Bookings", "Payer", "Traveler"]
+    const tabs = ["Bookings", "Payers", "Travelers"]
 
     return (
         <AppBarSideBarWithContent>
@@ -27,8 +27,8 @@ export default function AdminBookingsPage() {
                 <Tabs items={tabs} activeTab={activeTab} setActiveTab={setActiveTab}/>
             </div>
                 { activeTab === "Bookings" && <TabBookings/> }
-                { activeTab === "Payer" && <TabPayers/> }
-                { activeTab === "Traveler" && <TabTravelers/> }
+                { activeTab === "Payers" && <TabPayers/> }
+                { activeTab === "Travelers" && <TabTravelers/> }
 
         </AppBarSideBarWithContent>
     )

@@ -8,24 +8,33 @@ import ModalDialog from "../ModalDialog.jsx";
 import ButtonFill from "../ButtonFill.jsx";
 import InputField from "../InputField.jsx";
 
+
 export const TabBookings = () => {
+    const [searchQuery, setSearchQuery] = useState('');
     return (
         <WhiteContainer>
             <div className="flex flex-col">
                 {/* Search / Sort / Filter */}
                 <div className="flex flex-row justify-between items-center mb-3">
-                    <SearchBar placeholder={"Search for a booking"}/>
+                    <SearchBar
+                        searchQuery={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onClear={() => setSearchQuery('')}
+                        placeholder={"Search for a booking"}
+                    />
                     <div className="grid grid-cols-2 gap-2">
                         <ButtonOutline>Sort<ArrowUpDown size={18} className={"ml-2"}/></ButtonOutline>
                         <ButtonOutline>Filter<SlidersHorizontal size={18} className={"ml-2"}/></ButtonOutline>
                     </div>
                 </div>
-                <BookingsTable/>
+                <BookingsTable
+                    searchQuery={searchQuery}
+                />
             </div>
         </WhiteContainer>
     )
 }
-const BookingsTable = () => {
+const BookingsTable = ({searchQuery}) => {
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [isEditBookingModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteBookingModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -154,6 +163,17 @@ const BookingsTable = () => {
         }
     ]);
 
+    const filteredBookings = bookings.filter((booking) => {
+        const query = searchQuery.toLowerCase();
+        return (
+            booking.username.toLowerCase().includes(query) ||
+            booking.destination.city.toLowerCase().includes(query) ||
+            booking.destination.country.toLowerCase().includes(query) ||
+            booking.phone_number.toLowerCase().includes(query) ||
+            booking.branch.toLowerCase().includes(query)
+        );
+    })
+
     return (
         <>
             <Table
@@ -231,7 +251,7 @@ const BookingsTable = () => {
                         },
                     ]
                 }
-                data={bookings}
+                data={filteredBookings}
             />
 
             {/* Delete Modal */}
