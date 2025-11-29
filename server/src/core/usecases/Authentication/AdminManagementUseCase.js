@@ -102,6 +102,14 @@ class AdminManagementUseCase {
     throw new Error("Cannot delete a SUPER_ADMIN");
   }
 
+  // Delete from Supabase
+  if (user.supabase_id) {
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(user.supabase_id);
+    if (error) {
+      throw new Error("Failed to delete admin from Supabase: " + error.message);
+    }
+  }
+
   // Delete admin (user)
   const deleted = await this.userRepository.deleteUser(adminId);
 

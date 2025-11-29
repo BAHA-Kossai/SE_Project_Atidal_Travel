@@ -22,7 +22,7 @@ router.get("/me", verifySupabaseToken, readUserController);
 // PATCH /api/users/change-password
 router.patch("/change-password", verifySupabaseToken, changePasswordController);
 
-// GET /api/users/admins
+// GET /api/user/admins
 // Only accessible to SUPER_ADMIN users
 router.get(
   "/admins",

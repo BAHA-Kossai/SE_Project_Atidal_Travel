@@ -54,9 +54,11 @@ export default function Table({columns = [],  data = [], onSelect, onEdit, onDel
 
                 {
                     data.length === 0 &&
+                    <tr>
                     <td colSpan={columns.length + 2} className={"text-xl py-4"}>
                         No Data Found
                     </td>
+                    </tr>
                 }
                 {
                     paginatedRows.map((item) => (

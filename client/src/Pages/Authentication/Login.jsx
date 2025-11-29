@@ -59,7 +59,11 @@ const Login = () => {
         });
         
         //is successfull redirect to profile 
-         navigate("../profile");
+        const type = res.data.user.type
+        if(type == "USER")
+        navigate("../profile");
+        else
+        navigate("/admin")
       } catch (err) {
         console.error("Login error:", err);
       }

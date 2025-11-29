@@ -7,7 +7,7 @@ import { useUserHandlers } from "../../hooks/useUserHandlers.js";
 export default function Profile() {
   //init hook for sign out
   const { handleSignOut, handleFetchProfile } = useAuthHandlers();
-  const { handleUpdateUser,handleDeleteUser, message } = useUserHandlers();
+  const { handleUpdateUser, handleDeleteUser, message } = useUserHandlers();
   const storedProfile = JSON.parse(localStorage.getItem("user")) || null;
 
   const [profileData, setProfileData] = useState(
@@ -1185,83 +1185,81 @@ export default function Profile() {
                   onMouseLeave={(e) =>
                     (e.currentTarget.style.backgroundColor = "#117BB8")
                   }
-                  
                 >
                   Submit feedback
                 </button>
               </div>
-             
             </div>
-             <div style={{marginTop:"20px"}}>
-                <button
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "0.5rem",
-                    backgroundColor: "#dc3545",
-                    color: "white",
-                    padding: "0.625rem 1.5rem",
-                    border: "none",
-                    borderRadius: "0.5rem",
-                    fontSize: "1rem",
-                    fontWeight: "500",
-                    cursor: "pointer",
-                    transition: "background-color 0.2s",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#b02a37")
+            <div style={{ marginTop: "20px" }}>
+              <button
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  padding: "0.625rem 1.5rem",
+                  border: "none",
+                  borderRadius: "0.5rem",
+                  fontSize: "1rem",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#b02a37")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#dc3545")
+                }
+                onClick={async () => {
+                  const result = await Swal.fire({
+                    title: "Are you sure?",
+                    text: "This action will permanently delete your account.",
+                    icon: "warning",
+                    showCancelButton: true,
+                    confirmButtonColor: "#dc3545",
+                    cancelButtonColor: "#3085d6",
+                    confirmButtonText: "Yes, delete my account",
+                    cancelButtonText: "Cancel",
+                  });
+
+                  if (result.isConfirmed) {
+                    try {
+                      const accessToken = localStorage.getItem("accessToken");
+
+                      if (!accessToken)
+                        throw new Error("No access token found");
+
+                      // Call your delete API
+                      await handleDeleteUser(accessToken);
+
+                      // Clear local storage
+                      localStorage.removeItem("user");
+                      localStorage.removeItem("accessToken");
+                      localStorage.removeItem("refreshToken");
+
+                      Swal.fire(
+                        "Deleted!",
+                        "Your account has been deleted successfully.",
+                        "success"
+                      );
+
+                      // Redirect user to homepage or login
+                      window.location.href = "/";
+                    } catch (err) {
+                      Swal.fire(
+                        "Error!",
+                        err.message || "Failed to delete your account.",
+                        "error"
+                      );
+                    }
                   }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#dc3545")
-                  }
-onClick={async () => {
-  const result = await Swal.fire({
-    title: "Are you sure?",
-    text: "This action will permanently delete your account.",
-    icon: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#dc3545",
-    cancelButtonColor: "#3085d6",
-    confirmButtonText: "Yes, delete my account",
-    cancelButtonText: "Cancel",
-  });
-
-  if (result.isConfirmed) {
-    try {
-      const accessToken = localStorage.getItem("accessToken");
-
-      if (!accessToken) throw new Error("No access token found");
-
-      // Call your delete API
-      await handleDeleteUser(accessToken);
-
-      // Clear local storage
-      localStorage.removeItem("user");
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-
-      Swal.fire(
-        "Deleted!",
-        "Your account has been deleted successfully.",
-        "success"
-      );
-
-      // Redirect user to homepage or login
-      window.location.href = "/";
-    } catch (err) {
-      Swal.fire(
-        "Error!",
-        err.message || "Failed to delete your account.",
-        "error"
-      );
-    }
-  }
-}}
-
-                >
-                  Delete Account
-                </button>
-              </div>
+                }}
+              >
+                Delete Account
+              </button>
+            </div>
           </div>
         </main>
       </div>

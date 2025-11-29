@@ -78,7 +78,7 @@ class ReadAdminsUseCase {
 
     // Exclude sensitive fields
     return admins.map(admin => {
-      const { user_id, supabase_id, created_at, updated_at, password_hash, ...safeData } = admin;
+      const { supabase_id, created_at, updated_at, password_hash, ...safeData } = admin;
       return safeData;
     });
   }
