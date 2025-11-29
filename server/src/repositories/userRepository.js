@@ -153,7 +153,7 @@ class UserRepository extends BaseRepository {
     if (existingUser) {
       throw { status: 409, message: "Email already in use" };
     }
-    console.log("here");
+    
     //Hash password for DB
     const password_hash = await hashPassword(adminData.password);
     const { password, ...userWithoutPassword } = adminData;
@@ -178,14 +178,13 @@ class UserRepository extends BaseRepository {
           type: "ADMIN",
         },
       });
-
+      
     if (error) throw { status: 500, message: error.message };
-
     //Return both objects
     return {
       supabase: {
-        id: supabaseUser.id,
-        email: supabaseUser.email,
+        id: supabaseUser.user.id,
+        email: supabaseUser.user.email,
         type: "ADMIN",
         first_name: adminData.first_name,
         last_name: adminData.last_name,
@@ -240,8 +239,8 @@ class UserRepository extends BaseRepository {
     //Return both objects
     return {
       supabase: {
-        id: supabaseUser.id,
-        email: supabaseUser.email,
+        id: supabaseUser.user.id,
+        email: supabaseUser.user.email,
         type: "SUPER_ADMIN",
         first_name: superAdminData.first_name,
         last_name: superAdminData.last_name,

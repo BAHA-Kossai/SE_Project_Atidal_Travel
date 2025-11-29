@@ -51,3 +51,75 @@ export const createAdminController = async (req, res) => {
     });
   }
 };
+
+/**
+ * Controller to delete an admin user (Super Admin only)
+ * Expects:
+ *  - req.body.id : user_id of the admin to delete
+ *  - Authorization header with Super Admin token
+ */
+export const deleteAdminController = async (req, res) => {
+  try {
+    const superAdmin = req.user; // set by verifySupabaseToken
+    if (!superAdmin) {
+      return res.status(401).json({
+        status: "error",
+        data: {},
+        message: "Unauthorized",
+      });
+    }
+
+    const { id } = req.body;
+    if (!id) {
+      return res.status(400).json({
+        status: "error",
+        data: {},
+        message: "Admin user ID is required",
+      });
+    }
+
+    const useCase = new AdminManagementUseCase(userRepo);
+    const result = await useCase.deleteAdmin(id);
+
+    return res.status(200).json({
+      status: "success",
+      message: `Admin user with id ${id} deleted successfully`,
+      data: result,
+    });
+  } catch (err) {
+    return res.status(err.status || 500).json({
+      status: "error",
+      data: {},
+      message: err.message || "Something went wrong",
+    });
+  }
+};
+
+export const updateAdminController = async (req, res) => {
+  try {
+    const superAdmin = req.user;
+    if (!superAdmin) {
+      return res.status(401).json({ status: "error", data: {}, message: "Unauthorized" });
+    }
+
+    const { id, ...updateData } = req.body;
+    if (!id) {
+      return res.status(400).json({ status: "error", data: {}, message: "Admin ID is required" });
+    }
+
+    const useCase = new AdminManagementUseCase(userRepo);
+    const result = await useCase.updateAdmin(superAdmin, id, updateData);
+
+    return res.status(200).json({
+      status: "success",
+      message: result.message,
+      data: result.data
+    });
+  } catch (err) {
+    return res.status(err.status || 500).json({
+      status: "error",
+      data: {},
+      message: err.message || "Something went wrong"
+    });
+  }
+};

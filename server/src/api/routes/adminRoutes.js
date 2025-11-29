@@ -14,7 +14,7 @@
  */
 
 import express from 'express';
-import { createAdminController } from '../controllers/createAdminController.js';
+import { createAdminController,deleteAdminController,updateAdminController } from '../controllers/AdminController.js';
 import { verifySupabaseToken, requireSuperAdmin } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
@@ -28,6 +28,20 @@ router.post(
   verifySupabaseToken,   // validate JWT & attach req.user
   requireSuperAdmin,     // ensure SUPER_ADMIN
   createAdminController  // call controller
+);
+
+router.delete(
+  "/delete",
+  verifySupabaseToken,  
+  requireSuperAdmin,   
+  deleteAdminController,
+);
+
+router.put(
+  "/update",
+  verifySupabaseToken,
+  requireSuperAdmin,
+  updateAdminController
 );
 
 export default router;
