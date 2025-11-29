@@ -183,7 +183,7 @@ const TravelersTable = ({searchQuery}) => {
                 </div>
             </ModalDialog>
 
-            {/* Entry Modal */}
+            {/* Row Entry Modal */}
             <TableEntryModal
                 open={isEntryModalOpen}
                 title={"Traveler Information"}
@@ -249,20 +249,3 @@ const TravelersTable = ({searchQuery}) => {
         </>
     );
 }
-// {
-//     traveler_id: "#CR000123",
-//         payer_id: "#CR000123",
-//     payer: {
-//     first_name: "Younes",
-//         last_name: "Toufiq",
-// },
-//     booking_id: "#CR000123",
-//         created_at: "2025-02-14T13:45:30.123+00:00",
-//     first_name: "Mohamed",
-//     last_name: "Mahmoudi",
-//     age: 23,
-//     identity_number: 20323424,
-//     traveler_contact: "2032342340",
-//     passport_number: "40654630343",
-//     gender: "Male"
-// },

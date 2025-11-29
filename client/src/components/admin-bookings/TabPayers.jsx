@@ -1,11 +1,12 @@
 import WhiteContainer from "../WhiteContainer.jsx";
 import SearchBar from "../SearchBar.jsx";
 import ButtonOutline from "../ButtonOutline.jsx";
-import {ArrowUpDown, SlidersHorizontal} from "lucide-react";
+import {ArrowUpDown, SlidersHorizontal, X} from "lucide-react";
 import {useState} from "react";
 import Table from "../Table.jsx";
 import ModalDialog from "../ModalDialog.jsx";
 import ButtonFill from "../ButtonFill.jsx";
+import TableEntryModal from "../TableEntryModal.jsx";
 
 export const TabPayers = () => {
     const [searchQuery, setSearchQuery] = useState("");
@@ -36,6 +37,7 @@ export const TabPayers = () => {
 const PayersTable = ({searchQuery}) => {
     const [payers, setPayers] = useState([
         {
+            payer_id: "#CR000123",
             traveler_id: "#CR000123",
             booking_id: "#CR000123",
             first_name: "Mohammed",
@@ -48,6 +50,7 @@ const PayersTable = ({searchQuery}) => {
         },
     ]);
     const [selectedPayer, setSelectedPayer] = useState(null);
+    const [isEntryModalOpen, setIsEntryModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const handleDelete = (id) => {
@@ -67,6 +70,12 @@ const PayersTable = ({searchQuery}) => {
     return (
         <>
             <Table
+                onSelect={(payer) =>
+                {
+                    setSelectedPayer(payer)
+                    setIsEntryModalOpen(true)
+                }
+                }
                 onDelete={
                     (payer) =>
                     {
@@ -127,6 +136,77 @@ const PayersTable = ({searchQuery}) => {
                 data={filteredPayers}
             />
 
+            {/* Row Entry Modal */}
+            <TableEntryModal
+                title={"Payer Information"}
+                open={isEntryModalOpen}
+                properties={[
+                    {
+                        name: "Payer ID",
+                        value: selectedPayer?.["payer_id"],
+                    },
+                    {
+                        name: "Booking ID",
+                        value: selectedPayer?.["booking_id"],
+                    },
+                    {
+                        name: "Traveler ID",
+                        value: selectedPayer?.["traveler_id"],
+                    },
+                    {
+                        name: "First Name",
+                        value: selectedPayer?.["first_name"],
+                    },
+                    {
+                        name: "Last Name",
+                        value: selectedPayer?.["last_name"],
+                    },
+                    {
+                        name: "Phone Number",
+                        value: selectedPayer?.["phone"],
+                    },
+                    {
+                        name: "Creation Date",
+                        value: new Date(selectedPayer?.["created_at"]).toLocaleDateString(),
+                    },
+                    {
+                        name: "Creation Time",
+                        value: new Date(selectedPayer?.["created_at"]).toLocaleTimeString(),
+                    },
+                    {
+                        name: "Confirmation Date",
+                        value: new Date(selectedPayer?.["confirmed_at"]).toLocaleDateString(),
+                    },
+                    {
+                        name: "Confirmation Time",
+                        value: new Date(selectedPayer?.["confirmed_at"]).toLocaleTimeString(),
+                    },
+                    {
+                        name: "Cancellation Date",
+                        value: new Date(selectedPayer?.["cancelled_at"]).toLocaleDateString(),
+                    },
+                    {
+                        name: "Cancellation Time",
+                        value: new Date(selectedPayer?.["cancelled_at"]).toLocaleTimeString(),
+                    },
+                    {
+                        name: "Booking Notes",
+                        value: selectedPayer?.["booking_notes"],
+                    }
+
+                ]}
+                >
+                <X
+                    size={25}
+                    className={`
+                absolute top-5 right-5
+                cursor-pointer 
+                text-gray-400 hover:text-gray-600
+                `}
+                    onClick={() => setIsEntryModalOpen(false)}
+                />
+            </TableEntryModal>
+
             {/* Delete Modal */}
             <ModalDialog
                 open={isDeleteModalOpen}
@@ -148,7 +228,7 @@ const PayersTable = ({searchQuery}) => {
                 </div>
             </ModalDialog>
 
-            {/* Delete Modal */}
+            {/* Edit Modal */}
             <ModalDialog
                 open={isEditModalOpen}
             >
