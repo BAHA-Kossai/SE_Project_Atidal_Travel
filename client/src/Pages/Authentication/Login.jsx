@@ -165,7 +165,7 @@ const Login = () => {
                     </p>
                   )}
                   <div className="flex items-center justify-between pt-2">
-                    <label className="flex items-center gap-2 cursor-pointer">
+                    {/* <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="checkbox"
                         name="rememberMe"
@@ -176,7 +176,7 @@ const Login = () => {
                       <span className="text-lg lg:text-xl text-[#93999f] tracking-[-0.4px]">
                         Remember me
                       </span>
-                    </label>
+                    </label> */}
                     <Link
                       to="/forgot-password"
                       className="text-lg lg:text-xl text-[#93999f] tracking-[-0.4px] hover:text-[#117bb8] transition-colors"
