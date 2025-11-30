@@ -10,12 +10,18 @@ import Table from "../components/Table.jsx";
 import ModalDialog from "../components/ModalDialog.jsx";
 import InputField from "../components/InputField.jsx";
 import FileDropzone from "../components/FileDropzone.jsx";
+import TableEntryModal from "../components/TableEntryModal.jsx";
+
+const trip_type = Object.freeze({
+    NORMAL: "guided_trip",
+    UMRAH: "umrah"
+})
 
 export default function AdminGuidedTripsPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedGuidedTrip, setSelectedGuidedTrip] = useState(null);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isEntryModalOpen, setIsEntryModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [selectedImage, setSelectedImage] = useState();
     const [selectedAgendaFile, setSelectedAgendaFile] = useState();
@@ -32,9 +38,9 @@ export default function AdminGuidedTripsPage() {
                     country: "Algeria"
                 },
                 description: "lorem",
-                imageURL: "https://ibnbattutatravel.com/wp-content/uploads/listing-images/ibnbattuta-tfXoMXA-EqM2l-dz2.jpg"
+                imageURL: "https://ibnbattutatravel.com/wp-content/uploads/listing-images/ibnbattuta-tfXoMXA-EqM2l-dz2.jpg",
+                type : trip_type.UMRAH
             },
-
             {
                 trip_id: 2,
                 created_by: "Sara",
@@ -45,112 +51,9 @@ export default function AdminGuidedTripsPage() {
                     country: "Algeria"
                 },
                 description: "Weekend getaway to the coastal city of Oran.",
-                imageURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Oran_Cityscape.jpg/640px-Oran_Cityscape.jpg"
+                imageURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Oran_Cityscape.jpg/640px-Oran_Cityscape.jpg",
+                type : trip_type.NORMAL
             },
-
-            {
-                trip_id: 3,
-                created_by: "Yacine",
-                created_at: "2025-01-22T16:20:45.842+00:00",
-                available_seats: 30,
-                destination: {
-                    city: "Constantine",
-                    country: "Algeria"
-                },
-                description: "Explore the iconic hanging bridges of Constantine.",
-                imageURL: "https://upload.wikimedia.org/wikipedia/commons/4/4a/Constantine_Suspension_Bridge.jpg"
-            },
-
-            {
-                trip_id: 4,
-                created_by: "Imane",
-                created_at: "2025-04-10T11:00:00.000+00:00",
-                available_seats: 12,
-                destination: {
-                    city: "Tlemcen",
-                    country: "Algeria"
-                },
-                description: "Discover the historic palaces and waterfalls of Tlemcen.",
-                imageURL: "https://upload.wikimedia.org/wikipedia/commons/b/b1/Tlemcen_waterfall_El_Ourit.jpg"
-            },
-
-            {
-                trip_id: 5,
-                created_by: "Khaled",
-                created_at: "2025-02-28T07:34:11.200+00:00",
-                available_seats: 20,
-                destination: {
-                    city: "Annaba",
-                    country: "Algeria"
-                },
-                description: "A relaxing trip to the beaches and basilicas of Annaba.",
-                imageURL: "https://upload.wikimedia.org/wikipedia/commons/9/9f/Annaba_coast.jpg"
-            },
-
-            {
-                trip_id: 6,
-                created_by: "Nadia",
-                created_at: "2025-03-18T14:15:50.003+00:00",
-                available_seats: 8,
-                destination: {
-                    city: "Ghardaïa",
-                    country: "Algeria"
-                },
-                description: "Experience the beauty of the M'zab Valley in Ghardaïa.",
-                imageURL: "https://upload.wikimedia.org/wikipedia/commons/e/e2/Ghardaia_panorama.jpg"
-            },
-
-            {
-                trip_id: 7,
-                created_by: "Amir",
-                created_at: "2025-01-05T10:50:21.723+00:00",
-                available_seats: 15,
-                destination: {
-                    city: "Bejaïa",
-                    country: "Algeria"
-                },
-                description: "Hiking trip to the stunning Yemma Gouraya mountain.",
-                imageURL: "https://upload.wikimedia.org/wikipedia/commons/4/43/Yemma_Gouraya_Bejaia.jpg"
-            },
-
-            {
-                trip_id: 8,
-                created_by: "Rania",
-                created_at: "2025-04-01T19:30:00.555+00:00",
-                available_seats: 10,
-                destination: {
-                    city: "Setif",
-                    country: "Algeria"
-                },
-                description: "Visit the archaeological sites and lively city streets of Setif.",
-                imageURL: "https://upload.wikimedia.org/wikipedia/commons/8/8b/Setif_Fountain.jpg"
-            },
-
-            {
-                trip_id: 9,
-                created_by: "Omar",
-                created_at: "2025-03-25T06:05:10.100+00:00",
-                available_seats: 28,
-                destination: {
-                    city: "Tizi Ouzou",
-                    country: "Algeria"
-                },
-                description: "Discover the Kabyle culture and the Djurdjura mountains.",
-                imageURL: "https://upload.wikimedia.org/wikipedia/commons/5/5e/Tizi_Ouzou.jpg"
-            },
-
-            {
-                trip_id: 10,
-                created_by: "Lina",
-                created_at: "2025-02-12T22:18:40.980+00:00",
-                available_seats: 6,
-                destination: {
-                    city: "Biskra",
-                    country: "Algeria"
-                },
-                description: "Enjoy the warm desert oasis and palm groves of Biskra.",
-                imageURL: "https://upload.wikimedia.org/wikipedia/commons/2/21/Biskra_desert.jpg"
-            }
         ]
     );
     const currentGuidedTrips = guidedTrips.filter(guidedTrip => {
@@ -194,6 +97,10 @@ export default function AdminGuidedTripsPage() {
 
                 {/* Table */}
                 <Table
+                    onSelect={(trip) => {
+                        setSelectedGuidedTrip(trip);
+                        setIsEntryModalOpen(true);
+                    }}
                     onDelete={
                         (trip) => {
                             setSelectedGuidedTrip(trip);
@@ -254,11 +161,51 @@ export default function AdminGuidedTripsPage() {
                             format: (item) => (
                                 <td className={"text-gray-400 text-left"}>{item["available_seats"]}</td>
                             )
+                        },
+                        {
+                            title: "Trip Type",
+                            format: (item) => (
+                                <td className={"text-gray-400 text-left"}>{tripTypeWidget(item.type)}</td>
+                            )
                         }
                     ]}
                     data={currentGuidedTrips}
                 />
             </WhiteContainer>
+
+
+            {/* Row Entry Modal */}
+            <TableEntryModal
+                title={"Guided Trip Information"}
+                open={isEntryModalOpen}
+                onClose={() => setIsEntryModalOpen(false)}
+                properties={[
+                    {
+                        name: "Trip ID",
+                        value: selectedGuidedTrip?.trip_id,
+                    },
+                    {
+                        name: "Created By",
+                        value: selectedGuidedTrip?.created_by,
+                    },
+                    {
+                        name: "Creation Date",
+                        value: new Date(selectedGuidedTrip?.created_at).toLocaleDateString(),
+                    },
+                    {
+                        name: "Creation Time",
+                        value: new Date(selectedGuidedTrip?.created_at).toLocaleTimeString(),
+                    },
+                    {
+                        name: "Description",
+                        value: selectedGuidedTrip?.description,
+                    },
+                    {
+                        name: "Trip Type",
+                        value: selectedGuidedTrip?.type === trip_type.UMRAH ? "Umrah" : "Normal",
+                    },
+                ]}
+            />
 
             {/* Add Modal */}
             <ModalDialog
@@ -326,5 +273,37 @@ export default function AdminGuidedTripsPage() {
                 </div>
             </ModalDialog>
         </AppBarSideBarWithContent>
+    )
+}
+
+
+const tripTypeWidget = (type) => {
+    let foregroundColor = ""
+    let backgroundColor = ""
+    let text = ""
+    switch (type) {
+        case trip_type.NORMAL:
+            foregroundColor = "green-600"
+            backgroundColor = "green-100"
+            text = "Normal"
+            break
+        case trip_type.UMRAH:
+            foregroundColor = "amber-600"
+            backgroundColor = "amber-100"
+            text = "Umrah"
+    }
+
+
+    return (
+        <div className={`
+            flex flex-row px-4 justify-center items-center
+            h-10 text-sm
+            text-${foregroundColor}
+            bg-${backgroundColor}
+            rounded-full
+       `}>
+            <div className={`rounded-xl w-2 h-2 bg-${foregroundColor} mr-2`}></div>
+            {text}
+        </div>
     )
 }

@@ -1,4 +1,4 @@
-import {UploadCloud, UploadIcon} from "lucide-react";
+import {FileIcon, UploadCloud, UploadIcon} from "lucide-react";
 import {useState} from "react";
 
 export default function FileDropzone(props) {
@@ -44,13 +44,44 @@ export default function FileDropzone(props) {
         props.setSelectedFile({file, preview});
     }
 
-    // Handle when the uploaded image is local or an online URL
+    // Determine preview and file type
     let previewSrc = null;
-    if (typeof props.selectedFile === "string") {
-        previewSrc = props.selectedFile;
-    }
-    else if (props.selectedFile && props.selectedFile.preview) {
+    let fileName = null;
+    let isImage = false;
+
+
+    // Case 1: Local upload (file object)
+    if (props.selectedFile && props.selectedFile.file instanceof File) {
+        const file = props.selectedFile.file;
+        fileName = file.name;
+        isImage = file.type.startsWith("image/");
         previewSrc = props.selectedFile.preview;
+    }
+
+    // Case 2: Direct string (URL or base64)
+    else if (typeof props.selectedFile === "string") {
+        previewSrc = props.selectedFile;
+
+        // Detect if URL looks like an image
+        const url = props.selectedFile.toLowerCase()
+        isImage =
+            url.endsWith(".jpg") ||
+            url.endsWith(".jpeg") ||
+            url.endsWith(".png") ||
+            url.endsWith(".gif") ||
+            url.endsWith(".webp") ||
+            url.endsWith("data:image")
+
+
+        // Extract file name for non-image
+        if (!isImage) {
+            try {
+                fileName = props.selectedFile.split("/").pop()
+            }
+            catch {
+                fileName = "file"
+            }
+        }
     }
 
     return (
@@ -76,35 +107,51 @@ export default function FileDropzone(props) {
             />
 
             {/* Show placeholder if no file is uploaded, else show the image */}
-            {
-                previewSrc ? (
-                        <img className={`
+
+            {/* Placeholder when no file is selected */}
+            {!props.selectedFile && (
+                <div className={`flex flex-col items-center h-full gap-4 min-h-20`}>
+                    <UploadCloud size={140} className={"text-(--color-primary)"}
+                                 style={{
+                                     color: "#669bbc",
+                                 }}/>
+                    <div className={"flex flex-row items-center"}>
+                        <UploadIcon className={"mr-2"}
+                                    style={{
+                                        color: "#669bbc",
+                                    }}
+                        />
+                        {props.placeholderText}
+                    </div>
+                </div>
+            )
+            }
+
+            {/* When an Image is selected */}
+            {props.selectedFile && isImage && (
+                <img className={`
                                 w-full
                                 rounded-3xl
                                 `}
-                             style={{
-                                 height: props.selectedFile ? "auto" : props.height
-                             }}
-                             src={previewSrc}
-                             alt={"Preview Image"}
-                        />
-                    ) : (
-                    // Placeholder
-                    <div className={`flex flex-col items-center h-full gap-4 min-h-20`}>
-                        <UploadCloud size={140} className={"text-(--color-primary)"}
-                                     style={{
-                                         color: "#669bbc",
-                                     }}/>
-                        <div className={"flex flex-row items-center"}>
-                            <UploadIcon className={"mr-2"}
-                                        style={{
-                                            color: "#669bbc",
-                                        }}
-                            />
-                            {props.placeholderText}
-                        </div>
-                    </div>
-                )
+                     style={{
+                         // set height for the placeholder when no file is selected
+                         height: props.selectedFile ? "auto" : props.height
+                     }}
+                     src={previewSrc}
+                     alt={"Preview Image"}
+                />
+            )
+            }
+
+            {/* When the file is not an image */}
+            {props.selectedFile && !isImage && (
+                <div className={"flex flex-col items-center gap-3 py-6 text-gray-700"}>
+                    <FileIcon size={60}/>
+                    <span className="text-sm font-medium">
+                        {fileName}
+                    </span>
+                </div>
+            )
             }
         </label>
     )
