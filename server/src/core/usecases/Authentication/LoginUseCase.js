@@ -69,7 +69,8 @@ class LoginUseCase {
         date_of_birth : user.date_of_birth,
         supabase_id: user.supabase_id,
         email: user.email,
-        phone:user.phone
+        phone:user.phone,
+        type: user.type
       }
     };
   }

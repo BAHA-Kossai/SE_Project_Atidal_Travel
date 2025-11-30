@@ -13,7 +13,7 @@
 
 import { hashPassword, comparePassword } from "../../../utils/formValidation.js";
 import supabase from "../../../config/supabase.js";
-
+import { supabaseAdmin } from "../../../config/supabase.js";
 class ChangePasswordUseCase {
   constructor(userRepository) {
     this.userRepository = userRepository;
@@ -38,16 +38,15 @@ class ChangePasswordUseCase {
     const isValid = await comparePassword(currentPassword, user.password_hash);
     if (!isValid) throw { status: 401, message: "Current password is incorrect" };
 
-    // Hash the new password for internal DB
+    // Hash new password for internal DB
     const hashedNewPassword = await hashPassword(newPassword);
 
-    // Update Supabase password using session token
-    const { data: supabaseUpdate, error } = await supabase.auth.updateUser(
-      { password: newPassword },
-      {
-        headers: { Authorization: `Bearer ${authUser.accessToken}` } // pass JWT token
-      }
-    );
+    // Update Supabase password using admin API
+    if (!user.supabase_id) throw { status: 500, message: "Supabase ID missing for user" };
+
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(user.supabase_id, {
+      password: newPassword
+    });
     if (error) throw { status: 500, message: "Failed to update Supabase password", detail: error.message };
 
     // Update internal DB
@@ -55,9 +54,10 @@ class ChangePasswordUseCase {
 
     return {
       status: 200,
-      message: "Password updated successfully",
+      message: "Password updated successfully"
     };
   }
+
 }
 
 export default ChangePasswordUseCase;

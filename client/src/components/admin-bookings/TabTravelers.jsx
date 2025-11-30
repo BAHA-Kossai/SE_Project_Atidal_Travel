@@ -1,175 +1,74 @@
 import WhiteContainer from "../WhiteContainer.jsx";
 import SearchBar from "../SearchBar.jsx";
 import ButtonOutline from "../ButtonOutline.jsx";
-import {ArrowUpDown, SlidersHorizontal} from "lucide-react";
+import {ArrowUpDown, SlidersHorizontal, X} from "lucide-react";
 import {useState} from "react";
 import Table from "../Table.jsx";
 import ModalDialog from "../ModalDialog.jsx";
 import ButtonFill from "../ButtonFill.jsx";
+import TableEntryModal from "../TableEntryModal.jsx";
 
 export const TabTravelers = () => {
+    const [searchQuery, setSearchQuery] = useState('');
     return (
         <WhiteContainer>
             <div className="flex flex-col">
                 {/* Search / Sort / Filter */}
                 <div className="flex flex-row justify-between items-center mb-3">
-                    <SearchBar placeholder={"Search for a traveler"}/>
+                    <SearchBar
+                        searchQuery={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        onClear={() => setSearchQuery('')}
+                        placeholder={"Search for a traveler"}
+                    />
                     <div className="grid grid-cols-2 gap-2">
                         <ButtonOutline>Sort<ArrowUpDown size={18} className={"ml-2"}/></ButtonOutline>
                         <ButtonOutline>Filter<SlidersHorizontal size={18} className={"ml-2"}/></ButtonOutline>
                     </div>
                 </div>
-                <TravelersTable/>
+                <TravelersTable
+                    searchQuery={searchQuery}
+                />
             </div>
         </WhiteContainer>
     )
 }
 
 
-const TravelersTable = () => {
+const TravelersTable = ({searchQuery}) => {
     const [selectedTraveler, setSelectedTraveler] = useState(null);
+    const [isEntryModalOpen, setIsEntryModalOpen] = useState(false);
     const [travelers, setTravelers] = useState([
         {
             traveler_id: "#CR000123",
+            payer_id: "#CR000123",
+            payer: {
+                first_name: "Younes",
+                last_name: "Toufiq",
+            },
             booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000124",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000125",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000126",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000127",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000128",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000129",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000130",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000131",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000132",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000133",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000134",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000135",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000136",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000137",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000138",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000139",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000140",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000141",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
-        },
-        {
-            traveler_id: "#CR000142",
-            booking_id: "#CR000123",
-            user_id: "#CR000123",
-            payer_name: "Mohammed",
-            phone_number: "0544444444",
+            created_at: "2025-02-14T13:45:30.123+00:00",
+            first_name: "Mohamed",
+            last_name: "Mahmoudi",
+            age: 23,
+            identity_number: 20323424,
+            traveler_contact: "2032342340",
+            passport_number: "40654630343",
+            gender: "Male"
         },
     ]);
+
+    const filteredTravelers = travelers.filter((traveler) => {
+        const query = searchQuery.toLowerCase();
+        return (
+            traveler.first_name.toLowerCase().includes(query) ||
+            traveler.last_name.toLowerCase().includes(query) ||
+            traveler.age.toString().includes(query) ||
+            traveler.identity_number.toString().toLowerCase().includes(query) ||
+            traveler.passport_number.toLowerCase().includes(query)
+        )
+    })
+
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const handleDelete = (id) => {
         setTravelers(travelers.filter(traveler => traveler["traveler_id"] !== id));
@@ -179,6 +78,12 @@ const TravelersTable = () => {
     return (
         <>
             <Table
+                onSelect={(traveler) =>
+                {
+                    setSelectedTraveler(traveler)
+                    setIsEntryModalOpen(true)
+                }
+                }
                 onDelete={
                     (traveler) =>
                     {
@@ -191,46 +96,70 @@ const TravelersTable = () => {
                         {
                             title: 'Traveler ID',
                             format: (item) => (
-                                <td className={"text-center text-(--color-text-secondary) cursor-pointer hover:underline"}>
+                                <td className={"text-center text-(--color-text-secondary)"}>
                                     {item["traveler_id"]}
+                                </td>
+                            )
+                        },
+                        {
+                            title: 'Payer ID',
+                            format: (item) => (
+                                <td className={"text-center text-(--color-text-secondary)"}>
+                                    {item["payer_id"]}
                                 </td>
                             )
                         },
                         {
                             title: 'Booking ID',
                             format: (item) => (
-                                <td className={"text-center text-(--color-text-secondary) cursor-pointer hover:underline"}>
+                                <td className={"text-center text-(--color-text-secondary)"}>
                                     {item["booking_id"]}
                                 </td>
                             )
                         },
                         {
-                            title: 'User ID',
+                            title: 'First Name',
                             format: (item) => (
-                                <td className={"text-center text-(--color-text-secondary) cursor-pointer hover:underline"}>
-                                    {item["user_id"]}
+                                <td className={"text-center text-gray-400"}>
+                                    {item["first_name"]}
                                 </td>
                             )
                         },
                         {
-                            title: 'Payer Name',
+                            title: 'Last Name',
                             format: (item) => (
                                 <td className={"text-center text-gray-400"}>
-                                    {item["payer_name"]}
+                                    {item["last_name"]}
                                 </td>
                             )
                         },
                         {
-                            title: 'Phone Number',
+                            title: 'Age',
                             format: (item) => (
                                 <td className={"text-center text-gray-400"}>
-                                    {item["phone_number"]}
+                                    {item["age"]}
+                                </td>
+                            )
+                        },
+                        {
+                            title: 'Payer Full Name',
+                            format: (item) => (
+                                <td className={"text-center text-gray-400"}>
+                                    {item["payer"]["first_name"]} {item["payer"]["last_name"]}
+                                </td>
+                            )
+                        },
+                        {
+                            title: 'Passport Number',
+                            format: (item) => (
+                                <td className={"text-center text-gray-400"}>
+                                    {item["passport_number"]}
                                 </td>
                             )
                         },
                     ]
                 }
-                data={travelers}
+                data={filteredTravelers}
             />
 
             {/* Delete Modal */}
@@ -253,6 +182,70 @@ const TravelersTable = () => {
                     <ButtonOutline onClick={() => setIsDeleteModalOpen(false)}>No</ButtonOutline>
                 </div>
             </ModalDialog>
+
+            {/* Row Entry Modal */}
+            <TableEntryModal
+                open={isEntryModalOpen}
+                title={"Traveler Information"}
+                properties={
+                    [
+                        {
+                            name: "Traveler ID",
+                            value: selectedTraveler?.["traveler_id"]
+                        },
+                        {
+                            name: "Payer ID",
+                            value: selectedTraveler?.["payer_id"]
+                        },
+                        {
+                            name: "Booking ID",
+                            value: selectedTraveler?.["booking_id"]
+                        },
+                        {
+                            name: "Payer Full Name",
+                            value: `${selectedTraveler?.["payer"]["first_name"]}  ${selectedTraveler?.["payer"]["last_name"]}`
+                        },
+                        {
+                            name: "Creation Date",
+                            value: new Date(selectedTraveler?.["created_at"]).toLocaleDateString()
+                        },
+                        {
+                            name: "Creation Time",
+                            value: new Date(selectedTraveler?.["created_at"]).toLocaleTimeString()
+                        },
+                        {
+                            name: "Age",
+                            value: selectedTraveler?.["age"]
+                        },
+                        {
+                            name: "Gender",
+                            value: selectedTraveler?.["gender"]
+                        },
+                        {
+                            name: "Traveler Contact",
+                            value: selectedTraveler?.["traveler_contact"]
+                        },
+                        {
+                            name: "Identity Number",
+                            value: selectedTraveler?.["identity_number"]
+                        },
+                        {
+                            name: "Passport Number",
+                            value: selectedTraveler?.["passport_number"]
+                        },
+                    ]
+                }
+            >
+                <X
+                    size={25}
+                    className={`
+                absolute top-5 right-5
+                cursor-pointer 
+                text-gray-400 hover:text-gray-600
+                `}
+                   onClick={() => setIsEntryModalOpen(false)}
+                />
+            </TableEntryModal>
         </>
     );
 }

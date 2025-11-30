@@ -21,6 +21,7 @@ import ForgotPassword from './Pages/Authentication/ForgotPassword.jsx';
 import DestinationsPage from "./Pages/destinations.jsx";
 import NotFoundPage from "./Pages/not_found.jsx";
 import { StrictMode } from "react";
+import AdminGuidedTripsPage from "./pages/admin_guided_trips.jsx";
 
 
 const rootElement = document.getElementById('root');
@@ -48,6 +49,7 @@ createRoot(rootElement).render(
                 <Route path="/admin/settings" element={<AdminSettingsPage/>} />
                 <Route path="/admin/bookings" element={<AdminBookingsPage/>} />
                 <Route path="/admin/destinations" element={<AdminDestinationsPage/>} />
+                <Route path="/admin/guided-trips" element={<AdminGuidedTripsPage/>} />
                 <Route path="/admin/employees" element={<AdminEmployeesPage/>} />
                 <Route path="/admin/branches" element={<AdminBranchesPage/>} />
             </Routes>
