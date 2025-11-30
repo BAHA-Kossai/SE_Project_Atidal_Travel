@@ -42,7 +42,7 @@ class BookingsController {
         travelersRepository,
         tripInfoRepository
       );
-      const newBooking = await useCase.execute(req.body);
+
       const result = await useCase.execute(req.body);
 
       res.status(201).json({
@@ -59,6 +59,7 @@ class BookingsController {
       });
     }
   }
+
 
   async getUserBookings(req, res) {
     try {
