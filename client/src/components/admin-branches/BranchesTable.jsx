@@ -7,7 +7,6 @@ const BranchesTable = () => {
   const [showModal, setShowModal] = useState(false);
   const [branches, setBranches] = useState([
     {
-      id: 1,
       branchId: '#CR000123',
       city: 'Algiers',
       email: 'email@gmail.com',
@@ -16,7 +15,6 @@ const BranchesTable = () => {
       availability: 'available'
     },
     {
-      id: 2,
       branchId: '#CR000124',
       city: 'Oran',
       email: 'oran@gmail.com',
@@ -25,7 +23,6 @@ const BranchesTable = () => {
       availability: 'available'
     },
     {
-      id: 3,
       branchId: '#CR000125',
       city: 'Constantine',
       email: 'constantine@gmail.com',
@@ -34,7 +31,6 @@ const BranchesTable = () => {
       availability: 'not available'
     },
     {
-      id: 4,
       branchId: '#CR000126',
       city: 'Annaba',
       email: 'annaba@gmail.com',
@@ -43,7 +39,6 @@ const BranchesTable = () => {
       availability: 'available'
     },
     {
-      id: 5,
       branchId: '#CR000127',
       city: 'Tlemcen',
       email: 'tlemcen@gmail.com',
@@ -52,7 +47,6 @@ const BranchesTable = () => {
       availability: 'not available'
     },
     {
-      id: 6,
       branchId: '#CR000128',
       city: 'Batna',
       email: 'batna@gmail.com',
@@ -61,7 +55,6 @@ const BranchesTable = () => {
       availability: 'available'
     },
     {
-      id: 7,
       branchId: '#CR000129',
       city: 'Setif',
       email: 'setif@gmail.com',
@@ -70,7 +63,6 @@ const BranchesTable = () => {
       availability: 'available'
     },
     {
-      id: 8,
       branchId: '#CR000130',
       city: 'Bejaia',
       email: 'bejaia@gmail.com',
@@ -79,7 +71,6 @@ const BranchesTable = () => {
       availability: 'not available'
     },
     {
-      id: 9,
       branchId: '#CR000131',
       city: 'Blida',
       email: 'blida@gmail.com',
@@ -88,7 +79,6 @@ const BranchesTable = () => {
       availability: 'available'
     },
     {
-      id: 10,
       branchId: '#CR000132',
       city: 'Mostaganem',
       email: 'mostaganem@gmail.com',
