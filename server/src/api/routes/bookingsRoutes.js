@@ -23,7 +23,6 @@ import {
 import bookingsController from "../controllers/bookingsController.js";
 
 const router = express.Router();
-router.post("/", bookingsController.createBooking);
 
 router.post("/create", bookingsController.createBooking);
 
