@@ -270,16 +270,6 @@ export default function Profile() {
         <main style={{ maxWidth: "1280px", margin: "0 auto", padding: "2rem 1rem" }}>
           <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
             
-            {/* Debug Info - Remove in production */}
-            <div style={{ backgroundColor: "#f8f9fa", padding: "1rem", marginBottom: "1rem", borderRadius: "0.5rem", border: "1px solid #dee2e6" }}>
-              <h3 style={{ margin: "0 0 0.5rem 0", color: "#495057" }}>Debug Info:</h3>
-              <p style={{ margin: "0.25rem 0", fontSize: "0.875rem" }}>
-                <strong>User ID:</strong> {userId || 'undefined'} | 
-                <strong> Has Data:</strong> {hasUserData ? 'yes' : 'no'} |
-                <strong> Bookings:</strong> {userBookings?.length || 0}
-              </p>
-            </div>
-            
             {/* Profile Section */}
             <div style={{ backgroundColor: "white", borderRadius: "0.5rem", boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)", padding: "2rem", marginBottom: "1.5rem" }}>
               <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "2rem" }}>

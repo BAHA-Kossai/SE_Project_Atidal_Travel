@@ -7,6 +7,12 @@ import bookingsRoutes from './api/routes/bookingsRoutes.js';
 import guidedTripsRoutes from './api/routes/guidedTripsRoutes.js';
 import branchesRoutes from './api/routes/branchesRoutes.js';
 import authRoutes from './api/routes/authRoutes.js';
+import guideRouter from './api/routes/guideRoutes.js';
+import userRouter from './api/routes/userRoutes.js';
+import adminRouter from './api/routes/adminRoutes.js';
+
+
+
 
 const app = express();
 
@@ -28,6 +34,9 @@ app.use((req, res, next) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use("/api/guide", guideRouter);
+app.use("/api/user", userRouter);
+app.use("/api/admin", adminRouter); 
 app.use('/api/destinations', destinationsRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/guided-trips', guidedTripsRoutes);
