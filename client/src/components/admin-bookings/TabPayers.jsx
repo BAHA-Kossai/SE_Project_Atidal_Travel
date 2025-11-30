@@ -140,6 +140,7 @@ const PayersTable = ({searchQuery}) => {
             <TableEntryModal
                 title={"Payer Information"}
                 open={isEntryModalOpen}
+                onClose={() => setIsEntryModalOpen(false)}
                 properties={[
                     {
                         name: "Payer ID",
@@ -195,17 +196,7 @@ const PayersTable = ({searchQuery}) => {
                     }
 
                 ]}
-                >
-                <X
-                    size={25}
-                    className={`
-                absolute top-5 right-5
-                cursor-pointer 
-                text-gray-400 hover:text-gray-600
-                `}
-                    onClick={() => setIsEntryModalOpen(false)}
                 />
-            </TableEntryModal>
 
             {/* Delete Modal */}
             <ModalDialog

@@ -187,6 +187,7 @@ const TravelersTable = ({searchQuery}) => {
             <TableEntryModal
                 open={isEntryModalOpen}
                 title={"Traveler Information"}
+                onClose={() => setIsEntryModalOpen(false)}
                 properties={
                     [
                         {
@@ -235,17 +236,7 @@ const TravelersTable = ({searchQuery}) => {
                         },
                     ]
                 }
-            >
-                <X
-                    size={25}
-                    className={`
-                absolute top-5 right-5
-                cursor-pointer 
-                text-gray-400 hover:text-gray-600
-                `}
-                   onClick={() => setIsEntryModalOpen(false)}
-                />
-            </TableEntryModal>
+            />
         </>
     );
 }

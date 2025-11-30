@@ -1,6 +1,7 @@
 import ModalDialog from "./ModalDialog.jsx";
+import {X} from "lucide-react";
 
-export default function TableEntryModal({title, open, properties = [], children}) {
+export default function TableEntryModal({title, open, properties = [], onClose}) {
     return (
         <ModalDialog
             open={open}
@@ -17,14 +18,23 @@ export default function TableEntryModal({title, open, properties = [], children}
                             <h1 className="text-(--color-primary) font-semibold">
                                 {entry.name}
                             </h1>
-                            <h1>
+                            <h1 className="text-center">
                                 {entry.value}
                             </h1>
                         </div>
                 ))
             }
             </div>
-            {children}
+
+            <X
+                size={25}
+                className={`
+                absolute top-5 right-5
+                cursor-pointer 
+                text-gray-400 hover:text-gray-600
+                `}
+                onClick={onClose}
+            />
         </ModalDialog>
     )
 }
