@@ -37,24 +37,13 @@ class BookingsController {
   // In your bookingsController.js - update the createBooking method
   async createBooking(req, res) {
     try {
-      console.log('🔵 [Controller] Received request body:', req.body);
-      console.log('🔵 [Controller] Request headers:', req.headers);
-      console.log('🔵 [Controller] Content-Type:', req.headers['content-type']);
-      
-      // Check if body is empty
       if (!req.body || Object.keys(req.body).length === 0) {
-        console.log('🔴 [Controller] Request body is empty!');
         return res.status(400).json({
           status: "error",
           data: null,
           message: "Request body is empty",
         });
       }
-
-      // Check specific fields
-      console.log('🔵 [Controller] Type field:', req.body.type);
-      console.log('🔵 [Controller] Destination country:', req.body.destination_country);
-      console.log('🔵 [Controller] Payer first name:', req.body.payer_info?.first_name);
 
       const useCase = new CreateBookingUseCase(
         bookingsRepository,
@@ -71,7 +60,6 @@ class BookingsController {
         message: "Booking created successfully with trip info, payer, and traveler information",
       });
     } catch (error) {
-      console.error('🔴 [Controller] Error:', error);
       res.status(400).json({
         status: "error",
         data: null,
@@ -85,20 +73,27 @@ class BookingsController {
     try {
       const { userId } = req.params;
 
-      const { type } = req.query;
+      if (!bookingsRepository) {
+        throw new Error('Bookings repository not initialized');
+      }
 
       const useCase = new GetUserBookingsUseCase(bookingsRepository);
-      const bookings = await useCase.execute(userId, type);
 
+      const bookings = await useCase.execute(userId);
+
+      const bookingsData = Array.isArray(bookings) ? bookings : [];
       res.json({
         status: "success",
-        data: bookings,
+        data: bookingsData, 
         message: "User bookings retrieved successfully",
       });
+      
     } catch (error) {
+      
+      // Return proper error response
       res.status(500).json({
         status: "error",
-        data: null,
+        data: null, // Don't put error object in data field
         message: error.message,
       });
     }

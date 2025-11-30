@@ -20,8 +20,11 @@ export const createBooking = async (bookingData) => {
 export const getBookings = () =>
   request("/api/bookings", { method: "GET" });
 
-export const getBookingById = (id) =>
-  request(`/api/bookings/${id}`, { method: "GET" });
+export const getUserBookings = (userId) => {
+  return request(`/api/bookings/user/${userId}`, {
+    method: "GET"
+  });
+};
 
 export const updateBookingStatus = (id, status) =>
   request(`/api/bookings/${id}/status`, {

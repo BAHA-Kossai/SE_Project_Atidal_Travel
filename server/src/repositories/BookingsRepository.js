@@ -63,14 +63,28 @@ class BookingsRepository extends BaseRepository {
 
   // Custom methods
 
-  // Find bookings by user ID
+  // Find bookings by user ID with complete trip information
   async findBookingsByUserId(userId) {
-    const { data, error } = await this.supabase
-      .from(this.table)
-      .select('*')
-      .eq('user_id', userId);
-    if (error) throw error;
-    return data;
+    try {
+      const { data, error } = await this.supabase
+        .from(this.table)
+        .select(`
+          *,
+          TripInfo:info_id (*)
+        `)
+        .eq('user_id', userId);
+      
+      if (error) {
+        console.error('🔴 Database Error in findBookingsByUserId:', error);
+        throw error;
+      }
+      
+      console.log('🔵 Bookings found with trip info:', data);
+      return data;
+    } catch (error) {
+      console.error('🔴 Error in findBookingsByUserId:', error);
+      throw error;
+    }
   }
 
   // Find bookings by status

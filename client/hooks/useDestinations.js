@@ -3,7 +3,7 @@ import { getFeaturedDestinations, getAllDestinations } from "../api/destinations
 
 export function useDestinations() {
   const [destinations, setDestinations] = useState([]);
-  const [loading, setLoading] = useState(false); // Changed to false initially
+  const [loading, setLoading] = useState(false); 
   const [error, setError] = useState("");
 
   const fetchFeaturedDestinations = useCallback(async (limit = 3) => {
@@ -15,11 +15,9 @@ export function useDestinations() {
       if (res && res.status === "success") {
         setDestinations(res.data);
       } else {
-        console.error('Unexpected API response:', res);
         setError("Invalid response from server");
       }
     } catch (err) {
-      console.error('API Error:', err);
       setError(err.message || "Failed to fetch destinations");
     } finally {
       setLoading(false);
@@ -35,11 +33,9 @@ export function useDestinations() {
       if (res && res.status === "success") {
         setDestinations(res.data);
       } else {
-        console.error('Unexpected API response:', res);
         setError("Invalid response from server");
       }
     } catch (err) {
-      console.error('API Error:', err);
       setError(err.message || "Failed to fetch destinations");
     } finally {
       setLoading(false);

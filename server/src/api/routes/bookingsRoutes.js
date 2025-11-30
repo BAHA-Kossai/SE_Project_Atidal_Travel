@@ -1,15 +1,13 @@
 /**
  * @file        bookingsRoutes.js
- * @description Routes for booking API endpoints (Read-only)
+ * @description Routes for booking API endpoints
  * 
- * @author      Abderahim ,Ahlem Toubrient,kossai BAHA
+ * @author      Abderahim, Ahlem Toubrient, kossai BAHA
  * @version     1.0.0
  * @date        2025-11-22
-igin/feature/ahlem-api-integration
  */
 
 import express from "express";
-
 import {
   verifySupabaseToken,
   requireSuperAdmin,
@@ -20,15 +18,24 @@ import {
   updateBookingStatusController,
 } from "../controllers/bookingsController.js";
 
+
 import bookingsController from "../controllers/bookingsController.js";
 
 const router = express.Router();
 
+
+router.use((req, res, next) => {
+  next();
+});
+
+
 router.post("/create", bookingsController.createBooking);
 
-router.get("/user/:userId", bookingsController.getUserBookings);
 
-// PATCH /bookings/assign-branch
+router.get("/user/:userId", (req, res, next) => {
+  next();
+}, bookingsController.getUserBookings);
+
 router.patch(
   "/assign-branch",
   verifySupabaseToken,
@@ -36,7 +43,6 @@ router.patch(
   assignBranchController
 );
 
-// PATCH /bookings/update-status
 router.patch(
   "/update-status",
   verifySupabaseToken,

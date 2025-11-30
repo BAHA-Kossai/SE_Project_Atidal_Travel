@@ -56,6 +56,7 @@ export default function BookingForm() {
   const [numberOfPersons, setNumberOfPersons] = useState(1);
   const [travelers, setTravelers] = useState([]);
 
+
   const { loading, error, submitBooking, clearError } = useBookings();
 
   // Initialize travelers based on number of persons and payer status
@@ -224,7 +225,10 @@ export default function BookingForm() {
       duration_days: Number(bookingInfo.duration_days) || 7,
       needs_visa_assistance: bookingInfo.needs_visa_assistance,
       booking_status: 'pending',
-      user_id: null,
+      
+      // ADD THIS LINE - Get user ID from localStorage
+      user_id: JSON.parse(localStorage.getItem('user'))?.id || JSON.parse(localStorage.getItem('user'))?.user_id,
+      
       branch_id: null,
       guide_id: null,
 

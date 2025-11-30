@@ -10,14 +10,9 @@ export function useBookings() {
       setLoading(true);
       setError("");
 
-      console.log('Submitting booking data:', bookingData);
-
-      // Send the data exactly as structured in the form
       const result = await createBooking(bookingData);
-      console.log('Booking creation result:', result);
       return result;
     } catch (err) {
-      console.error('Booking submission error:', err);
       setError(err.message || 'Failed to create booking');
       throw err;
     } finally {

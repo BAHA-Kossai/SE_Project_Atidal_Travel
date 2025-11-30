@@ -6,31 +6,13 @@ import destinationsRoutes from './api/routes/destinationsRoutes.js';
 import bookingsRoutes from './api/routes/bookingsRoutes.js';
 import guidedTripsRoutes from './api/routes/guidedTripsRoutes.js';
 import branchesRoutes from './api/routes/branchesRoutes.js';
+import authRoutes from './api/routes/authRoutes.js';
 
 const app = express();
-
-app.use((req, res, next) => {
-  console.log('🔵 [App] Incoming request:', {
-    method: req.method,
-    url: req.url,
-    contentType: req.headers['content-type'],
-    contentLength: req.headers['content-length'],
-    body: req.body // This should be empty before body parser
-  });
-  next();
-});
 
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.use((req, res, next) => {
-  if (req.method === 'POST' && req.url.includes('/bookings/create')) {
-    console.log('🔵 [App] After body parser - Request body:', req.body);
-    console.log('🔵 [App] After body parser - Body keys:', Object.keys(req.body));
-  }
-  next();
-});
 
 app.use(cors({
   origin: 'http://localhost:5173',
@@ -38,7 +20,14 @@ app.use(cors({
   credentials: true
 }));
 
+// Add request logging middleware
+app.use((req, res, next) => {
+  console.log('🌐 [App] Incoming request:', req.method, req.originalUrl);
+  console.log('🌐 [App] Headers:', req.headers);
+  next();
+});
 
+app.use('/api/auth', authRoutes);
 app.use('/api/destinations', destinationsRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/guided-trips', guidedTripsRoutes);

@@ -14,16 +14,23 @@
 
 class GetUserBookingsUseCase {
   constructor(bookingsRepository) {
+  
     this.bookingsRepository = bookingsRepository;
   }
 
   async execute(userId) {
+    
     if (!userId) {
       throw new Error('User ID is required');
     }
-
-    const bookings = await this.bookingsRepository.findBookingsByUserId(userId);
-    return bookings;
+    
+    try {
+      const bookings = await this.bookingsRepository.findBookingsByUserId(userId);
+      
+      return bookings;
+    } catch (error) {
+      throw error;
+    }
   }
 }
 
