@@ -66,6 +66,9 @@ export default function TabGuides() {
         setIsDeleteModalOpen(false);
     }
 
+    const AddGuide = (guide) => {
+        console.log(guide);
+    }
 
 
     return (
@@ -192,6 +195,43 @@ export default function TabGuides() {
                 }
             />
 
+            {/* Add Modal */}
+            <ModalDialog
+                title={"Add Guide"}
+                description={"Add a new guide to the team"}
+                open={isAddModalOpen}
+            >
+                <div className={"grid grid-cols-2 gap-4"}>
+                    <InputField
+                        label={"First name"}
+                        onChange={(e) => setFormData({...formData, first_name: e.target.value})}
+                    />
+                    <InputField
+                        label={"Last name"}
+                        onChange={(e) => setFormData({...formData, last_name: e.target.value})}
+                    />
+                    <InputField
+                        label={"Phone number"}
+                        onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    />
+                    <InputField
+                        label={"Experience"}
+                        disabled={false}
+                        onChange={(e) => setFormData({...formData, experience: e.target.value})}
+                    />
+                    <InputField
+                        label={"Birth date"}
+                        type={"date"}
+                        disabled={false}
+                        onChange={(e) => setFormData({...formData, birth_date: new Date(e.target.value).toISOString()})}
+                    />
+                </div>
+                <div className={"grid grid-cols-2 gap-4 mt-5"}>
+                    <ButtonOutline onClick={() => setIsAddModalOpen(false)}>Cancel</ButtonOutline>
+                    <ButtonFill onClick={() => AddGuide(formData)}>Add Guide</ButtonFill>
+                </div>
+            </ModalDialog>
+
             {/* Edit Modal */}
             <ModalDialog
                 title={`Edit Guide ${selectedGuide?.guide_id}`}
@@ -232,8 +272,8 @@ export default function TabGuides() {
                 </div>
                 <div className={"grid grid-cols-2 gap-4 mt-4"}
                 >
-                    <ButtonFill>Edit Guide</ButtonFill>
                     <ButtonOutline onClick={() => setIsEditModalOpen(false)}>Cancel</ButtonOutline>
+                    <ButtonFill>Edit Guide</ButtonFill>
                 </div>
             </ModalDialog>
 

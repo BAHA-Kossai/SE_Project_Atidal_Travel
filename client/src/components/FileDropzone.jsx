@@ -40,14 +40,18 @@ export default function FileDropzone(props) {
 
         // Only update the state if a real file (image) is selected
         if (!file) return
-        props.setSelectedFile(file ? URL.createObjectURL(file) : null);
+        const preview = URL.createObjectURL(file);
+        props.setSelectedFile({file, preview});
     }
 
-    const handleRemove = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        props.setSelectedFile(null);
-    };
+    // Handle when the uploaded image is local or an online URL
+    let previewSrc = null;
+    if (typeof props.selectedFile === "string") {
+        previewSrc = props.selectedFile;
+    }
+    else if (props.selectedFile && props.selectedFile.preview) {
+        previewSrc = props.selectedFile.preview;
+    }
 
     return (
         <label
@@ -73,45 +77,34 @@ export default function FileDropzone(props) {
 
             {/* Show placeholder if no file is uploaded, else show the image */}
             {
-                props.selectedFile ?
-                    (
-                        <div className={"content-center text-center"}>
-                            {
-                                props.accept === "image/*" ?
-                                <img className={`
+                previewSrc ? (
+                        <img className={`
                                 w-full
                                 rounded-3xl
                                 `}
-                                     style={{
-                                         height: props.selectedFile ? "auto" : props.height
-                                     }}
-                                     src={props.selectedFile}
-                                     alt={"Preview Image"}
-                                />
-                                    :
-                                    <h1>
-                                        file uploaded
-                                        {props.selectedFile?.name}
-                                    </h1>
-                            }
-                        </div>
+                             style={{
+                                 height: props.selectedFile ? "auto" : props.height
+                             }}
+                             src={previewSrc}
+                             alt={"Preview Image"}
+                        />
                     ) : (
-                        // Placeholder
-                        <div className={`flex flex-col items-center h-full gap-4 min-h-20`}>
-                            <UploadCloud size={140} className={"text-(--color-primary)"}
-                                         style={{
-                                             color: "#669bbc",
-                                         }}/>
-                            <div className={"flex flex-row items-center"}>
-                                <UploadIcon className={"mr-2"}
-                                            style={{
-                                                color: "#669bbc",
-                                            }}
-                                />
-                                {props.placeholderText}
-                            </div>
+                    // Placeholder
+                    <div className={`flex flex-col items-center h-full gap-4 min-h-20`}>
+                        <UploadCloud size={140} className={"text-(--color-primary)"}
+                                     style={{
+                                         color: "#669bbc",
+                                     }}/>
+                        <div className={"flex flex-row items-center"}>
+                            <UploadIcon className={"mr-2"}
+                                        style={{
+                                            color: "#669bbc",
+                                        }}
+                            />
+                            {props.placeholderText}
                         </div>
-                    )
+                    </div>
+                )
             }
         </label>
     )

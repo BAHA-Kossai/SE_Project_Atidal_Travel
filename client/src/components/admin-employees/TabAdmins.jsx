@@ -134,10 +134,10 @@ export default function TabAdmins() {
     <>
       <WhiteContainer>
         <div className="flex flex-col">
-          {/* Search / Sort / Filter/ New Employee */}
+          {/* Search / Sort / Filter/ New Admin */}
           <div className="flex flex-row justify-between items-center mb-5">
             <SearchBar
-              placeholder={"Search for an employee"}
+              placeholder={"Search for an admin"}
               onChange={(e) => setSearchQuery(e.target.value)}
               onClear={() => setSearchQuery("")}
               searchQuery={searchQuery}
@@ -152,7 +152,7 @@ export default function TabAdmins() {
                 <SlidersHorizontal size={18} className={"ml-2"} />
               </ButtonOutline>
               <ButtonFill onClick={() => setIsAddModalOpen(true)}>
-                New Employee
+                New Admin
                 <Plus size={22} className={"ml-2"} />
               </ButtonFill>
             </div>
@@ -222,10 +222,10 @@ export default function TabAdmins() {
         />
       </TableEntryModal>
 
-      {/* New Employee Modal */}
+      {/* New Admin Modal */}
       <ModalDialog
-        title={"New Employee"}
-        description={"Add an employee to the team"}
+        title={"New Admin"}
+        description={"Add a new admin to the team"}
         open={isAddModalOpen}
       >
         {/* Form */}
