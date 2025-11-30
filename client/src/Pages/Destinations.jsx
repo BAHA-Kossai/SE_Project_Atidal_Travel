@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown, MapPin, Calendar, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout.jsx';
-import { DESTINATIONS } from '../data/constants.js';
+import { useDestinations } from '../../hooks/useDestinations.js'; // Import your hook
 
 const DestinationCard = ({ name, location, imageSrc }) => {
   return (
@@ -33,6 +33,14 @@ const DestinationsPage = () => {
   const [date, setDate] = useState('');
   const [persons, setPersons] = useState('');
   const [displayCount, setDisplayCount] = useState(6);
+  
+  // Use the destinations hook
+  const { destinations, loading, error, fetchAllDestinations } = useDestinations();
+
+  // Fetch all destinations when component mounts
+  useEffect(() => {
+    fetchAllDestinations();
+  }, [fetchAllDestinations]);
 
   const handleSearch = () => {
     const params = new URLSearchParams();
@@ -46,7 +54,80 @@ const DestinationsPage = () => {
     setDisplayCount(displayCount + 6);
   };
 
-  const visibleDestinations = DESTINATIONS.slice(0, displayCount);
+  // Use fetched destinations instead of static data
+  const visibleDestinations = destinations.slice(0, displayCount);
+
+  // Loading state
+  if (loading) {
+    return (
+      <Layout>
+        <div className="w-full">
+          {/* Search Bar Section */}
+          <div className="bg-[#BFE7FF] px-4 sm:px-6 lg:px-8 py-6">
+            <div className="max-w-7xl mx-auto">
+              <div className="flex flex-col lg:flex-row gap-4 items-stretch lg:items-center">
+                {/* Loading placeholders for search inputs */}
+                {[1, 2, 3].map((item) => (
+                  <div key={item} className="flex-1 flex items-center gap-3 bg-white rounded-lg px-4 py-3 lg:py-4">
+                    <div className="animate-pulse flex-1">
+                      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    </div>
+                  </div>
+                ))}
+                <div className="animate-pulse bg-gray-200 px-8 py-3 lg:py-4 rounded-lg w-32"></div>
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content Loading */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="animate-pulse h-8 bg-gray-200 rounded w-1/3 mb-12"></div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+              {[1, 2, 3, 4, 5, 6].map((item) => (
+                <div key={item} className="animate-pulse">
+                  <div className="bg-gray-200 rounded-2xl h-48 mb-4"></div>
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <Layout>
+        <div className="w-full">
+          {/* Search Bar Section */}
+          <div className="bg-[#BFE7FF] px-4 sm:px-6 lg:px-8 py-6">
+            {/* ... same search bar as original ... */}
+          </div>
+
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div className="text-center">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-normal text-gray-900 mb-6">
+                Explore our popular destinations
+              </h1>
+              <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
+                <p className="text-red-700 font-medium">Error loading destinations</p>
+                <p className="text-red-600 text-sm mt-2">{error}</p>
+                <button 
+                  onClick={fetchAllDestinations}
+                  className="mt-4 bg-[#117BB8] text-white px-6 py-2 rounded-lg font-medium hover:bg-[#0f6da4] transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -121,28 +202,36 @@ const DestinationsPage = () => {
           </h1>
 
           {/* Destination Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {visibleDestinations.map((destination) => (
-              <DestinationCard 
-                key={destination.id}
-                name={destination.title}
-                location={destination.location}
-                imageSrc={destination.image}
-              />
-            ))}
-          </div>
-
-          {/* Show More Link */}
-          {displayCount < DESTINATIONS.length && (
-            <div className="flex justify-end">
-              <button 
-                onClick={handleShowMore}
-                className="flex items-center gap-3 text-[#117BB8] hover:text-[#0f6da4] transition-colors font-medium"
-              >
-                Show more
-                <ChevronDown size={20} />
-              </button>
+          {destinations.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">No destinations available at the moment.</p>
             </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                {visibleDestinations.map((destinationItem, index) => (
+                  <DestinationCard 
+                    key={destinationItem.destination_id || index}
+                    name={destinationItem.destination_city}
+                    location={destinationItem.destination_country}
+                    imageSrc={destinationItem.destination_pic || `https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=400&h=300&fit=crop&auto=format&ix=${index}`}
+                  />
+                ))}
+              </div>
+
+              {/* Show More Link */}
+              {displayCount < destinations.length && (
+                <div className="flex justify-end">
+                  <button 
+                    onClick={handleShowMore}
+                    className="flex items-center gap-3 text-[#117BB8] hover:text-[#0f6da4] transition-colors font-medium"
+                  >
+                    Show more
+                    <ChevronDown size={20} />
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

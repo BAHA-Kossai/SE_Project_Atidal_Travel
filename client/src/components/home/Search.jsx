@@ -69,7 +69,7 @@ const Navigate= useNavigate();
         </div>
 
         {/* Hero Text (dynamic) */}
-       <div className="max-w-4xl mb-16 ">
+       <div className="max-w-4xl mb-20 ">
   <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-white leading-tight mb-4 drop-shadow-2xl">
     {title}
   </h1>
@@ -78,62 +78,11 @@ const Navigate= useNavigate();
   </p>
 
 
-          <button className="bg-[#117BB8] hover:bg-[#0d5a8a] text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105"
+          <button className="bg-[#117BB8] hover:bg-[#0d5a8a] text-white font-semibold px-8 py-3 rounded-full transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 mt-9"
           onClick={Navigate('/booking')}>
             Book A Trip Now
           </button>
         </div>
-
-        {!hideSearch && (
-          <div className="max-w-4xl">
-            <div className="p-1 bg-[#BFE7FF] to-amber-500 rounded-2xl shadow-2xl">
-              <div className="bg-white rounded-xl overflow-hidden">
-                <div className="flex items-center">
-                  <div className="flex-1 relative">
-                    <div className="flex items-center px-6 py-4 border-r border-gray-200">
-                      <Plane className="w-5 h-5 text-gray-400 mr-3" />
-                      <div className="flex-1 relative">
-                        <input
-                          type="text"
-                          placeholder="Destination"
-                          value={destination}
-                          onChange={e => setDestination(e.target.value)}
-                          onFocus={() => setIsDropdownOpen(true)}
-                          onBlur={() => setTimeout(() => setIsDropdownOpen(false), 200)}
-                          className="w-full outline-none text-gray-700 placeholder-gray-400 bg-transparent"
-                        />
-                        {isDropdownOpen && (
-                          <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto z-50">
-                            {destinations.map((dest, idx) => (
-                              <button
-                                key={idx}
-                                onClick={() => {
-                                  setDestination(dest);
-                                  setIsDropdownOpen(false);
-                                }}
-                                className="w-full text-left px-4 py-3 hover:bg-blue-50 transition-colors"
-                              >
-                                {dest}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                      <ChevronDown className="w-5 h-5 text-gray-400 ml-2" />
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={handleSearch}
-                    className="bg-[#117BB8] hover:bg-[#0d5a8a] text-white px-10 py-5 transition-colors duration-300 flex items-center justify-center space-x-2 rounded-r-xl"
-                  >
-                    <span className="font-semibold">Search</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
       </div>
 

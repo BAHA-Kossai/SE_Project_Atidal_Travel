@@ -8,7 +8,7 @@ import AdminDestinationsPage from "./pages/admin_destinations.jsx";
 import AdminEmployeesPage from "./pages/admin_employees.jsx";
 import { AdminDashboardPage } from "./pages/admin_dashboard.jsx";
 import BookingsPage from "./Pages/bookings.jsx";
-import HomePage from "./Pages/homepage.jsx";
+import HomePage from "./Pages/Homepage.jsx";
 import UmrahPage from "./Pages/umrah.jsx";
 import Login from "./Pages/Authentication/Login.jsx";
 import Signup from './Pages/Authentication/Signup.jsx'; 

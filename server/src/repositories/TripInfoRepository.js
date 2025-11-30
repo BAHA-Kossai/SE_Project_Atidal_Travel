@@ -34,7 +34,7 @@ import BaseRepository from './baseRepository.js';
 
 class TripInfoRepository extends BaseRepository {
   constructor(supabaseClient) {
-    super(supabaseClient, 'Tripinfo');
+    super(supabaseClient, 'TripInfo');
     this.primaryKey = 'info_id';
   }
 

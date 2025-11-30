@@ -34,8 +34,28 @@ const travelersRepository = new TravelersRepository(supabase);
 const tripInfoRepository = new TripInfoRepository(supabase);
 
 class BookingsController {
+  // In your bookingsController.js - update the createBooking method
   async createBooking(req, res) {
     try {
+      console.log('🔵 [Controller] Received request body:', req.body);
+      console.log('🔵 [Controller] Request headers:', req.headers);
+      console.log('🔵 [Controller] Content-Type:', req.headers['content-type']);
+      
+      // Check if body is empty
+      if (!req.body || Object.keys(req.body).length === 0) {
+        console.log('🔴 [Controller] Request body is empty!');
+        return res.status(400).json({
+          status: "error",
+          data: null,
+          message: "Request body is empty",
+        });
+      }
+
+      // Check specific fields
+      console.log('🔵 [Controller] Type field:', req.body.type);
+      console.log('🔵 [Controller] Destination country:', req.body.destination_country);
+      console.log('🔵 [Controller] Payer first name:', req.body.payer_info?.first_name);
+
       const useCase = new CreateBookingUseCase(
         bookingsRepository,
         payerRepository,
@@ -48,10 +68,10 @@ class BookingsController {
       res.status(201).json({
         status: "success",
         data: result,
-        message:
-          "Booking created successfully with trip info, payer, and traveler information",
+        message: "Booking created successfully with trip info, payer, and traveler information",
       });
     } catch (error) {
+      console.error('🔴 [Controller] Error:', error);
       res.status(400).json({
         status: "error",
         data: null,

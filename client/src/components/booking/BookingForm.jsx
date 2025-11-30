@@ -1,798 +1,954 @@
-// BookingForm.jsx
-import { useState, useEffect, useRef } from 'react';
-import { useLocation } from "react-router-dom";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useBookings } from '../../../hooks/useBookings';
+
+// Import frontend validation functions
 import {
-  MapPin, Hotel, User, Phone, Mail, MapPinned,
-  Users, Plane, Package, Calendar as CalendarIcon, Map
-} from 'lucide-react';
-import DatePicker from './DatePicker.jsx';
-import TimePicker from './TimePicker.jsx';
+  validateFirstName,
+  validateLastName,
+  validatePhoneNumber,
+  validateAge,
+  validatePrice,
+  validateDate,
+  validateTime,
+  validateIdentityNumber,
+  validatePassportNumber,
+  validateGender,
+  validateDestinationCountry,
+  validateDuration
+} from '../../../utils/validation';
 
 export default function BookingForm() {
-  const location = useLocation();
-  const { packageData, isUmrah, isGroupTrip, groupTripData } = location.state || {};
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formErrors, setFormErrors] = useState({});
+  const [showSuccess, setShowSuccess] = useState(false);
+  const navigate = useNavigate();
+  
+  // Booking Info State
+  const [bookingInfo, setBookingInfo] = useState({
+    destination_country: '',
+    destination_city: '',
+    trip_date: '',
+    returning_date: '',
+    departure_time: '',
+    returning_time: '',
+    price: '',
+    duration_days: '',
+    hotel_stars: '',
+    no_hotel_needed: false,
+    needs_visa_assistance: false
+  });
 
-  // Booking type flags
-  const isUmrahBooking = isUmrah === true;
-  const isGroupTripBooking = isGroupTrip === true;
-  const isSpecialBooking = isUmrahBooking || isGroupTripBooking;
+  // Payer Info State
+  const [payerInfo, setPayerInfo] = useState({
+    first_name: '',
+    last_name: '',
+    phone: '',
+    is_traveler: true,
+    age: '',
+    identity_number: '',
+    passport_number: '',
+    gender: '',
+    booking_notes: ''
+  });
 
-  // Step state: if it's a special booking, we start on step 2 (payer info)
-  const [currentStep, setCurrentStep] = useState(isSpecialBooking ? 2 : 1);
-
-  // Step 1 - destination / trip (NORMAL trips use these inputs; Umrah/Group use package/group data)
-  const [destinationCountry, setDestinationCountry] = useState(
-    isUmrahBooking ? 'Saudi Arabia' : isGroupTripBooking ? (groupTripData?.destination || '') : ''
-  );
-  const [destinationCity, setDestinationCity] = useState(
-    isUmrahBooking ? 'Mecca' : isGroupTripBooking ? (groupTripData?.city || '') : ''
-  );
-
-  // Keep hotel/visa fields (you selected Option 1)
-  const [hotelStars, setHotelStars] = useState('');
-  const [noHotelNeeded, setNoHotelNeeded] = useState(false);
-  const [needsVisaAssistance, setNeedsVisaAssistance] = useState(false);
-
-  // New trip fields for NORMAL trips (Option B -> only normal trips use these)
-  const [tripDate, setTripDate] = useState(''); // single start date
-  const [durationDays, setDurationDays] = useState(''); // number input for number of days
-  const [departureTime, setDepartureTime] = useState(''); // time picker (string like "12 AM")
-  const [returnTime, setReturnTime] = useState(''); // time picker
-  const [budgetDA, setBudgetDA] = useState(''); // numeric budget in Algerian Dinar
-
-  // Step 2 - payer info (payer fields)
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [age, setAge] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [email, setEmail] = useState('');
-  const [wilaya, setWilaya] = useState('');
-  const [dayOfMeet, setDayOfMeet] = useState('');
-  const [timeOfMeet, setTimeOfMeet] = useState('');
-  const [isTraveler, setIsTraveler] = useState(true);
-
-  // Number of persons and travelers array
-  const [numberOfPersons, setNumberOfPersons] = useState('');
+  // Travelers State
+  const [numberOfPersons, setNumberOfPersons] = useState(1);
   const [travelers, setTravelers] = useState([]);
 
-  const [errors, setErrors] = useState({});
+  const { loading, error, submitBooking, clearError } = useBookings();
 
-  // refs to avoid overwriting user typing when not intended
-  const isInitialMount = useRef(true);
-  const lastNumberOfPersons = useRef(numberOfPersons);
-  const lastIsTraveler = useRef(isTraveler);
+  // Initialize travelers based on number of persons and payer status
+  useEffect(() => {
+    const totalTravelers = payerInfo.is_traveler ? numberOfPersons - 1 : numberOfPersons;
+    const newTravelers = [];
+    
+    for (let i = 0; i < totalTravelers; i++) {
+      newTravelers.push({
+        first_name: '',
+        last_name: '',
+        age: '',
+        phone: '',
+        identity_number: '',
+        passport_number: '',
+        gender: ''
+      });
+    }
+    
+    setTravelers(newTravelers);
+  }, [numberOfPersons, payerInfo.is_traveler]);
 
-  const today = new Date().toISOString().split('T')[0];
-  const oneYearFromNow = new Date(new Date().setFullYear(new Date().getFullYear() + 1))
-    .toISOString()
-    .split('T')[0];
+  // Form validation compatible with backend
+  const validateStep = (step) => {
+    const errors = {};
 
-  const wilayas = [
-    'Adrar', 'Chlef', 'Laghouat', 'Oum El Bouaghi', 'Batna', 'Béjaïa', 'Biskra', 'Béchar',
-    'Blida', 'Bouira', 'Tamanrasset', 'Tébessa', 'Tlemcen', 'Tiaret', 'Tizi Ouzou', 'Alger',
-    'Djelfa', 'Jijel', 'Sétif', 'Saïda', 'Skikda', 'Sidi Bel Abbès', 'Annaba', 'Guelma',
-    'Constantine', 'Médéa', 'Mostaganem', 'MSila', 'Mascara', 'Ouargla', 'Oran', 'El Bayadh',
-    'Illizi', 'Bordj Bou Arreridj', 'Boumerdès', 'El Tarf', 'Tindouf', 'Tissemsilt', 'El Oued',
-    'Khenchela', 'Souk Ahras', 'Tipaza', 'Mila', 'Aïn Defla', 'Naâma', 'Aïn Témouchent',
-    'Ghardaïa', 'Relizane'
-  ];
+    if (step === 1) {
+      if (!validateDestinationCountry(bookingInfo.destination_country)) {
+        errors.destination_country = 'Destination country is required';
+      }
+      if (!validateDate(bookingInfo.trip_date)) {
+        errors.trip_date = 'Valid trip date is required';
+      }
+      if (!validateDate(bookingInfo.returning_date)) {
+        errors.returning_date = 'Valid return date is required';
+      }
+      if (!validateTime(bookingInfo.departure_time)) {
+        errors.departure_time = 'Valid departure time is required';
+      }
+      if (!validateTime(bookingInfo.returning_time)) {
+        errors.returning_time = 'Valid return time is required';
+      }
+      if (!validatePrice(bookingInfo.price)) {
+        errors.price = 'Valid price is required';
+      }
+      if (!validateDuration(bookingInfo.duration_days)) {
+        errors.duration_days = 'Valid duration is required';
+      }
+    }
 
-  // Phone formatting handlers
-  const handlePhoneNumberChange = (e) => {
-    const value = e.target.value;
-    const cleaned = value.replace(/\D/g, '');
-    const limited = cleaned.slice(0, 10);
-    setPhoneNumber(limited);
+    if (step === 2) {
+      if (!validateFirstName(payerInfo.first_name)) {
+        errors.first_name = 'Valid first name is required (min 2 characters, letters only)';
+      }
+      if (!validateLastName(payerInfo.last_name)) {
+        errors.last_name = 'Valid last name is required (min 2 characters, letters only)';
+      }
+      if (!validatePhoneNumber(payerInfo.phone)) {
+        errors.phone = 'Valid Algerian phone number is required (10 digits starting with 0)';
+      }
+      
+      if (payerInfo.is_traveler) {
+        if (!validateAge(payerInfo.age)) {
+          errors.age = 'Valid age is required (1-120)';
+        }
+        if (!validateIdentityNumber(payerInfo.identity_number)) {
+          errors.identity_number = 'Valid identity number is required (min 5 characters)';
+        }
+        if (!validatePassportNumber(payerInfo.passport_number)) {
+          errors.passport_number = 'Valid passport number is required (min 6 characters)';
+        }
+        if (!validateGender(payerInfo.gender)) {
+          errors.gender = 'Gender is required';
+        }
+      }
+    }
+
+    if (step === 3) {
+      travelers.forEach((traveler, index) => {
+        if (!validateFirstName(traveler.first_name)) {
+          errors[`traveler_${index}_first_name`] = `Traveler ${index + 1} valid first name is required (min 2 characters, letters only)`;
+        }
+        if (!validateLastName(traveler.last_name)) {
+          errors[`traveler_${index}_last_name`] = `Traveler ${index + 1} valid last name is required (min 2 characters, letters only)`;
+        }
+        if (!validateAge(traveler.age)) {
+          errors[`traveler_${index}_age`] = `Traveler ${index + 1} valid age is required (1-120)`;
+        }
+        if (!validatePhoneNumber(traveler.phone)) {
+          errors[`traveler_${index}_phone`] = `Traveler ${index + 1} valid Algerian phone number is required (10 digits starting with 0)`;
+        }
+        if (!validateIdentityNumber(traveler.identity_number)) {
+          errors[`traveler_${index}_identity_number`] = `Traveler ${index + 1} valid identity number is required (min 5 characters)`;
+        }
+        if (!validatePassportNumber(traveler.passport_number)) {
+          errors[`traveler_${index}_passport_number`] = `Traveler ${index + 1} valid passport number is required (min 6 characters)`;
+        }
+        if (!validateGender(traveler.gender)) {
+          errors[`traveler_${index}_gender`] = `Traveler ${index + 1} gender is required`;
+        }
+      });
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
   };
 
-  const handleTravelerPhoneNumberChange = (index, e) => {
-    const value = e.target.value;
-    const cleaned = value.replace(/\D/g, '');
-    const limited = cleaned.slice(0, 10);
-    updateTraveler(index, 'phoneNumber', limited);
+  const updateBookingInfo = (field, value) => {
+    setBookingInfo(prev => ({ ...prev, [field]: value }));
+    // Clear error when user starts typing
+    if (formErrors[field]) {
+      setFormErrors(prev => ({ ...prev, [field]: '' }));
+    }
   };
 
-  // Update single traveler field
+  const updatePayerInfo = (field, value) => {
+    setPayerInfo(prev => ({ ...prev, [field]: value }));
+    // Clear error when user starts typing
+    if (formErrors[field]) {
+      setFormErrors(prev => ({ ...prev, [field]: '' }));
+    }
+  };
+
   const updateTraveler = (index, field, value) => {
     setTravelers(prev => {
-      const next = [...prev];
-      next[index] = { ...(next[index] || {}), [field]: value };
-      return next;
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
     });
+    // Clear error when user starts typing
+    const errorKey = `traveler_${index}_${field}`;
+    if (formErrors[errorKey]) {
+      setFormErrors(prev => ({ ...prev, [errorKey]: '' }));
+    }
   };
 
-  // Validation helpers
-  const validateName = (name, fieldName) => {
-    if (!name || !name.trim()) return `${fieldName} is required`;
-    if (name.trim().length < 2) return `${fieldName} must be at least 2 characters`;
-    if (!/^[a-zA-ZÀ-ÿ\s'-]+$/.test(name)) return `${fieldName} can only contain letters, spaces, hyphens and apostrophes`;
-    return null;
+  const handleNextStep = () => {
+    if (validateStep(currentStep)) {
+      setCurrentStep(prev => prev + 1);
+    }
   };
 
-  const validatePhoneNumber = (phone) => {
-    if (!phone || !phone.trim()) return 'Phone number is required';
-    const cleanPhone = phone.replace(/[\s-]/g, '');
-    if (!/^0\d{9}$/.test(cleanPhone)) return 'Phone number must start with 0 and be exactly 10 digits';
-    return null;
+  const handlePreviousStep = () => {
+    setCurrentStep(prev => prev - 1);
+    setFormErrors({});
   };
 
-  // Sync travelers array size and auto-fill payer -> traveler 0 when needed.
-  useEffect(() => {
-    // Skip on initial mount (we don't want to run logic until user interacts)
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      lastNumberOfPersons.current = numberOfPersons;
-      lastIsTraveler.current = isTraveler;
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateStep(3)) {
       return;
     }
 
-    // Only proceed if numberOfPersons or isTraveler actually changed
-    if (numberOfPersons !== lastNumberOfPersons.current || isTraveler !== lastIsTraveler.current) {
-      lastNumberOfPersons.current = numberOfPersons;
-      lastIsTraveler.current = isTraveler;
+    const bookingData = {
+      type: 'normal',
+      price: Number(bookingInfo.price) || 0,
+      trip_date: bookingInfo.trip_date,
+      returning_date: bookingInfo.returning_date || bookingInfo.trip_date,
+      departure_time: bookingInfo.departure_time,
+      returning_time: bookingInfo.returning_time,
+      destination_country: bookingInfo.destination_country,
+      destination_city: bookingInfo.destination_city || 'none',
+      no_hotel_needed: bookingInfo.no_hotel_needed,
+      hotel_stars: bookingInfo.no_hotel_needed ? null : bookingInfo.hotel_stars,
+      duration_days: Number(bookingInfo.duration_days) || 7,
+      needs_visa_assistance: bookingInfo.needs_visa_assistance,
+      booking_status: 'pending',
+      user_id: null,
+      branch_id: null,
+      guide_id: null,
 
-      if (numberOfPersons) {
-        const numPersons = parseInt(numberOfPersons, 10) || 0;
-        const newTravelers = [];
-        for (let i = 0; i < numPersons; i++) {
-          // If payer is a traveler, put payer into travelers[0]
-          if (isTraveler && i === 0) {
-            newTravelers.push({
-              firstName: firstName || '',
-              lastName: lastName || '',
-              age: '', // intentionally left empty for payer (user can fill)
-              identityNumber: '', // intentionally left empty
-              phoneNumber: phoneNumber || '',
-              passportNumber: '',
-              gender: '',
-              email: email || ''
-            });
-          } else {
-            // preserve existing if available, otherwise empty template
-            const existing = travelers[i];
-            newTravelers.push({
-              firstName: existing?.firstName || '',
-              lastName: existing?.lastName || '',
-              age: existing?.age || '',
-              identityNumber: existing?.identityNumber || '',
-              phoneNumber: existing?.phoneNumber || '',
-              passportNumber: existing?.passportNumber || '',
-              gender: existing?.gender || '',
-              email: existing?.email || ''
-            });
-          }
-        }
-        setTravelers(newTravelers);
-      } else {
-        setTravelers([]);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [numberOfPersons, isTraveler]);
+      payer_info: {
+        first_name: payerInfo.first_name,
+        last_name: payerInfo.last_name,
+        phone: payerInfo.phone,
+        is_traveler: payerInfo.is_traveler,
+        confirmed_at: null,
+        canceled_at: null,
+        booking_notes: payerInfo.booking_notes || `Booking for ${numberOfPersons} persons`,
+        ...(payerInfo.is_traveler && {
+          age: Number(payerInfo.age) || null,
+          identity_number: payerInfo.identity_number || '',
+          passport_number: payerInfo.passport_number || '',
+          gender: payerInfo.gender || ''
+        })
+      },
 
-  // When payer fields change and payer is traveling, sync them to travelers[0]
-  useEffect(() => {
-    if (!isTraveler) return;
-    // ensure there's at least one traveler slot
-    setTravelers(prev => {
-      if (prev.length === 0) {
-        return [{
-          firstName: firstName || '',
-          lastName: lastName || '',
-          age: '',
-          identityNumber: '',
-          phoneNumber: phoneNumber || '',
-          passportNumber: '',
-          gender: '',
-          email: email || ''
-        }];
-      } else {
-        // update first traveler with payer fields (firstName, lastName, phoneNumber) but DO NOT overwrite age/identity/passport/gender
-        const next = [...prev];
-        const first = next[0] || {};
-        next[0] = {
-          ...first,
-          firstName: firstName || '',
-          lastName: lastName || '',
-          phoneNumber: phoneNumber || '',
-          // keep existing age/identity/passport/gender as-is (user can fill)
-          age: first.age || '',
-          identityNumber: first.identityNumber || '',
-          passportNumber: first.passportNumber || '',
-          gender: first.gender || '',
-          email: email || ''
-        };
-        return next;
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [firstName, lastName, phoneNumber, isTraveler, email]);
-
-  // Validation per-step
-  const validateStep1 = () => {
-    const newErrors = {};
-
-    // For special bookings (umrah/group) we do not require normal trip fields.
-    if (!isSpecialBooking) {
-      if (!destinationCountry || !destinationCountry.trim()) newErrors.destinationCountry = 'Please enter destination country';
-      // destinationCity is optional for normal trips (per your request) — do not require it
-
-      // Trip date & duration & times & budget validation (normal trips only)
-      if (!tripDate) newErrors.tripDate = 'Please select the trip start date';
-      if (!durationDays) newErrors.durationDays = 'Please enter the trip duration in days';
-      else {
-        const num = parseInt(durationDays, 10);
-        if (isNaN(num) || num < 1) newErrors.durationDays = 'Duration must be at least 1 day';
-        else if (num > 365) newErrors.durationDays = 'Duration seems too long';
-      }
-
-      if (!departureTime) newErrors.departureTime = 'Please select a departure time';
-      if (!returnTime) newErrors.returnTime = 'Please select a return time';
-
-      if (!noHotelNeeded && !hotelStars) newErrors.hotelStars = 'Please select hotel stars or check "I don\'t need hotel"';
-      if (budgetDA === '' || budgetDA === null) newErrors.budgetDA = 'Please enter your budget in DA';
-      else {
-        const b = Number(budgetDA);
-        if (isNaN(b) || b < 0) newErrors.budgetDA = 'Budget must be a positive number';
-      }
-
-      // Optional date sanity: tripDate not in past
-      if (tripDate && tripDate < today) newErrors.tripDate = 'Trip date cannot be in the past';
-      if (tripDate && tripDate > oneYearFromNow) newErrors.tripDate = 'Trip date cannot be more than one year in the future';
-    } else {
-      // For Umrah/Group trips, we may still require hotel selection depending on your choices
-      if (!noHotelNeeded && !hotelStars) newErrors.hotelStars = 'Please select hotel stars or check "I don\'t need hotel"';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const validateStep2 = () => {
-    const newErrors = {};
-
-    const firstNameError = validateName(firstName, 'First name');
-    if (firstNameError) newErrors.firstName = firstNameError;
-
-    const lastNameError = validateName(lastName, 'Last name');
-    if (lastNameError) newErrors.lastName = lastNameError;
-
-    if (!age) {
-      newErrors.age = 'Age is required';
-    } else {
-      const ageNum = parseInt(age, 10);
-      if (ageNum < 18) newErrors.age = 'Payer must be at least 18 years old';
-      else if (ageNum > 120) newErrors.age = 'Please enter a valid age';
-    }
-
-    const phoneError = validatePhoneNumber(phoneNumber);
-    if (phoneError) newErrors.phoneNumber = phoneError;
-
-    if (!email.trim()) newErrors.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(email)) newErrors.email = 'Email is invalid';
-
-    if (!wilaya) newErrors.wilaya = 'Please select a wilaya';
-    if (!dayOfMeet) newErrors.dayOfMeet = 'Day of meet is required';
-    if (!timeOfMeet) newErrors.timeOfMeet = 'Time of meet is required';
-    if (!numberOfPersons) newErrors.numberOfPersons = 'Number of persons is required';
-    else if (parseInt(numberOfPersons, 10) < 1) newErrors.numberOfPersons = 'At least 1 person is required';
-
-    // Validate travelers
-    travelers.forEach((traveler, index) => {
-      const travelerFirstNameError = validateName(traveler.firstName || '', 'First name');
-      if (travelerFirstNameError) newErrors[`traveler${index}FirstName`] = travelerFirstNameError;
-
-      const travelerLastNameError = validateName(traveler.lastName || '', 'Last name');
-      if (travelerLastNameError) newErrors[`traveler${index}LastName`] = travelerLastNameError;
-
-      // If payer is traveling and this is traveler 0 (payer), we DO NOT require age/identity/passport/gender (user can fill them)
-      const isPayerSlot = isTraveler && index === 0;
-      if (!isPayerSlot) {
-        if (!traveler.age) {
-          newErrors[`traveler${index}Age`] = 'Age is required';
-        } else if (parseInt(traveler.age, 10) < 1 || parseInt(traveler.age, 10) > 120) {
-          newErrors[`traveler${index}Age`] = 'Please enter a valid age';
-        }
-
-        if (!traveler.identityNumber) {
-          newErrors[`traveler${index}Identity`] = 'Identity number is required';
-        }
-      }
-
-      const travelerPhoneError = validatePhoneNumber(traveler.phoneNumber || '');
-      if (travelerPhoneError) newErrors[`traveler${index}PhoneNumber`] = travelerPhoneError;
-
-      if (!traveler.email || !traveler.email.trim()) {
-        newErrors[`traveler${index}Email`] = 'Email is required';
-      } else if (!/\S+@\S+\.\S+/.test(traveler.email)) {
-        newErrors[`traveler${index}Email`] = 'Email is invalid';
-      }
-    });
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleNextStep = (e) => {
-    e.preventDefault();
-    if (validateStep1()) {
-      setCurrentStep(2);
-      setErrors({});
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  };
-
-  // Submit handler - composes payload and posts
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!validateStep2()) return;
+      travelers_info: travelers.map(traveler => ({
+        first_name: traveler.first_name,
+        last_name: traveler.last_name,
+        age: Number(traveler.age) || null,
+        identity_number: traveler.identity_number,
+        travler_contact: traveler.phone,
+        passport_number: traveler.passport_number,
+        gender: traveler.gender
+      }))
+    };
 
     try {
-      // Build destination/trip payload depending on booking type
-      let destinationPayload = {};
-      let tripPayload = {};
-
-      if (isUmrahBooking) {
-        destinationPayload = {
-          country: 'Saudi Arabia',
-          city: packageData?.city || 'Mecca'
-        };
-        tripPayload = {
-          packageType: packageData || null,
-          dates: packageData?.dates || null
-        };
-      } else if (isGroupTripBooking) {
-        destinationPayload = {
-          country: groupTripData?.country || '',
-          city: groupTripData?.city || groupTripData?.destination || ''
-        };
-        tripPayload = {
-          groupInfo: groupTripData || null
-        };
-      } else {
-        destinationPayload = {
-          country: destinationCountry,
-          city: destinationCity || null
-        };
-        tripPayload = {
-          tripDate,
-          durationDays: durationDays ? parseInt(durationDays, 10) : null,
-          departureTime,
-          returnTime,
-          hotelStars: noHotelNeeded ? null : hotelStars,
-          noHotelNeeded,
-          needsVisaAssistance,
-          budgetDA: budgetDA ? Number(budgetDA) : null
-        };
-      }
-
-      const bookingData = {
-        type: isUmrahBooking ? 'umrah' : isGroupTripBooking ? 'group' : 'normal',
-        packageInfo: packageData || null,
-        groupTripInfo: groupTripData || null,
-        destination: destinationPayload,
-        trip: tripPayload,
-        payer: {
-          firstName,
-          lastName,
-          age: parseInt(age, 10),
-          phoneNumber,
-          email,
-          wilaya,
-          dayOfMeet,
-          timeOfMeet,
-          isTraveler
-        },
-        travelers: travelers.map(t => ({
-          firstName: t.firstName || null,
-          lastName: t.lastName || null,
-          age: t.age ? parseInt(t.age, 10) : null,
-          identityNumber: t.identityNumber || null,
-          phoneNumber: t.phoneNumber || null,
-          passportNumber: t.passportNumber || null,
-          gender: t.gender || null,
-          email: t.email || null
-        })),
-        numberOfPersons: parseInt(numberOfPersons, 10) || 0,
-        booking_status: 'pending'
-      };
-
-      // Example POST - adjust URL as needed
-      const response = await fetch('http://localhost:3000/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(bookingData)
-      });
-      const result = await response.json();
-
-      if (result?.status === 'success' || response.ok) {
-        alert('Booking submitted successfully!');
-        // Optionally reset form or redirect
-      } else {
-        alert(`Failed to submit booking: ${result?.message || result?.error || 'Unknown error'}`);
-      }
+      await submitBooking(bookingData);
+      setShowSuccess(true);
+      setTimeout(() => {
+        navigate('/'); // Redirect to home page after 3 seconds
+      }, 3000);
     } catch (err) {
-      console.error('Booking submission error', err);
-      alert('Failed to submit booking. See console for details.');
+      // Error is handled by the hook
     }
   };
 
-  // Simple UI helpers
-  const getBookingTitle = () => {
-    if (isUmrahBooking) return 'Umrah Booking Form';
-    if (isGroupTripBooking) return 'Group Trip Booking Form';
-    return 'Destination Booking Form';
-  };
-  const getBookingSubtitle = () => {
-    if (isUmrahBooking) return 'Complete your spiritual journey booking';
-    if (isGroupTripBooking) return 'Join an amazing group adventure';
-    return 'Plan your perfect getaway with us';
-  };
+  // Success message component
+  if (showSuccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
+        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Successful!</h2>
+          <p className="text-gray-600 mb-6">
+            Your booking has been created successfully. You will be redirected to the home page shortly.
+          </p>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="bg-green-600 h-2 rounded-full animate-pulse"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Step indicator
+  const steps = [
+    { number: 1, title: 'Trip Details' },
+    { number: 2, title: 'Payer Info' },
+    { number: 3, title: 'Travelers' }
+  ];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-12 sm:py-16">
-      <div className="text-center mb-12">
-        <h1 className="text-gray-800 mb-3 text-3xl font-bold">{getBookingTitle()}</h1>
-        <p className="text-gray-600 mb-8">{getBookingSubtitle()}</p>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">Create New Booking</h1>
+          <p className="text-gray-600">Fill in the details below to create your travel booking</p>
+        </div>
 
-        {isUmrahBooking && packageData && (
-          <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 mb-8">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-center gap-2 bg-[#f1f9fe] rounded-xl px-4 py-3">
-                <Plane className="w-5 h-5 text-[#495057]" />
-                <p className="text-[#495057]">Umrah</p>
-              </div>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div className="flex items-center justify-center gap-2 bg-[#f1f9fe] rounded-xl px-4 py-3">
-                  <Package className="w-5 h-5 text-[#495057]" />
-                  <p className="text-[#495057]">{packageData.type} Pack</p>
+        {/* Progress Steps */}
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
+          <div className="flex items-center justify-between">
+            {steps.map((step, index) => (
+              <div key={step.number} className="flex items-center">
+                <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
+                  currentStep >= step.number 
+                    ? 'bg-blue-600 border-blue-600 text-white' 
+                    : 'border-gray-300 text-gray-500'
+                } font-semibold`}>
+                  {step.number}
                 </div>
-                <div className="flex items-center justify-center gap-2 bg-[#f1f9fe] rounded-xl px-4 py-3">
-                  <CalendarIcon className="w-5 h-5 text-[#495057]" />
-                  <p className="text-[#495057]">{packageData.dates}</p>
-                </div>
+                <span className={`ml-3 font-medium ${
+                  currentStep >= step.number ? 'text-blue-600' : 'text-gray-500'
+                }`}>
+                  {step.title}
+                </span>
+                {index < steps.length - 1 && (
+                  <div className={`w-16 h-0.5 mx-6 ${
+                    currentStep > step.number ? 'bg-blue-600' : 'bg-gray-300'
+                  }`} />
+                )}
               </div>
-            </div>
+            ))}
           </div>
-        )}
+        </div>
 
-        {isGroupTripBooking && groupTripData && (
-          <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 mb-8">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center justify-center gap-2 bg-[#f1f9fe] rounded-xl px-4 py-3">
-                <Users className="w-5 h-5 text-[#495057]" />
-                <p className="text-[#495057] font-semibold">Group Trip</p>
+        {/* Error Display */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-red-700">{error}</span>
               </div>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div className="flex items-center justify-center gap-2 bg-[#f1f9fe] rounded-xl px-4 py-3">
-                  <Map className="w-5 h-5 text-[#495057]" />
-                  <p className="text-[#495057]">{groupTripData.destination}</p>
-                </div>
-                <div className="flex items-center justify-center gap-2 bg-[#f1f9fe] rounded-xl px-4 py-3">
-                  <CalendarIcon className="w-5 h-5 text-[#495057]" />
-                  <p className="text-[#495057]">{groupTripData.date}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-gray-100">
-        {/* Step 1 */}
-        {currentStep === 1 && (
-          <form onSubmit={handleNextStep} className="space-y-6">
-            <div className="mb-8">
-              <h2 className="text-[#117BB8] mb-2 text-2xl font-semibold">Trip Details</h2>
-              <p className="text-gray-500">Tell us about your trip</p>
-            </div>
-
-            {/* Destination inputs: for normal trips we show text inputs; for Umrah/Group we display package/group info above and do not show these inputs */}
-            {!isSpecialBooking && (
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div className="relative">
-                  <label className="block text-gray-700 mb-2 font-medium">Destination Country <span className="text-red-500">*</span></label>
-                  <MapPin className="absolute left-4 bottom-5 text-gray-400 w-5 h-5 pointer-events-none" />
-                  <input
-                    type="text"
-                    value={destinationCountry}
-                    onChange={(e) => setDestinationCountry(e.target.value)}
-                    placeholder="e.g. France"
-                    className={`w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border ${errors.destinationCountry ? 'border-red-500' : 'border-gray-200'} text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent focus:bg-white transition-all`}
-                  />
-                  {errors.destinationCountry && <p className="text-red-500 text-sm mt-2">{errors.destinationCountry}</p>}
-                </div>
-
-                <div className="relative">
-                  <label className="block text-gray-700 mb-2 font-medium">Destination City <span className="text-gray-400">(optional)</span></label>
-                  <MapPin className="absolute left-4 bottom-5 text-gray-400 w-5 h-5 pointer-events-none" />
-                  <input
-                    type="text"
-                    value={destinationCity}
-                    onChange={(e) => setDestinationCity(e.target.value)}
-                    placeholder="e.g. Paris (optional)"
-                    className={`w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent focus:bg-white transition-all`}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Trip date / duration / times (normal trips only) */}
-            {!isSpecialBooking && (
-              <div className="grid sm:grid-cols-2 gap-6 mt-4">
-                <div>
-                  <label className="block text-gray-700 mb-2">Trip Date (Start) <span className="text-red-500">*</span></label>
-                  <DatePicker value={tripDate} onChange={setTripDate} placeholder="Select trip start date" min={today} max={oneYearFromNow} error={!!errors.tripDate} />
-                  {errors.tripDate && <p className="text-red-500 text-sm mt-2">{errors.tripDate}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 mb-2">Duration (days) <span className="text-red-500">*</span></label>
-                  <input type="number" value={durationDays} onChange={(e) => setDurationDays(e.target.value)} min="1" max="365" placeholder="e.g. 7" className={`w-full pl-4 pr-4 py-4 rounded-xl bg-gray-50 border ${errors.durationDays ? 'border-red-500' : 'border-gray-200'} text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#117BB8] transition-all`} />
-                  {errors.durationDays && <p className="text-red-500 text-sm mt-2">{errors.durationDays}</p>}
-                </div>
-              </div>
-            )}
-
-            {!isSpecialBooking && (
-              <div className="grid sm:grid-cols-2 gap-6 mt-4">
-                <div>
-                  <label className="block text-gray-700 mb-2">Departure Time <span className="text-red-500">*</span></label>
-                  <TimePicker value={departureTime} onChange={setDepartureTime} placeholder="Select departure time" error={!!errors.departureTime} />
-                  {errors.departureTime && <p className="text-red-500 text-sm mt-2">{errors.departureTime}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 mb-2">Return Time <span className="text-red-500">*</span></label>
-                  <TimePicker value={returnTime} onChange={setReturnTime} placeholder="Select return time" error={!!errors.returnTime} />
-                  {errors.returnTime && <p className="text-red-500 text-sm mt-2">{errors.returnTime}</p>}
-                </div>
-              </div>
-            )}
-
-            {/* Budget field for normal trips */}
-            {!isSpecialBooking && (
-              <div className="mt-4">
-                <label className="block text-gray-700 mb-2">Budget (DA) <span className="text-red-500">*</span></label>
-                <div className="flex items-center gap-3">
-                  <input type="number" value={budgetDA} onChange={(e) => setBudgetDA(e.target.value)} min="0" placeholder="e.g. 50000" className={`w-full pl-4 pr-4 py-4 rounded-xl bg-gray-50 border ${errors.budgetDA ? 'border-red-500' : 'border-gray-200'} text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#117BB8] transition-all`} />
-                  <span className="text-gray-600">DA</span>
-                </div>
-                {errors.budgetDA && <p className="text-red-500 text-sm mt-2">{errors.budgetDA}</p>}
-              </div>
-            )}
-
-            {/* Hotel & Visa options (kept per Option 1) */}
-            <div className="grid sm:grid-cols-2 gap-6 mt-4">
-              <div className="relative">
-                <label className="block text-gray-700 mb-2 font-medium">Hotel Rating {!noHotelNeeded && <span className="text-red-500">*</span>}</label>
-                <Hotel className="absolute left-4 bottom-5 text-gray-400 w-5 h-5 pointer-events-none" />
-                <select
-                  value={hotelStars}
-                  onChange={(e) => setHotelStars(e.target.value)}
-                  disabled={noHotelNeeded}
-                  className={`w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border ${errors.hotelStars ? 'border-red-500' : 'border-gray-200'} text-gray-700 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent focus:bg-white transition-all disabled:opacity-50 disabled:cursor-not-allowed`}
-                >
-                  <option value="">Select rating</option>
-                  <option value="3">★★★ 3 Stars</option>
-                  <option value="4">★★★★ 4 Stars</option>
-                  <option value="5">★★★★★ 5 Stars</option>
-                </select>
-                {errors.hotelStars && !noHotelNeeded && <p className="text-red-500 text-sm mt-2">{errors.hotelStars}</p>}
-              </div>
-
-              <div className="flex flex-col gap-4">
-                <label className="block text-gray-700 mb-2 font-medium">Additional Options</label>
-                <label className="flex items-center bg-gray-50 px-5 py-4 rounded-xl border border-gray-200 cursor-pointer hover:bg-blue-50 hover:border-[#117BB8] transition-all group">
-                  <input type="checkbox" checked={noHotelNeeded} onChange={(e) => setNoHotelNeeded(e.target.checked)} className="mr-3 w-5 h-5 text-[#117BB8] rounded focus:ring-2 focus:ring-[#117BB8] cursor-pointer" />
-                  <span className="text-gray-700 group-hover:text-[#117BB8] transition-colors">I don't need a hotel</span>
-                </label>
-
-                <label className="flex items-center bg-gray-50 px-5 py-4 rounded-xl border border-gray-200 cursor-pointer hover:bg-blue-50 hover:border-[#117BB8] transition-all group">
-                  <input type="checkbox" checked={needsVisaAssistance} onChange={(e) => setNeedsVisaAssistance(e.target.checked)} className="mr-3 w-5 h-5 text-[#117BB8] rounded focus:ring-2 focus:ring-[#117BB8] cursor-pointer" />
-                  <span className="text-gray-700 group-hover:text-[#117BB8] transition-colors">I need visa assistance</span>
-                </label>
-              </div>
-            </div>
-
-            <div className="pt-6">
-              <button type="submit" className="w-full bg-gradient-to-r from-[#117BB8] to-[#0f6da4] hover:from-[#0f6da4] hover:to-[#0d5f92] text-white py-5 rounded-xl transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-0.5">
-                Continue to Payer Information →
+              <button onClick={clearError} className="text-red-500 hover:text-red-700">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
               </button>
             </div>
-          </form>
+          </div>
         )}
 
-        {/* Step 2 - Payer & Travelers */}
-        {currentStep === 2 && (
-          <div>
-            {!isUmrahBooking && (
-              <div className="mb-8">
-                <button onClick={() => setCurrentStep(1)} className="text-[#117BB8] hover:text-[#0f6da4] transition-colors flex items-center gap-2 mb-4">← Back to trip details</button>
+        {/* Form Container */}
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          {/* Step 1: Booking Information */}
+          {currentStep === 1 && (
+            <div className="p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Trip Details</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Destination Country *</label>
+                  <input
+                    type="text"
+                    value={bookingInfo.destination_country}
+                    onChange={(e) => updateBookingInfo('destination_country', e.target.value)}
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      formErrors.destination_country ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="Enter destination country"
+                    required
+                  />
+                  {formErrors.destination_country && (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.destination_country}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Destination City</label>
+                  <input
+                    type="text"
+                    value={bookingInfo.destination_city}
+                    onChange={(e) => updateBookingInfo('destination_city', e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Enter destination city"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Trip Date *</label>
+                  <input
+                    type="date"
+                    value={bookingInfo.trip_date}
+                    onChange={(e) => updateBookingInfo('trip_date', e.target.value)}
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      formErrors.trip_date ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    required
+                  />
+                  {formErrors.trip_date && (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.trip_date}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Return Date *</label>
+                  <input
+                    type="date"
+                    value={bookingInfo.returning_date}
+                    onChange={(e) => updateBookingInfo('returning_date', e.target.value)}
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      formErrors.returning_date ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    required
+                  />
+                  {formErrors.returning_date && (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.returning_date}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Departure Time *</label>
+                  <input
+                    type="time"
+                    value={bookingInfo.departure_time}
+                    onChange={(e) => updateBookingInfo('departure_time', e.target.value)}
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      formErrors.departure_time ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    required
+                  />
+                  {formErrors.departure_time && (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.departure_time}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Return Time *</label>
+                  <input
+                    type="time"
+                    value={bookingInfo.returning_time}
+                    onChange={(e) => updateBookingInfo('returning_time', e.target.value)}
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      formErrors.returning_time ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    required
+                  />
+                  {formErrors.returning_time && (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.returning_time}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Price (Budget) *</label>
+                  <input
+                    type="number"
+                    value={bookingInfo.price}
+                    onChange={(e) => updateBookingInfo('price', e.target.value)}
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      formErrors.price ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="0.00"
+                    min="0"
+                    step="0.01"
+                    required
+                  />
+                  {formErrors.price && (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.price}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Duration (Days) *</label>
+                  <input
+                    type="number"
+                    value={bookingInfo.duration_days}
+                    onChange={(e) => updateBookingInfo('duration_days', e.target.value)}
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      formErrors.duration_days ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="7"
+                    min="1"
+                    required
+                  />
+                  {formErrors.duration_days && (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.duration_days}</p>
+                  )}
+                </div>
               </div>
-            )}
 
-            <div className="mb-8">
-              <h2 className="text-[#117BB8] mb-2">Payer Information</h2>
-              <p className="text-gray-500">Provide details about the person making the booking</p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Payer Row 1 */}
-              <div className="grid sm:grid-cols-3 gap-6">
-                <div className="relative">
-                  <label className="block text-gray-700 mb-2">First Name <span className="text-red-500">*</span></label>
-                  <User className="absolute left-4 bottom-5 text-gray-400 w-5 h-5 pointer-events-none" />
-                  <input type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="Enter first name" className={`w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border ${errors.firstName ? 'border-red-500' : 'border-gray-200'} text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent focus:bg-white transition-all`} />
-                  {errors.firstName && <p className="text-red-500 text-sm mt-2">{errors.firstName}</p>}
-                </div>
-
-                <div className="relative">
-                  <label className="block text-gray-700 mb-2">Last Name <span className="text-red-500">*</span></label>
-                  <User className="absolute left-4 bottom-5 text-gray-400 w-5 h-5 pointer-events-none" />
-                  <input type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} placeholder="Enter last name" className={`w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border ${errors.lastName ? 'border-red-500' : 'border-gray-200'} text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent focus:bg-white transition-all`} />
-                  {errors.lastName && <p className="text-red-500 text-sm mt-2">{errors.lastName}</p>}
-                </div>
-
-                <div className="relative">
-                  <label className="block text-gray-700 mb-2">Age <span className="text-red-500">*</span></label>
-                  <User className="absolute left-4 bottom-5 text-gray-400 w-5 h-5 pointer-events-none" />
-                  <input type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="18+" min="18" max="120" className={`w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border ${errors.age ? 'border-red-500' : 'border-gray-200'} text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent focus:bg-white transition-all`} />
-                  {errors.age && <p className="text-red-500 text-sm mt-2">{errors.age}</p>}
-                </div>
-              </div>
-
-              {/* Payer Row 2 */}
-              <div className="grid sm:grid-cols-3 gap-6">
-                <div className="relative">
-                  <label className="block text-gray-700 mb-2">Phone Number <span className="text-red-500">*</span></label>
-                  <Phone className="absolute left-4 bottom-5 text-gray-400 w-5 h-5 pointer-events-none" />
-                  <input type="tel" value={phoneNumber} onChange={handlePhoneNumberChange} placeholder="0XXXXXXXXX" className={`w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border ${errors.phoneNumber ? 'border-red-500' : 'border-gray-200'} text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent focus:bg-white transition-all`} />
-                  {errors.phoneNumber && <p className="text-red-500 text-sm mt-2">{errors.phoneNumber}</p>}
-                </div>
-
-                <div className="relative">
-                  <label className="block text-gray-700 mb-2">Email <span className="text-red-500">*</span></label>
-                  <Mail className="absolute left-4 bottom-5 text-gray-400 w-5 h-5 pointer-events-none" />
-                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="example@email.com" className={`w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border ${errors.email ? 'border-red-500' : 'border-gray-200'} text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent focus:bg-white transition-all`} />
-                  {errors.email && <p className="text-red-500 text-sm mt-2">{errors.email}</p>}
-                </div>
-
-                <div className="relative">
-                  <label className="block text-gray-700 mb-2">Wilaya <span className="text-red-500">*</span></label>
-                  <MapPinned className="absolute left-4 bottom-5 text-gray-400 w-5 h-5 pointer-events-none" />
-                  <select value={wilaya} onChange={(e) => setWilaya(e.target.value)} className={`w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border ${errors.wilaya ? 'border-red-500' : 'border-gray-200'} text-gray-700 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent focus:bg-white transition-all`}>
-                    <option value="">Select wilaya</option>
-                    {wilayas.map(w => <option key={w} value={w}>{w}</option>)}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Hotel Rating</label>
+                  <select
+                    value={bookingInfo.hotel_stars}
+                    onChange={(e) => updateBookingInfo('hotel_stars', e.target.value)}
+                    disabled={bookingInfo.no_hotel_needed}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                  >
+                    <option value="">Select rating</option>
+                    <option value="3">3 Stars</option>
+                    <option value="4">4 Stars</option>
+                    <option value="5">5 Stars</option>
                   </select>
-                  {errors.wilaya && <p className="text-red-500 text-sm mt-2">{errors.wilaya}</p>}
                 </div>
-              </div>
 
-              {/* Meeting Details */}
-              <div className="grid sm:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-gray-700 mb-2">Meeting Day <span className="text-red-500">*</span></label>
-                  <DatePicker value={dayOfMeet} onChange={setDayOfMeet} placeholder="Select meeting date" min={today} max={oneYearFromNow} error={!!errors.dayOfMeet} />
-                  {errors.dayOfMeet && <p className="text-red-500 text-sm mt-2">{errors.dayOfMeet}</p>}
-                </div>
-                <div>
-                  <label className="block text-gray-700 mb-2">Meeting Time <span className="text-red-500">*</span></label>
-                  <TimePicker value={timeOfMeet} onChange={setTimeOfMeet} placeholder="Select meeting time" error={!!errors.timeOfMeet} />
-                  {errors.timeOfMeet && <p className="text-red-500 text-sm mt-2">{errors.timeOfMeet}</p>}
-                </div>
-              </div>
-
-              {/* Traveler status toggle */}
-              <div className="bg-blue-50 rounded-xl p-6 border border-blue-100">
-                <label className="block text-gray-700 mb-4">Are you a traveler? <span className="text-red-500">*</span></label>
-                <div className="flex gap-4">
-                  <button type="button" onClick={() => setIsTraveler(true)} className={`flex-1 px-8 py-4 rounded-xl transition-all ${isTraveler ? 'bg-[#117BB8] text-white shadow-lg transform scale-105' : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-[#117BB8]'}`}>
-                    Yes, I'm traveling
-                  </button>
-                  <button type="button" onClick={() => setIsTraveler(false)} className={`flex-1 px-8 py-4 rounded-xl transition-all ${!isTraveler ? 'bg-[#117BB8] text-white shadow-lg transform scale-105' : 'bg-white text-gray-700 border-2 border-gray-200 hover:border-[#117BB8]'}`}>
-                    No, I'm not traveling
-                  </button>
-                </div>
-                <p className="text-sm mt-2 text-gray-600">If you are traveling, we'll prefill Traveler 1 with your name & phone. You can still edit passport/identity fields manually.</p>
-              </div>
-
-              {/* Number of persons */}
-              <div className="relative">
-                <label className="block text-gray-700 mb-2">Total Number of Persons <span className="text-red-500">*</span></label>
-                <Users className="absolute left-4 bottom-5 text-gray-400 w-5 h-5 pointer-events-none" />
-                <select value={numberOfPersons} onChange={(e) => setNumberOfPersons(e.target.value)} className={`w-full pl-12 pr-4 py-4 rounded-xl bg-gray-50 border ${errors.numberOfPersons ? 'border-red-500' : 'border-gray-200'} text-gray-700 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent focus:bg-white transition-all`}>
-                  <option value="">Select number of persons</option>
-                  {[...Array(20)].map((_, i) => <option key={i+1} value={i+1}>{i+1} {i+1 === 1 ? 'person' : 'persons'}</option>)}
-                </select>
-                {errors.numberOfPersons && <p className="text-red-500 text-sm mt-2">{errors.numberOfPersons}</p>}
-                {numberOfPersons && <p className="text-gray-600 text-sm mt-2">{`You will fill ${travelers.length} traveler form${travelers.length !== 1 ? 's' : ''}`}</p>}
-              </div>
-
-              {/* Travelers forms (all travelers) */}
-              {travelers.length > 0 && (
-                <div className="space-y-6 mt-8">
-                  <div className="border-t-2 border-gray-200 pt-6">
-                    <h3 className="text-gray-800 mb-6 flex items-center gap-2"><Users className="w-6 h-6 text-[#117BB8]" /> Travelers Information</h3>
+                <div className="space-y-4">
+                  <label className="block text-sm font-medium text-gray-700">Options</label>
+                  <div className="flex flex-col space-y-3">
+                    <label className="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        checked={bookingInfo.no_hotel_needed}
+                        onChange={(e) => updateBookingInfo('no_hotel_needed', e.target.checked)}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span className="text-gray-700">No Hotel Needed</span>
+                    </label>
+                    
+                    <label className="flex items-center space-x-3">
+                      <input
+                        type="checkbox"
+                        checked={bookingInfo.needs_visa_assistance}
+                        onChange={(e) => updateBookingInfo('needs_visa_assistance', e.target.checked)}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      />
+                      <span className="text-gray-700">Need Visa Assistance</span>
+                    </label>
                   </div>
+                </div>
+              </div>
 
-                  {travelers.map((traveler, idx) => {
-                    const isPayerSlot = isTraveler && idx === 0;
-                    return (
-                      <div key={idx} className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-xl p-6 border border-gray-200">
-                        <h4 className="text-gray-700 mb-4">Traveler {idx + 1} {isPayerSlot && <span className="text-sm text-green-600 ml-2">(Payer)</span>}</h4>
+              <div className="flex justify-end mt-8">
+                <button
+                  onClick={handleNextStep}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded-lg transition duration-200 transform hover:scale-105"
+                >
+                  Continue to Payer Info
+                </button>
+              </div>
+            </div>
+          )}
 
-                        <div className="space-y-4">
-                          <div className="grid sm:grid-cols-3 gap-4">
-                            <div className="relative">
-                              <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
-                              <input type="text" value={traveler.firstName} onChange={(e) => updateTraveler(idx, 'firstName', e.target.value)} placeholder="First name *" className={`w-full pl-12 pr-4 py-3 rounded-xl bg-white border ${errors[`traveler${idx}FirstName`] ? 'border-red-500' : 'border-gray-200'} text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent transition-all`} />
-                              {errors[`traveler${idx}FirstName`] && <p className="text-red-500 text-xs mt-1">{errors[`traveler${idx}FirstName`]}</p>}
-                            </div>
+          {/* Step 2: Payer Information */}
+          {currentStep === 2 && (
+            <div className="p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Payer Information</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                  <input
+                    type="text"
+                    value={payerInfo.first_name}
+                    onChange={(e) => updatePayerInfo('first_name', e.target.value)}
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      formErrors.first_name ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="Enter first name"
+                    required
+                  />
+                  {formErrors.first_name && (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.first_name}</p>
+                  )}
+                </div>
 
-                            <div className="relative">
-                              <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
-                              <input type="text" value={traveler.lastName} onChange={(e) => updateTraveler(idx, 'lastName', e.target.value)} placeholder="Last name *" className={`w-full pl-12 pr-4 py-3 rounded-xl bg-white border ${errors[`traveler${idx}LastName`] ? 'border-red-500' : 'border-gray-200'} text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent transition-all`} />
-                              {errors[`traveler${idx}LastName`] && <p className="text-red-500 text-xs mt-1">{errors[`traveler${idx}LastName`]}</p>}
-                            </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                  <input
+                    type="text"
+                    value={payerInfo.last_name}
+                    onChange={(e) => updatePayerInfo('last_name', e.target.value)}
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      formErrors.last_name ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="Enter last name"
+                    required
+                  />
+                  {formErrors.last_name && (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.last_name}</p>
+                  )}
+                </div>
 
-                            <div className="relative">
-                              <User className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
-                              <input type="number" value={traveler.age} onChange={(e) => updateTraveler(idx, 'age', e.target.value)} placeholder="Age" min="1" max="120" className={`w-full pl-12 pr-4 py-3 rounded-xl bg-white border ${errors[`traveler${idx}Age`] ? 'border-red-500' : 'border-gray-200'} text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent transition-all`} />
-                              {errors[`traveler${idx}Age`] && <p className="text-red-500 text-xs mt-1">{errors[`traveler${idx}Age`]}</p>}
-                            </div>
-                          </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
+                  <input
+                    type="tel"
+                    value={payerInfo.phone}
+                    onChange={(e) => updatePayerInfo('phone', e.target.value)}
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      formErrors.phone ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="e.g., 0551234567"
+                    required
+                  />
+                  {formErrors.phone && (
+                    <p className="mt-1 text-sm text-red-600">{formErrors.phone}</p>
+                  )}
+                </div>
+              </div>
 
-                          <div className="grid sm:grid-cols-2 gap-4">
-                            <div className="relative">
-                              <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
-                              <input type="tel" value={traveler.phoneNumber} onChange={(e) => handleTravelerPhoneNumberChange(idx, e)} placeholder="Phone number *" className={`w-full pl-12 pr-4 py-3 rounded-xl bg-white border ${errors[`traveler${idx}PhoneNumber`] ? 'border-red-500' : 'border-gray-200'} text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent transition-all`} />
-                              {errors[`traveler${idx}PhoneNumber`] && <p className="text-red-500 text-xs mt-1">{errors[`traveler${idx}PhoneNumber`]}</p>}
-                            </div>
+              {/* Booking Notes */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Booking Notes</label>
+                <textarea
+                  value={payerInfo.booking_notes}
+                  onChange={(e) => updatePayerInfo('booking_notes', e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  rows="3"
+                  placeholder="Any special requests or preferences..."
+                />
+              </div>
 
-                            <div className="relative">
-                              <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
-                              <input type="email" value={traveler.email} onChange={(e) => updateTraveler(idx, 'email', e.target.value)} placeholder="Email *" className={`w-full pl-12 pr-4 py-3 rounded-xl bg-white border ${errors[`traveler${idx}Email`] ? 'border-red-500' : 'border-gray-200'} text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent transition-all`} />
-                              {errors[`traveler${idx}Email`] && <p className="text-red-500 text-xs mt-1">{errors[`traveler${idx}Email`]}</p>}
-                            </div>
-                          </div>
+              {/* Payer Traveler Details */}
+              {payerInfo.is_traveler && (
+                <div className="border border-gray-200 rounded-xl p-6 bg-gray-50 mb-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Traveler Details</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Age *</label>
+                      <input
+                        type="number"
+                        value={payerInfo.age}
+                        onChange={(e) => updatePayerInfo('age', e.target.value)}
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          formErrors.age ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter age"
+                        min="1"
+                        max="120"
+                        required
+                      />
+                      {formErrors.age && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors.age}</p>
+                      )}
+                    </div>
 
-                          <div className="grid sm:grid-cols-3 gap-4">
-                            <div className="relative">
-                              <label className="block text-sm text-gray-600 mb-2">Identity Number {(!isTraveler || idx !== 0) && <span className="text-red-500">*</span>}</label>
-                              <input type="text" value={traveler.identityNumber} onChange={(e) => updateTraveler(idx, 'identityNumber', e.target.value)} placeholder={isTraveler && idx === 0 ? 'Leave empty or fill later' : 'Identity number *'} className={`w-full pl-4 pr-4 py-3 rounded-xl bg-white border ${errors[`traveler${idx}Identity`] ? 'border-red-500' : 'border-gray-200'} text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent transition-all`} />
-                              {errors[`traveler${idx}Identity`] && <p className="text-red-500 text-xs mt-1">{errors[`traveler${idx}Identity`]}</p>}
-                            </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Identity Number *</label>
+                      <input
+                        type="text"
+                        value={payerInfo.identity_number}
+                        onChange={(e) => updatePayerInfo('identity_number', e.target.value)}
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          formErrors.identity_number ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Min 5 characters"
+                        required
+                      />
+                      {formErrors.identity_number && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors.identity_number}</p>
+                      )}
+                    </div>
 
-                            <div className="relative">
-                              <label className="block text-sm text-gray-600 mb-2">Passport Number</label>
-                              <input type="text" value={traveler.passportNumber} onChange={(e) => updateTraveler(idx, 'passportNumber', e.target.value)} placeholder="Passport number" className="w-full pl-4 pr-4 py-3 rounded-xl bg-white border border-gray-200 text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent transition-all" />
-                            </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Passport Number *</label>
+                      <input
+                        type="text"
+                        value={payerInfo.passport_number}
+                        onChange={(e) => updatePayerInfo('passport_number', e.target.value)}
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          formErrors.passport_number ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Min 6 characters"
+                        required
+                      />
+                      {formErrors.passport_number && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors.passport_number}</p>
+                      )}
+                    </div>
 
-                            <div className="relative">
-                              <label className="block text-sm text-gray-600 mb-2">Gender</label>
-                              <select value={traveler.gender} onChange={(e) => updateTraveler(idx, 'gender', e.target.value)} className="w-full pl-4 pr-4 py-3 rounded-xl bg-white border border-gray-200 text-gray-700 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#117BB8] focus:border-transparent transition-all">
-                                <option value="">Select gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                              </select>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Gender *</label>
+                      <select
+                        value={payerInfo.gender}
+                        onChange={(e) => updatePayerInfo('gender', e.target.value)}
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          formErrors.gender ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        required
+                      >
+                        <option value="">Select gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                      </select>
+                      {formErrors.gender && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors.gender}</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
               )}
 
-              <div className="pt-6 grid sm:grid-cols-2 gap-4">
-                <button type="button" onClick={() => setCurrentStep(1)} className="w-full bg-white border border-gray-200 text-gray-700 py-4 rounded-xl">← Back</button>
-                <button type="submit" className="w-full bg-gradient-to-r from-[#117BB8] to-[#0f6da4] text-white py-4 rounded-xl">Submit Booking</button>
+              {/* Traveler Option */}
+              <div className="bg-gray-50 rounded-xl p-6 mb-6">
+                <label className="block text-lg font-medium text-gray-900 mb-4">Are you traveling?</label>
+                <div className="flex gap-4">
+                  <button
+                    type="button"
+                    onClick={() => updatePayerInfo('is_traveler', true)}
+                    className={`flex-1 py-4 rounded-xl border-2 transition duration-200 ${
+                      payerInfo.is_traveler 
+                        ? 'bg-blue-600 border-blue-600 text-white shadow-lg transform scale-105' 
+                        : 'bg-white border-gray-300 text-gray-700 hover:border-blue-500'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center space-x-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      <span className="font-medium">Yes, I'm traveling</span>
+                    </div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => updatePayerInfo('is_traveler', false)}
+                    className={`flex-1 py-4 rounded-xl border-2 transition duration-200 ${
+                      !payerInfo.is_traveler 
+                        ? 'bg-blue-600 border-blue-600 text-white shadow-lg transform scale-105' 
+                        : 'bg-white border-gray-300 text-gray-700 hover:border-blue-500'
+                    }`}
+                  >
+                    <div className="flex items-center justify-center space-x-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      <span className="font-medium">No, I'm not traveling</span>
+                    </div>
+                  </button>
+                </div>
               </div>
-            </form>
-          </div>
-        )}
+
+              {/* Number of Persons */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">Total Number of Persons *</label>
+                <select
+                  value={numberOfPersons}
+                  onChange={(e) => setNumberOfPersons(parseInt(e.target.value))}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {[1,2,3,4,5,6,7,8,9,10].map(num => (
+                    <option key={num} value={num}>{num} {num === 1 ? 'person' : 'persons'}</option>
+                  ))}
+                </select>
+                {payerInfo.is_traveler && (
+                  <p className="mt-2 text-sm text-gray-600">
+                    Including you as one traveler
+                  </p>
+                )}
+              </div>
+
+              <div className="flex justify-between mt-8">
+                <button
+                  onClick={handlePreviousStep}
+                  className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-8 rounded-lg transition duration-200"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={handleNextStep}
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded-lg transition duration-200 transform hover:scale-105"
+                >
+                  Continue to Travelers
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Travelers Information */}
+          {currentStep === 3 && (
+            <div className="p-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Travelers Information</h2>
+              
+              {travelers.map((traveler, index) => (
+                <div key={index} className="border border-gray-200 rounded-xl p-6 mb-6 bg-white shadow-sm">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                    <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mr-3">
+                      {index + 1}
+                    </span>
+                    Traveler {index + 1}
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
+                      <input
+                        type="text"
+                        value={traveler.first_name}
+                        onChange={(e) => updateTraveler(index, 'first_name', e.target.value)}
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          formErrors[`traveler_${index}_first_name`] ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter first name"
+                        required
+                      />
+                      {formErrors[`traveler_${index}_first_name`] && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors[`traveler_${index}_first_name`]}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Last Name *</label>
+                      <input
+                        type="text"
+                        value={traveler.last_name}
+                        onChange={(e) => updateTraveler(index, 'last_name', e.target.value)}
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          formErrors[`traveler_${index}_last_name`] ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter last name"
+                        required
+                      />
+                      {formErrors[`traveler_${index}_last_name`] && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors[`traveler_${index}_last_name`]}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Age *</label>
+                      <input
+                        type="number"
+                        value={traveler.age}
+                        onChange={(e) => updateTraveler(index, 'age', e.target.value)}
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          formErrors[`traveler_${index}_age`] ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Enter age"
+                        min="1"
+                        max="120"
+                        required
+                      />
+                      {formErrors[`traveler_${index}_age`] && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors[`traveler_${index}_age`]}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
+                      <input
+                        type="tel"
+                        value={traveler.phone}
+                        onChange={(e) => updateTraveler(index, 'phone', e.target.value)}
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          formErrors[`traveler_${index}_phone`] ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="e.g., 0551234567"
+                        required
+                      />
+                      {formErrors[`traveler_${index}_phone`] && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors[`traveler_${index}_phone`]}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Identity Number *</label>
+                      <input
+                        type="text"
+                        value={traveler.identity_number}
+                        onChange={(e) => updateTraveler(index, 'identity_number', e.target.value)}
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          formErrors[`traveler_${index}_identity_number`] ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Min 5 characters"
+                        required
+                      />
+                      {formErrors[`traveler_${index}_identity_number`] && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors[`traveler_${index}_identity_number`]}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Passport Number *</label>
+                      <input
+                        type="text"
+                        value={traveler.passport_number}
+                        onChange={(e) => updateTraveler(index, 'passport_number', e.target.value)}
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          formErrors[`traveler_${index}_passport_number`] ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        placeholder="Min 6 characters"
+                        required
+                      />
+                      {formErrors[`traveler_${index}_passport_number`] && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors[`traveler_${index}_passport_number`]}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Gender *</label>
+                      <select
+                        value={traveler.gender}
+                        onChange={(e) => updateTraveler(index, 'gender', e.target.value)}
+                        className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                          formErrors[`traveler_${index}_gender`] ? 'border-red-500' : 'border-gray-300'
+                        }`}
+                        required
+                      >
+                        <option value="">Select gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                      </select>
+                      {formErrors[`traveler_${index}_gender`] && (
+                        <p className="mt-1 text-sm text-red-600">{formErrors[`traveler_${index}_gender`]}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+
+              {travelers.length === 0 && payerInfo.is_traveler && (
+                <div className="text-center p-8 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
+                  <svg className="w-12 h-12 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                  </svg>
+                  <p className="text-gray-600 text-lg">No additional travelers to add. You are the only traveler.</p>
+                </div>
+              )}
+
+              <div className="flex justify-between mt-8">
+                <button
+                  onClick={handlePreviousStep}
+                  className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-8 rounded-lg transition duration-200"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={loading}
+                  className="bg-green-600 hover:bg-green-700 text-white font-medium py-3 px-8 rounded-lg transition duration-200 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center space-x-2"
+                >
+                  {loading ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      <span>Creating Booking...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span>Create Booking</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

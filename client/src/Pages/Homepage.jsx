@@ -9,7 +9,7 @@ import TravelHeroSection from '../components/home/Search.jsx';
 function HomePage() {
   return (
     <Layout>
-<TravelHeroSection/>
+      <TravelHeroSection/>
       <PopularDestinations />
       <UmrahHadjPacks />
       <GroupTrips />

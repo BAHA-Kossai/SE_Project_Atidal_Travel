@@ -23,7 +23,7 @@ class BookingTypeValidator {
   static validate(bookingType) {
     const errors = [];
 
-    const validTypes = ['normal', 'guided_trip', 'umrah_trip'];
+    const validTypes = ['normal', 'guided_trip', 'umrah'];
     if (!validTypes.includes(bookingType)) {
       errors.push(`Error: Invalid booking type [${bookingType}]. Must be: ${validTypes.join(', ')}`);
     }
