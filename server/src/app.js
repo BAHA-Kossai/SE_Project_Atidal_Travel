@@ -26,12 +26,12 @@ app.use(cors({
   credentials: true
 }));
 
-// Add request logging middleware
-app.use((req, res, next) => {
-  console.log('🌐 [App] Incoming request:', req.method, req.originalUrl);
-  console.log('🌐 [App] Headers:', req.headers);
-  next();
-});
+// // Add request logging middleware
+// app.use((req, res, next) => {
+//   console.log('🌐 [App] Incoming request:', req.method, req.originalUrl);
+//   console.log('🌐 [App] Headers:', req.headers);
+//   next();
+// });
 
 app.use('/api/auth', authRoutes);
 app.use("/api/guide", guideRouter);

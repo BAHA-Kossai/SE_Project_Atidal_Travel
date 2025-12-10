@@ -29,7 +29,7 @@ import {
 
 const router = express.Router();
 
-//POST /api/guides/create-guide
+//POST /api/guide/create-guide
 router.post(
   "/",
   verifySupabaseToken, // Attach user from JWT
@@ -37,7 +37,7 @@ router.post(
   createGuideController // Call controller to create guide
 );
 
-//PUT /api/guides/update-guide
+//PUT /api/guide/update-guide
 router.put(
   "/:id",
   verifySupabaseToken,
@@ -45,7 +45,7 @@ router.put(
   updateGuideController
 );
 
-//DELETE /api/guides/delete-guide
+//DELETE /api/guide/delete-guide
 router.delete(
   "/:id",
   verifySupabaseToken,
