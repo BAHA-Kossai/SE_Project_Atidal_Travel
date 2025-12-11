@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Search, ArrowUpDown, Filter, Star } from "lucide-react";
 import Layout from "../components/layout/Layout";
-import Table from "../components/Table.jsx"; // Import the Table component
+import Table from "../components/Table.jsx"; 
 import { useAuthHandlers } from "../../hooks/useAuthHandlers.js";
 import { useUserHandlers } from "../../hooks/useUserHandlers.js";
 import { useUserBookings } from "../../hooks/useUserBookings.js";
@@ -14,16 +14,12 @@ export default function Profile() {
   const refreshToken = localStorage.getItem("refreshToken");
   const userData = localStorage.getItem("user");
   
-  // Get user data from localStorage
   const storedProfile = userData ? JSON.parse(userData) : null;
   
-  // Extract user_id
   const userId = storedProfile?.database?.id || storedProfile?.user_id || storedProfile?.id || storedProfile?.supabase_id;
 
-  // Use the user bookings hook
   const { bookings: userBookings, loading: bookingsLoading, error: bookingsError } = useUserBookings(userId);
 
-  // Extract profile data based on your signup structure
   const getProfileData = () => {
     if (!storedProfile) {
       return {
@@ -35,7 +31,6 @@ export default function Profile() {
       };
     }
 
-    // Try multiple possible structures
     if (storedProfile.supabase && storedProfile.database) {
       return {
         email: storedProfile.supabase.email,
@@ -71,20 +66,15 @@ export default function Profile() {
   const [feedbackName, setFeedbackName] = useState("");
   const [feedbackList, setFeedbackList] = useState([]);
 
-  // Check if we have valid user data to display
   const hasUserData = profileData && (profileData.email || profileData.first_name);
 
-  // Transform bookings data for the Table component
   const transformBookingsData = (bookings) => {
-    console.log('🔄 Transforming bookings data:', bookings);
     
     if (!bookings || !Array.isArray(bookings)) {
-      console.log('⚠️ No bookings or not an array');
       return [];
     }
     
     return bookings.map((booking) => {
-      // The booking data structure has TripInfo nested inside
       const tripInfo = booking.TripInfo || {};
       
       return {
@@ -95,13 +85,11 @@ export default function Profile() {
         trip_date: tripInfo.trip_date || booking.trip_date || 'Not specified',
         booking_status: booking.booking_status || 'pending',
         type: booking.type || 'normal',
-        // Include the full booking object for selection if needed
         rawBooking: booking
       };
     });
   };
 
-  // Filter bookings based on search query
   const filteredBookings = transformBookingsData(userBookings).filter((booking) => {
     if (!searchQuery) return true;
 
@@ -116,7 +104,6 @@ export default function Profile() {
     );
   });
 
-  // Define columns for the Table component
   const bookingColumns = [
     {
       title: "Booking ID",
@@ -166,28 +153,19 @@ export default function Profile() {
     }
   ];
 
-  // Handle table row selection
   const handleBookingSelect = (booking) => {
-    console.log('Selected booking:', booking);
-    // You can navigate to booking details or show a modal
-    // Example: navigate(`/bookings/${booking.booking_id}`);
+    
   };
 
-  // Handle table row edit
   const handleBookingEdit = (booking) => {
-    console.log('Edit booking:', booking);
-    // Implement edit logic here
   };
 
-  // Handle table row delete
   const handleBookingDelete = (booking) => {
     if (window.confirm(`Are you sure you want to delete booking #${booking.booking_id}?`)) {
       console.log('Delete booking:', booking);
-      // Implement delete logic here
     }
   };
 
-  // Handle submit feedback
   const handleSubmitFeedback = () => {
     if (!feedbackName.trim()) {
       alert("Please enter your name");
@@ -219,7 +197,6 @@ export default function Profile() {
     alert("Thank you for your feedback!");
   };
 
-  // Get user initials for avatar
   const getUserInitials = () => {
     if (profileData.first_name && profileData.last_name) {
       return `${profileData.first_name[0]}${profileData.last_name[0]}`.toUpperCase();
@@ -227,7 +204,6 @@ export default function Profile() {
     return profileData.email ? profileData.email[0].toUpperCase() : 'U';
   };
 
-  // Handle delete account with browser confirm
   const handleDeleteAccount = async () => {
     const confirmed = window.confirm(
       "Are you sure you want to delete your account? This action cannot be undone."
@@ -252,7 +228,6 @@ export default function Profile() {
     }
   };
 
-  // Loading state - only show if bookings are loading AND we have a userId
   if (bookingsLoading && userId) {
     return (
       <Layout>
@@ -266,7 +241,6 @@ export default function Profile() {
     );
   }
 
-  // If no user data at all, show error
   if (!hasUserData) {
     return (
       <Layout>

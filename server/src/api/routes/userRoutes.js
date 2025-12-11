@@ -17,8 +17,6 @@ const router = express.Router();
 router.put("/update-profile", verifySupabaseToken, updateUserController);
 // DELETE /api/user/delete-profile
 router.delete("/delete-profile", verifySupabaseToken, deleteUserController);
-// GET /api/user/me - logged-in user's profile
-router.get("/me", verifySupabaseToken, readUserController);
 // PATCH /api/users/change-password
 router.patch("/change-password", verifySupabaseToken, changePasswordController);
 
