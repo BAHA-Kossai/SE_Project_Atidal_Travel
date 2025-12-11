@@ -56,8 +56,26 @@ export default function BookingForm() {
   const [numberOfPersons, setNumberOfPersons] = useState(1);
   const [travelers, setTravelers] = useState([]);
 
-
   const { loading, error, submitBooking, clearError } = useBookings();
+
+  // Helper function to clean identity numbers (remove non-numeric characters)
+  const cleanIdentityNumber = (identityNumber) => {
+    if (!identityNumber) return '';
+    // Remove all non-numeric characters
+    return identityNumber.toString().replace(/[^0-9]/g, '');
+  };
+
+  // Handler for identity number input changes
+  const handleIdentityNumberChange = (value, isPayer = false, travelerIndex = null) => {
+    // Clean the value - keep only numbers
+    const cleanedValue = cleanIdentityNumber(value);
+    
+    if (isPayer) {
+      updatePayerInfo('identity_number', cleanedValue);
+    } else if (travelerIndex !== null) {
+      updateTraveler(travelerIndex, 'identity_number', cleanedValue);
+    }
+  };
 
   // Initialize travelers based on number of persons and payer status
   useEffect(() => {
@@ -123,7 +141,7 @@ export default function BookingForm() {
           errors.age = 'Valid age is required (1-120)';
         }
         if (!validateIdentityNumber(payerInfo.identity_number)) {
-          errors.identity_number = 'Valid identity number is required (min 5 characters)';
+          errors.identity_number = 'Valid identity number is required (min 5 digits, numbers only)';
         }
         if (!validatePassportNumber(payerInfo.passport_number)) {
           errors.passport_number = 'Valid passport number is required (min 6 characters)';
@@ -149,7 +167,7 @@ export default function BookingForm() {
           errors[`traveler_${index}_phone`] = `Traveler ${index + 1} valid Algerian phone number is required (10 digits starting with 0)`;
         }
         if (!validateIdentityNumber(traveler.identity_number)) {
-          errors[`traveler_${index}_identity_number`] = `Traveler ${index + 1} valid identity number is required (min 5 characters)`;
+          errors[`traveler_${index}_identity_number`] = `Traveler ${index + 1} valid identity number is required (min 5 digits, numbers only)`;
         }
         if (!validatePassportNumber(traveler.passport_number)) {
           errors[`traveler_${index}_passport_number`] = `Traveler ${index + 1} valid passport number is required (min 6 characters)`;
@@ -226,7 +244,7 @@ export default function BookingForm() {
       needs_visa_assistance: bookingInfo.needs_visa_assistance,
       booking_status: 'pending',
       
-      // ADD THIS LINE - Get user ID from localStorage
+      // Get user ID from localStorage
       user_id: JSON.parse(localStorage.getItem('user'))?.id || JSON.parse(localStorage.getItem('user'))?.user_id,
       
       branch_id: null,
@@ -242,7 +260,7 @@ export default function BookingForm() {
         booking_notes: payerInfo.booking_notes || `Booking for ${numberOfPersons} persons`,
         ...(payerInfo.is_traveler && {
           age: Number(payerInfo.age) || null,
-          identity_number: payerInfo.identity_number || '',
+          identity_number: cleanIdentityNumber(payerInfo.identity_number) || '',
           passport_number: payerInfo.passport_number || '',
           gender: payerInfo.gender || ''
         })
@@ -252,7 +270,7 @@ export default function BookingForm() {
         first_name: traveler.first_name,
         last_name: traveler.last_name,
         age: Number(traveler.age) || null,
-        identity_number: traveler.identity_number,
+        identity_number: cleanIdentityNumber(traveler.identity_number) || '',
         travler_contact: traveler.phone,
         passport_number: traveler.passport_number,
         gender: traveler.gender
@@ -644,11 +662,13 @@ export default function BookingForm() {
                       <input
                         type="text"
                         value={payerInfo.identity_number}
-                        onChange={(e) => updatePayerInfo('identity_number', e.target.value)}
+                        onChange={(e) => handleIdentityNumberChange(e.target.value, true)}
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                           formErrors.identity_number ? 'border-red-500' : 'border-gray-300'
                         }`}
-                        placeholder="Min 5 characters"
+                        placeholder="Enter numbers only (min 5 digits)"
                         required
                       />
                       {formErrors.identity_number && (
@@ -860,11 +880,13 @@ export default function BookingForm() {
                       <input
                         type="text"
                         value={traveler.identity_number}
-                        onChange={(e) => updateTraveler(index, 'identity_number', e.target.value)}
+                        onChange={(e) => handleIdentityNumberChange(e.target.value, false, index)}
+                        inputMode="numeric"
+                        pattern="[0-9]*"
                         className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                           formErrors[`traveler_${index}_identity_number`] ? 'border-red-500' : 'border-gray-300'
                         }`}
-                        placeholder="Min 5 characters"
+                        placeholder="Enter numbers only (min 5 digits)"
                         required
                       />
                       {formErrors[`traveler_${index}_identity_number`] && (

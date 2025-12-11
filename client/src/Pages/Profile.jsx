@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Search, ArrowUpDown, Filter, Star } from "lucide-react";
 import Layout from "../components/layout/Layout";
+import Table from "../components/Table.jsx"; // Import the Table component
 import { useAuthHandlers } from "../../hooks/useAuthHandlers.js";
 import { useUserHandlers } from "../../hooks/useUserHandlers.js";
 import { useUserBookings } from "../../hooks/useUserBookings.js";
@@ -18,7 +19,6 @@ export default function Profile() {
   
   // Extract user_id
   const userId = storedProfile?.database?.id || storedProfile?.user_id || storedProfile?.id || storedProfile?.supabase_id;
-
 
   // Use the user bookings hook
   const { bookings: userBookings, loading: bookingsLoading, error: bookingsError } = useUserBookings(userId);
@@ -70,97 +70,124 @@ export default function Profile() {
   const [currentPage, setCurrentPage] = useState(1);
   const [feedbackName, setFeedbackName] = useState("");
   const [feedbackList, setFeedbackList] = useState([]);
-  const rowsPerPage = 7;
 
   // Check if we have valid user data to display
   const hasUserData = profileData && (profileData.email || profileData.first_name);
 
-  // Transform real bookings data for display
-  // Transform real bookings data for display
+  // Transform bookings data for the Table component
   const transformBookingsData = (bookings) => {
+    console.log('🔄 Transforming bookings data:', bookings);
     
     if (!bookings || !Array.isArray(bookings)) {
+      console.log('⚠️ No bookings or not an array');
       return [];
     }
     
-    return bookings.map((booking, index) => {
+    return bookings.map((booking) => {
+      // The booking data structure has TripInfo nested inside
+      const tripInfo = booking.TripInfo || {};
       
       return {
-        id: `temp-${index}`,
-        type: booking.type,
-        destination: booking.destination_country || 
-                    booking.destination_city || 
-                    'Unknown Destination',
-        date: booking.trip_date,
-        persons:(booking.travelers_info ? booking.travelers_info.length + 1 : 1),
-        status: booking.booking_status,
+        id: booking.booking_id,
+        booking_id: booking.booking_id,
+        destination_city: tripInfo.destination_city || 'Not specified',
+        destination_country: tripInfo.destination_country || 'Not specified',
+        trip_date: tripInfo.trip_date || booking.trip_date || 'Not specified',
+        booking_status: booking.booking_status || 'pending',
+        type: booking.type || 'normal',
+        // Include the full booking object for selection if needed
+        rawBooking: booking
       };
     });
   };
-  // Use real bookings data
-  const allBookingsData = transformBookingsData(userBookings);
 
-  const filteredBookings = allBookingsData.filter((booking) => {
+  // Filter bookings based on search query
+  const filteredBookings = transformBookingsData(userBookings).filter((booking) => {
     if (!searchQuery) return true;
 
     const searchLower = searchQuery.toLowerCase();
     return (
-      booking.displayId.toString().includes(searchLower) ||
-      booking.type.toLowerCase().includes(searchLower) ||
-      booking.destination.toLowerCase().includes(searchLower) ||
-      booking.date.toLowerCase().includes(searchLower) ||
-      booking.persons.toString().includes(searchLower) ||
-      booking.status.toLowerCase().includes(searchLower)
+      booking.booking_id.toString().includes(searchLower) ||
+      booking.destination_city.toLowerCase().includes(searchLower) ||
+      booking.destination_country.toLowerCase().includes(searchLower) ||
+      booking.trip_date.toLowerCase().includes(searchLower) ||
+      booking.booking_status.toLowerCase().includes(searchLower) ||
+      booking.type.toLowerCase().includes(searchLower)
     );
   });
 
-  const totalPages = Math.ceil(filteredBookings.length / rowsPerPage);
-  const startIndex = (currentPage - 1) * rowsPerPage;
-  const endIndex = startIndex + rowsPerPage;
-  const currentBookings = filteredBookings.slice(startIndex, endIndex);
-
-  const emptyRowsCount = rowsPerPage - currentBookings.length;
-  const emptyRows = Array(emptyRowsCount).fill(null);
-
-  const getPageNumbers = () => {
-    const pages = [];
-    const maxPagesToShow = 5;
-
-    if (totalPages <= maxPagesToShow + 2) {
-      for (let i = 1; i <= totalPages; i++) {
-        pages.push(i);
+  // Define columns for the Table component
+  const bookingColumns = [
+    {
+      title: "Booking ID",
+      format: (item) => (
+        <span className="text-blue-600 font-medium">#{item.booking_id}</span>
+      )
+    },
+    {
+      title: "Destination",
+      format: (item) => (
+        <div>
+          <div className="font-medium">{item.destination_city}</div>
+          <div className="text-sm text-gray-500">{item.destination_country}</div>
+        </div>
+      )
+    },
+    {
+      title: "Trip Date",
+      format: (item) => (
+        <span>{new Date(item.trip_date).toLocaleDateString()}</span>
+      )
+    },
+    {
+      title: "Status",
+      format: (item) => {
+        const statusColors = {
+          'confirmed': 'bg-green-100 text-green-800',
+          'pending': 'bg-yellow-100 text-yellow-800',
+          'cancelled': 'bg-red-100 text-red-800',
+          'completed': 'bg-blue-100 text-blue-800'
+        };
+        
+        const colorClass = statusColors[item.booking_status] || 'bg-gray-100 text-gray-800';
+        
+        return (
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}>
+            {item.booking_status?.charAt(0).toUpperCase() + item.booking_status?.slice(1)}
+          </span>
+        );
       }
-    } else {
-      pages.push(1);
-
-      if (currentPage > 3) {
-        pages.push("...");
-      }
-
-      for (
-        let i = Math.max(2, currentPage - 1);
-        i <= Math.min(totalPages - 1, currentPage + 1);
-        i++
-      ) {
-        pages.push(i);
-      }
-
-      if (currentPage < totalPages - 2) {
-        pages.push("...");
-      }
-
-      pages.push(totalPages);
+    },
+    {
+      title: "Type",
+      format: (item) => (
+        <span className="capitalize">{item.type}</span>
+      )
     }
+  ];
 
-    return pages;
+  // Handle table row selection
+  const handleBookingSelect = (booking) => {
+    console.log('Selected booking:', booking);
+    // You can navigate to booking details or show a modal
+    // Example: navigate(`/bookings/${booking.booking_id}`);
   };
 
-  const handlePageChange = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+  // Handle table row edit
+  const handleBookingEdit = (booking) => {
+    console.log('Edit booking:', booking);
+    // Implement edit logic here
+  };
+
+  // Handle table row delete
+  const handleBookingDelete = (booking) => {
+    if (window.confirm(`Are you sure you want to delete booking #${booking.booking_id}?`)) {
+      console.log('Delete booking:', booking);
+      // Implement delete logic here
     }
   };
 
+  // Handle submit feedback
   const handleSubmitFeedback = () => {
     if (!feedbackName.trim()) {
       alert("Please enter your name");
@@ -418,126 +445,16 @@ export default function Profile() {
                   <p>Start by creating your first booking!</p>
                 </div>
               ) : (
-                <>
-                  <div style={{ overflowX: "auto" }}>
-                    <table style={{ width: "100%", tableLayout: "fixed", borderCollapse: "collapse" }}>
-                      <thead>
-                        <tr style={{ borderBottom: "1px solid #dee2e6" }}>
-                          <th style={{ textAlign: "left", padding: "0.75rem 1rem", fontSize: "0.875rem", fontWeight: "500", color: "#495057", width: "80px" }}>#</th>
-                          <th style={{ textAlign: "left", padding: "0.75rem 1rem", fontSize: "0.875rem", fontWeight: "500", color: "#495057", width: "100px" }}>Type</th>
-                          <th style={{ textAlign: "left", padding: "0.75rem 1rem", fontSize: "0.875rem", fontWeight: "500", color: "#495057", width: "200px" }}>Destination</th>
-                          <th style={{ textAlign: "left", padding: "0.75rem 1rem", fontSize: "0.875rem", fontWeight: "500", color: "#495057", width: "120px" }}>Date</th>
-                          <th style={{ textAlign: "left", padding: "0.75rem 1rem", fontSize: "0.875rem", fontWeight: "500", color: "#495057", width: "100px" }}>Travelers</th>
-                          <th style={{ textAlign: "left", padding: "0.75rem 1rem", fontSize: "0.875rem", fontWeight: "500", color: "#495057", width: "120px" }}>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {currentBookings.map((booking, index) => (
-                          <tr key={booking.id} style={{ borderBottom: "1px solid #f1f3f5" }}>
-                            <td style={{ padding: "1rem", fontSize: "0.875rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "#117BB8" }}>
-                              {booking.displayId}
-                            </td>
-                            <td style={{ padding: "1rem", fontSize: "0.875rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "#495057" }}>
-                              {booking.type?.charAt(0).toUpperCase() + booking.type?.slice(1) || 'Normal'}
-                            </td>
-                            <td style={{ padding: "1rem", fontSize: "0.875rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "#495057" }}>
-                              {booking.destination}
-                            </td>
-                            <td style={{ padding: "1rem", fontSize: "0.875rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "#495057" }}>
-                              {booking.date}
-                            </td>
-                            <td style={{ padding: "1rem", fontSize: "0.875rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", color: "#212529" }}>
-                              {booking.persons}
-                            </td>
-                            <td style={{ 
-                              padding: "1rem", 
-                              fontSize: "0.875rem", 
-                              whiteSpace: "nowrap", 
-                              overflow: "hidden", 
-                              textOverflow: "ellipsis",
-                              color: booking.status === 'confirmed' ? '#28a745' : 
-                                    booking.status === 'pending' ? '#ffc107' : 
-                                    booking.status === 'cancelled' ? '#dc3545' : '#6c757d'
-                            }}>
-                              {booking.status?.charAt(0).toUpperCase() + booking.status?.slice(1) || 'Pending'}
-                            </td>
-                          </tr>
-                        ))}
-                        {emptyRows.map((_, index) => (
-                          <tr key={`empty-${index}`} style={{ borderBottom: "1px solid #f1f3f5" }}>
-                            <td style={{ padding: "1rem", height: "3.5rem" }}>&nbsp;</td>
-                            <td style={{ padding: "1rem" }}>&nbsp;</td>
-                            <td style={{ padding: "1rem" }}>&nbsp;</td>
-                            <td style={{ padding: "1rem" }}>&nbsp;</td>
-                            <td style={{ padding: "1rem" }}>&nbsp;</td>
-                            <td style={{ padding: "1rem" }}>&nbsp;</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  {/* Pagination */}
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", marginTop: "1.5rem" }}>
-                    <button
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                      style={{
-                        padding: "0.25rem 0.75rem",
-                        backgroundColor: "transparent",
-                        color: "#495057",
-                        border: "none",
-                        borderRadius: "0.25rem",
-                        fontSize: "1rem",
-                        cursor: currentPage === 1 ? "not-allowed" : "pointer",
-                        opacity: currentPage === 1 ? "0.5" : "1",
-                      }}
-                    >
-                      &lt;
-                    </button>
-
-                    {getPageNumbers().map((page, index) =>
-                      page === "..." ? (
-                        <span key={`ellipsis-${index}`} style={{ padding: "0.25rem 0.75rem", color: "#495057" }}>
-                          .....
-                        </span>
-                      ) : (
-                        <button
-                          key={page}
-                          onClick={() => handlePageChange(page)}
-                          style={{
-                            padding: "0.25rem 0.75rem",
-                            backgroundColor: currentPage === page ? "#117BB8" : "transparent",
-                            color: currentPage === page ? "white" : "#212529",
-                            border: "none",
-                            borderRadius: "0.25rem",
-                            fontSize: "1rem",
-                            cursor: "pointer",
-                          }}
-                        >
-                          {page}
-                        </button>
-                      )
-                    )}
-
-                    <button
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                      style={{
-                        padding: "0.25rem 0.75rem",
-                        backgroundColor: "transparent",
-                        color: "#495057",
-                        border: "none",
-                        borderRadius: "0.25rem",
-                        fontSize: "1rem",
-                        cursor: currentPage === totalPages ? "not-allowed" : "pointer",
-                        opacity: currentPage === totalPages ? "0.5" : "1",
-                      }}
-                    >
-                      &gt;
-                    </button>
-                  </div>
-                </>
+                <div className="bg-white rounded-lg p-4">
+                  {/* Table Component */}
+                  <Table
+                    columns={bookingColumns}
+                    data={filteredBookings}
+                    onSelect={handleBookingSelect}
+                    onEdit={handleBookingEdit}
+                    onDelete={handleBookingDelete}
+                  />
+                </div>
               )}
             </div>
 

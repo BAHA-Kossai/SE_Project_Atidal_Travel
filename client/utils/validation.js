@@ -70,7 +70,9 @@ export const validateTime = (time) => {
  */
 export const validateIdentityNumber = (identityNumber) => {
   if (!identityNumber || typeof identityNumber !== 'string') return false;
-  return identityNumber.trim().length >= 5;
+  const trimmed = identityNumber.trim();
+  // Must be at least 5 digits, numbers only (no letters or special characters)
+  return /^\d{5,}$/.test(trimmed) && trimmed.length >= 5;
 };
 
 /**

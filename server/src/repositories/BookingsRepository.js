@@ -66,6 +66,28 @@ class BookingsRepository extends BaseRepository {
   // Find bookings by user ID with complete trip information
   async findBookingsByUserId(userId) {
     try {
+      console.log('=== REPOSITORY: findBookingsByUserId START ===');
+      console.log(`📊 Input: userId = ${userId} (type: ${typeof userId})`);
+      console.log(`📊 Table: ${this.table}`);
+      
+      // First, let's test if the table exists and we can query it
+      console.log('🔍 Testing basic query without join...');
+      const { data: testData, error: testError } = await this.supabase
+        .from(this.table)
+        .select('booking_id, user_id, type')
+        .eq('user_id', userId)
+        .limit(1);
+      
+      console.log(`🔍 Basic test query result:`, testData);
+      console.log(`🔍 Basic test query error:`, testError);
+      
+      if (testError) {
+        console.error('❌ Basic query failed:', testError);
+        throw testError;
+      }
+      
+      // Now try with the join
+      console.log('🔍 Trying query WITH join...');
       const { data, error } = await this.supabase
         .from(this.table)
         .select(`
@@ -74,15 +96,46 @@ class BookingsRepository extends BaseRepository {
         `)
         .eq('user_id', userId);
       
+      console.log(`📥 Query completed`);
+      console.log(`   Error:`, error);
+      console.log(`   Error details:`, error?.message, error?.details, error?.hint);
+      console.log(`   Data count: ${data?.length || 0}`);
+      
       if (error) {
-        console.error('🔴 Database Error in findBookingsByUserId:', error);
-        throw error;
+        console.error('❌ Join query failed:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        });
+        
+        // If join fails, try without it
+        console.log('🔄 Falling back to query without join...');
+        const { data: simpleData, error: simpleError } = await this.supabase
+          .from(this.table)
+          .select('*')
+          .eq('user_id', userId);
+        
+        if (simpleError) {
+          console.error('❌ Simple query also failed:', simpleError);
+          throw simpleError;
+        }
+        
+        console.log(`✅ Simple query found ${simpleData?.length || 0} bookings`);
+        return simpleData || [];
       }
       
-      console.log('🔵 Bookings found with trip info:', data);
-      return data;
+      console.log(`✅ Join query found ${data?.length || 0} bookings`);
+      console.log('=== REPOSITORY: findBookingsByUserId END ===');
+      
+      return data || [];
+      
     } catch (error) {
-      console.error('🔴 Error in findBookingsByUserId:', error);
+      console.error('🔴 EXCEPTION in findBookingsByUserId:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       throw error;
     }
   }

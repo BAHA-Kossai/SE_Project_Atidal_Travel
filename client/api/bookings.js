@@ -2,10 +2,14 @@ import { request } from "./request";
 
 export const createBooking = async (bookingData) => { 
   try {
+    console.log('📤 Sending booking data:', JSON.stringify(bookingData, null, 2));
+    
     const result = await request("/api/bookings/create", {
       method: "POST",
       data: bookingData, 
     });
+
+    console.log('📥 Received response:', result);
 
     if (result.status >= 400) {
       throw new Error(result.message || `HTTP error! status: ${result.status}`);
@@ -13,6 +17,8 @@ export const createBooking = async (bookingData) => {
 
     return result;
   } catch (error) {
+    console.error('❌ API call failed:', error);
+    console.error('Request data was:', bookingData);
     throw error;
   }
 };

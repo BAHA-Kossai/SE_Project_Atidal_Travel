@@ -22,7 +22,7 @@ import UpdateBookingStatusUseCase from "../../core/usecases/Booking/UpdateBookin
 import BookingsRepository from "../../repositories/BookingsRepository.js";
 import BranchRepository from "../../repositories/BranchRepository.js";
 import CreateBookingUseCase from "../../core/usecases/Booking/CreateBookingUseCase.js";
-import GetUserBookingsUseCase from "../../core/usecases/Booking/GetBookingUseCase.js";
+import GetUserBookingsUseCase from "../../core/usecases/Booking/GetUserBookingsUseCase.js";
 import PayerRepository from "../../repositories/PayerRepository.js";
 import TravelersRepository from "../../repositories/TravelersRepository.js";
 import TripInfoRepository from "../../repositories/TripInfoRepository.js";
