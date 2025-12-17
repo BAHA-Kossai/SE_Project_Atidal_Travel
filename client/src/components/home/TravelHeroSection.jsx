@@ -7,23 +7,9 @@ const TravelHeroSection = ({
   image = DefaultImage,
   title = "Get the best sejour",
   subtitle = "Enjoy your travel journey",
-  hideSearch = false
 }) => {
-  const [destination, setDestination] = useState('');
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-const Navigate= useNavigate();
-  const handleSearch = () => {
-    console.log('Searching for:', destination);
-  };
 
-  const destinations = [
-    'Paris, France',
-    'Tokyo, Japan',
-    'New York, USA',
-    'Dubai, UAE',
-    'London, UK',
-    'Barcelona, Spain'
-  ];
+const Navigate= useNavigate();
 
   return (
     <div className="min-h-screen relative overflow-hidden">
