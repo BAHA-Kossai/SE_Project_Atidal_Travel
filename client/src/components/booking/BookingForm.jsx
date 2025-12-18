@@ -247,32 +247,63 @@ export default function BookingForm() {
       return;
     }
 
+    const formatTime = (timeString) => {
+      if (!timeString) return '';
+      if (timeString.includes(':') && timeString.split(':').length === 3) {
+        return timeString.substring(0, 5); 
+      }
+      return timeString; 
+    };
+
     const bookingData = {
-      // Trip type information for backend
-      trip_type: isUmrahBooking ? 'umrah' : isGroupTripBooking ? 'group' : 'destinations',
-      package_info: packageData || null,
-      group_trip_info: groupTripData || null,
+      type: isUmrahBooking ? 'umrah' : isGroupTripBooking ? 'guided_trip' : 'normal',
       
-      // Trip details
-      type: isUmrahBooking ? 'umrah' : isGroupTripBooking ? 'group' : 'destinations',
       price: Number(bookingInfo.price) || 0,
+      
       trip_date: bookingInfo.trip_date,
       returning_date: bookingInfo.returning_date || bookingInfo.trip_date,
-      departure_time: bookingInfo.departure_time,
-      returning_time: bookingInfo.returning_time,
+      
+      departure_time: formatTime(bookingInfo.departure_time),
+      returning_time: formatTime(bookingInfo.returning_time),
+      
       destination_country: bookingInfo.destination_country,
-      destination_city: bookingInfo.destination_city || 'none',
+      destination_city: bookingInfo.destination_city || '',
+      
       no_hotel_needed: bookingInfo.no_hotel_needed,
       hotel_stars: bookingInfo.no_hotel_needed ? null : bookingInfo.hotel_stars,
+      
       duration_days: Number(bookingInfo.duration_days) || 7,
       needs_visa_assistance: bookingInfo.needs_visa_assistance,
       booking_status: 'pending',
       
-      // Get user ID from localStorage
       user_id: JSON.parse(localStorage.getItem('user'))?.id || JSON.parse(localStorage.getItem('user'))?.user_id,
       
       branch_id: null,
       guide_id: null,
+
+      ...(isUmrahBooking && packageData && {
+        package_info: {
+          package_id: packageData.id || packageData._id,
+          package_type: packageData.type || 'standard',
+          package_name: packageData.name || 'Umrah Package',
+          ...(packageData.TripInfo && {
+            duration: packageData.TripInfo.duration,
+            included_services: packageData.TripInfo.included_services || []
+          })
+        }
+      }),
+
+      ...(isGroupTripBooking && packageData && {
+        group_trip_info: {
+          group_trip_id: packageData.id || packageData._id,
+          trip_name: packageData.name || packageData.TripInfo?.destination_city || 'Group Trip',
+          ...(packageData.TripInfo && {
+            guide_included: packageData.TripInfo.guide_included || false,
+            max_participants: packageData.TripInfo.max_participants,
+            current_participants: packageData.TripInfo.current_participants
+          })
+        }
+      }),
 
       payer_info: {
         first_name: payerInfo.first_name,
@@ -301,18 +332,28 @@ export default function BookingForm() {
       }))
     };
 
+    console.log('Submitting booking data:', bookingData);
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || (!user.id && !user.user_id)) {
+      setError('You must be logged in to create a booking');
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+      return;
+    }
+
     try {
       await submitBooking(bookingData);
       setShowSuccess(true);
       setTimeout(() => {
-        navigate('/'); // Redirect to home page after 3 seconds
+        navigate('/'); 
       }, 3000);
     } catch (err) {
-      // Error is handled by the hook
+      console.error('Booking submission failed:', err);
     }
   };
 
-  // Success message component
   if (showSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
@@ -334,7 +375,6 @@ export default function BookingForm() {
     );
   }
 
-  // Step indicator
   const steps = [
     { number: 1, title: 'Trip Details' },
     { number: 2, title: 'Payer Info' },
