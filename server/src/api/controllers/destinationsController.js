@@ -12,7 +12,7 @@
  * @author      Ahlem Toubrinet, Abderahim
  * @version     1.0.0
  * @date        2025-11-17
- * @lastModified 2025-11-25
+ * @lastModified 2025-12-26
  */
 
 import GetAllDestinationsUseCase from '../../core/usecases/Destinations/GetAllDestinationsUseCase.js';
@@ -20,6 +20,7 @@ import SearchDestinationsUseCase from '../../core/usecases/Destinations/SearchDe
 import GetFeaturedDestinationsUseCase from '../../core/usecases/Destinations/GetFeaturedDestinationsUseCase.js'; 
 import DestinationsRepository from '../../repositories/DestinationsRepository.js';
 import supabase from '../../config/supabase.js';
+import { uploadImageToSupabase, deleteImageFromSupabase } from '../../utils/supabaseUpload.js';
 
 const destinationsRepository = new DestinationsRepository(supabase);
 
@@ -94,7 +95,10 @@ class DestinationsController {
 
   async createDestination(req, res) {
     try {
-      const { destination_pic, destination_country, description, destination_city } = req.body;
+      console.log('[Create] Incoming req.body:', req.body);
+      const { destination_country, description, destination_city } = req.body;
+      let { created_by } = req.body;
+      const pictureFile = req.file;
 
       if (!destination_country || !destination_city) {
         return res.status(400).json({
@@ -103,6 +107,13 @@ class DestinationsController {
           message: "Missing required fields: destination_country, destination_city"
         });
       }
+
+      // Ensure created_by is always a non-empty string
+      if (!created_by || !created_by.trim()) {
+        created_by = "admin";
+      }
+
+      console.log(`[Create] Creating destination: ${destination_city}, ${destination_country}, created_by: ${created_by}`);
 
       const existingDestination = await destinationsRepository.searchDestinationsByCountry(destination_country);
       const duplicate = existingDestination.find(
@@ -117,12 +128,33 @@ class DestinationsController {
         });
       }
 
+      let imageUrl = null;
+
+      // Upload image if provided
+      if (pictureFile) {
+        try {
+          console.log(`[Create] Uploading image: ${pictureFile.originalname}`);
+          imageUrl = await uploadImageToSupabase(pictureFile, 'destinations');
+          console.log(`[Create] Image uploaded: ${imageUrl}`);
+        } catch (uploadError) {
+          console.error('[Create] Image upload failed:', uploadError.message);
+          return res.status(400).json({
+            status: "error",
+            data: null,
+            message: `Image upload failed: ${uploadError.message}`
+          });
+        }
+      }
+
       const destination = await destinationsRepository.createDestination({
-        destination_pic,
+        destination_pic: imageUrl,
         destination_country,
         description,
-        destination_city
+        destination_city,
+        created_by
       });
+
+      console.log(`[Create] Destination created successfully`);
 
       res.status(201).json({
         status: "success",
@@ -130,6 +162,7 @@ class DestinationsController {
         message: "Destination created successfully"
       });
     } catch (error) {
+      console.error('[Create] Error:', error.message);
       res.status(500).json({
         status: "error",
         data: null,
@@ -169,7 +202,10 @@ class DestinationsController {
   async updateDestination(req, res) {
     try {
       const { id } = req.params;
-      const { destination_pic, destination_country, description, destination_city } = req.body;
+      const { destination_country, description, destination_city } = req.body;
+      const pictureFile = req.file;
+
+      console.log(`[Update] Updating destination: ${id}`);
 
       const existingDestination = await destinationsRepository.getDestinationById(id);
       if (!existingDestination) {
@@ -180,12 +216,40 @@ class DestinationsController {
         });
       }
 
+      let imageUrl = existingDestination.destination_pic;
+
+      // Handle image replacement
+      if (pictureFile) {
+        try {
+          console.log(`[Update] Uploading new image: ${pictureFile.originalname}`);
+          
+          // Delete old image if exists
+          if (existingDestination.destination_pic) {
+            console.log(`[Update] Deleting old image`);
+            await deleteImageFromSupabase(existingDestination.destination_pic);
+          }
+
+          // Upload new image
+          imageUrl = await uploadImageToSupabase(pictureFile, 'destinations');
+          console.log(`[Update] Image updated: ${imageUrl}`);
+        } catch (uploadError) {
+          console.error('[Update] Image upload failed:', uploadError.message);
+          return res.status(400).json({
+            status: "error",
+            data: null,
+            message: `Image upload failed: ${uploadError.message}`
+          });
+        }
+      }
+
       const destination = await destinationsRepository.updateDestination(id, {
-        destination_pic,
-        destination_country,
-        description,
-        destination_city
+        destination_pic: imageUrl,
+        destination_country: destination_country || existingDestination.destination_country,
+        description: description || existingDestination.description,
+        destination_city: destination_city || existingDestination.destination_city
       });
+
+      console.log(`[Update] Destination updated successfully`);
 
       res.json({
         status: "success",
@@ -193,6 +257,7 @@ class DestinationsController {
         message: "Destination updated successfully"
       });
     } catch (error) {
+      console.error('[Update] Error:', error.message);
       res.status(500).json({
         status: "error",
         data: null,

@@ -19,6 +19,7 @@
 
 import AssignBranchUseCase from "../../core/usecases/Booking/AssignBranchUseCase.js";
 import UpdateBookingStatusUseCase from "../../core/usecases/Booking/UpdateBookingStatusUseCase.js";
+import GetAllBookingsUseCase from "../../core/usecases/Booking/GetAllBookingsUseCase.js";
 import BookingsRepository from "../../repositories/BookingsRepository.js";
 import BranchRepository from "../../repositories/BranchRepository.js";
 import CreateBookingUseCase from "../../core/usecases/Booking/CreateBookingUseCase.js";
@@ -94,6 +95,50 @@ class BookingsController {
       res.status(500).json({
         status: "error",
         data: null, // Don't put error object in data field
+        message: error.message,
+      });
+    }
+  }
+
+  async getAllBookings(req, res) {
+    try {
+      const filters = {
+        user_id: req.query.user_id,
+        status: req.query.status,
+        branch_id: req.query.branch_id,
+        date_from: req.query.date_from,
+        date_to: req.query.date_to,
+        limit: req.query.limit || 50,
+        offset: req.query.offset || 0
+      };
+
+      const useCase = new GetAllBookingsUseCase({
+        bookingRepository: bookingsRepository,
+        tripInfoRepository: tripInfoRepository
+      });
+
+      const result = await useCase.execute(filters);
+
+      if (!result.success) {
+        return res.status(400).json({
+          status: "error",
+          data: null,
+          message: result.error,
+        });
+      }
+
+      res.json({
+        status: "success",
+        data: result.data.bookings,
+        total: result.data.total,
+        limit: result.data.limit,
+        offset: result.data.offset,
+        message: "Bookings retrieved successfully",
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        data: null,
         message: error.message,
       });
     }

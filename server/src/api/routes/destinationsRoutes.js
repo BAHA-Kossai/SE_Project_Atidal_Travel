@@ -9,6 +9,7 @@
 
 import express from "express";
 import destinationsController from "../controllers/destinationsController.js";
+import { upload } from "../middlewares/uploadMiddleware.js";
 console.log('Destinations routes loaded'); 
 const router = express.Router();
 
@@ -19,10 +20,10 @@ router.get("/search", destinationsController.searchDestinations);
 router.get("/:id", destinationsController.getDestinationById);
 
 // POST route
-router.post("/", destinationsController.createDestination);
+router.post("/", upload.single('picture'), destinationsController.createDestination);
 
 // PUT route
-router.put("/:id", destinationsController.updateDestination);
+router.put("/:id", upload.single('picture'), destinationsController.updateDestination);
 
 // DELETE route
 router.delete("/:id", destinationsController.deleteDestination);

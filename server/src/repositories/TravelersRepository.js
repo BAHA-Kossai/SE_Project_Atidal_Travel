@@ -40,12 +40,67 @@ class TravelersRepository extends BaseRepository {
     this.primaryKey = 'traveler_id';
   }
 
-  // Create a new traveler
+  // Get all travelers with pagination and filtering
+  async getAllTravelers(filters = {}) {
+    let query = this.supabase.from(this.table).select('*');
+    
+    if (filters.booking_id) {
+      query = query.eq('booking_id', filters.booking_id);
+    }
+    if (filters.traveler_id) {
+      query = query.eq('traveler_id', filters.traveler_id);
+    }
+    if (filters.first_name) {
+      query = query.ilike('first_name', `%${filters.first_name}%`);
+    }
+    if (filters.last_name) {
+      query = query.ilike('last_name', `%${filters.last_name}%`);
+    }
+    
+    if (filters.limit) {
+      query = query.limit(filters.limit);
+    }
+    if (filters.offset) {
+      query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1);
+    }
+    
+    const { data, error } = await query;
+    if (error) throw error;
+    return data;
+  }
+
+  // Get single traveler by ID
+  async getTravelerById(travelerId) {
+    return this.getById(this.primaryKey, travelerId);
+  }
+
+  // Get travelers by booking ID
+  async getTravelersByBookingId(bookingId) {
+    const { data, error } = await this.supabase
+      .from(this.table)
+      .select('*')
+      .eq('booking_id', bookingId);
+    
+    if (error) throw error;
+    return data;
+  }
+
+  // Create traveler
   async createTraveler(travelerData) {
     return this.create(travelerData);
   }
 
-  // Create multiple travelers in batch
+  // Update traveler by ID
+  async updateTraveler(travelerId, updates) {
+    return this.update(this.primaryKey, travelerId, updates);
+  }
+
+  // Delete traveler by ID
+  async deleteTraveler(travelerId) {
+    return this.delete(this.primaryKey, travelerId);
+  }
+
+  // Legacy methods for backward compatibility
   async createTravelersBatch(travelersData) {
     const { data, error } = await this.supabase
       .from(this.table)
@@ -55,7 +110,6 @@ class TravelersRepository extends BaseRepository {
     if (error) throw error;
     return data;
   }
-
 
   // Find travelers by payer_booking_id (if you want to keep the original relationship)
   async findTravelersByPayerBookingId(bookingId) {
