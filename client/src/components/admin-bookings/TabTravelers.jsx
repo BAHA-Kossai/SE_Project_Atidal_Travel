@@ -2,11 +2,13 @@ import WhiteContainer from "../WhiteContainer.jsx";
 import SearchBar from "../SearchBar.jsx";
 import ButtonOutline from "../ButtonOutline.jsx";
 import {ArrowUpDown, SlidersHorizontal, X} from "lucide-react";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import Table from "../Table.jsx";
 import ModalDialog from "../ModalDialog.jsx";
 import ButtonFill from "../ButtonFill.jsx";
 import TableEntryModal from "../TableEntryModal.jsx";
+import { useTravelers } from "../../../hooks/useTravelers.js";
+import Swal from "sweetalert2";
 
 export const TabTravelers = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -36,44 +38,64 @@ export const TabTravelers = () => {
 
 
 const TravelersTable = ({searchQuery}) => {
+    // Use API hook to fetch travelers from backend
+    const { travelers, loading, error, remove, refetch } = useTravelers();
     const [selectedTraveler, setSelectedTraveler] = useState(null);
     const [isEntryModalOpen, setIsEntryModalOpen] = useState(false);
-    const [travelers, setTravelers] = useState([
-        {
-            traveler_id: "#CR000123",
-            payer_id: "#CR000123",
-            payer: {
-                first_name: "Younes",
-                last_name: "Toufiq",
-            },
-            booking_id: "#CR000123",
-            created_at: "2025-02-14T13:45:30.123+00:00",
-            first_name: "Mohamed",
-            last_name: "Mahmoudi",
-            age: 23,
-            identity_number: 20323424,
-            traveler_contact: "2032342340",
-            passport_number: "40654630343",
-            gender: "Male"
-        },
-    ]);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+
+    // Show loading state
+    if (loading) {
+        return (
+            <div className="text-center py-8">
+                <p className="text-gray-500">Loading travelers...</p>
+            </div>
+        );
+    }
+
+    // Show error state
+    if (error) {
+        return (
+            <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                {error}
+            </div>
+        );
+    }
+
+    const handleDelete = async (id) => {
+        try {
+            setDeleteLoading(true);
+            await remove(id);
+            setIsDeleteModalOpen(false);
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Traveler deleted successfully',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } catch (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: err.message || 'Failed to delete traveler'
+            });
+        } finally {
+            setDeleteLoading(false);
+        }
+    };
 
     const filteredTravelers = travelers.filter((traveler) => {
         const query = searchQuery.toLowerCase();
         return (
-            traveler.first_name.toLowerCase().includes(query) ||
-            traveler.last_name.toLowerCase().includes(query) ||
-            traveler.age.toString().includes(query) ||
-            traveler.identity_number.toString().toLowerCase().includes(query) ||
-            traveler.passport_number.toLowerCase().includes(query)
+            (traveler.first_name || '').toLowerCase().includes(query) ||
+            (traveler.last_name || '').toLowerCase().includes(query) ||
+            (traveler.age || '').toString().includes(query) ||
+            (traveler.identity_number || '').toString().toLowerCase().includes(query) ||
+            (traveler.passport_number || '').toLowerCase().includes(query)
         )
-    })
-
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const handleDelete = (id) => {
-        setTravelers(travelers.filter(traveler => traveler["traveler_id"] !== id));
-        setIsDeleteModalOpen(false);
-    };
+    });
 
     return (
         <>
@@ -178,8 +200,10 @@ const TravelersTable = ({searchQuery}) => {
                     </h1>
                 </div>
                 <div className={"grid grid-cols-2 gap-4 mt-8"}>
-                    <ButtonFill onClick={() => handleDelete(selectedTraveler?.["traveler_id"])}>Yes</ButtonFill>
-                    <ButtonOutline onClick={() => setIsDeleteModalOpen(false)}>No</ButtonOutline>
+                    <ButtonFill onClick={() => handleDelete(selectedTraveler?.["traveler_id"])} disabled={deleteLoading}>
+                        {deleteLoading ? 'Deleting...' : 'Yes'}
+                    </ButtonFill>
+                    <ButtonOutline onClick={() => setIsDeleteModalOpen(false)} disabled={deleteLoading}>No</ButtonOutline>
                 </div>
             </ModalDialog>
 

@@ -11,6 +11,7 @@ import TableEntryModal from "../TableEntryModal.jsx";
 
 //----for api req
 import { useAdminHandlers } from "../../../hooks/useAdminHandlers.js";
+import Swal from "sweetalert2";
 
 export default function TabAdmins() {
   const {
@@ -22,8 +23,17 @@ export default function TabAdmins() {
     message,
   } = useAdminHandlers();
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    handleFetchAdmins().catch((err) => console.error(err));
+    handleFetchAdmins().catch((err) => {
+      console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err.message || 'Failed to fetch admins'
+      });
+    });
   }, []);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -38,6 +48,7 @@ export default function TabAdmins() {
   const handleEditSubmit = async () => {
     try {
       if (!selectedAdmin) return;
+      setLoading(true);
 
       // Call the update handler
       await handleUpdateAdmin(selectedAdmin.user_id, formData);
@@ -57,9 +68,24 @@ export default function TabAdmins() {
         phone: "",
         date_of_birth: "",
       });
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Admin updated successfully',
+        timer: 2000,
+        showConfirmButton: false
+      });
     } catch (err) {
       console.error("Failed to update admin:", err);
       setErrorMessage(err.message || "Something went wrong");
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err.message || 'Failed to update admin'
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -95,13 +121,11 @@ export default function TabAdmins() {
 
   const AddEmployee = async (employee) => {
     try {
-      const newAdmin = await handleCreateAdmin(employee); // call the API
-
-      // Use the database object for your table/state
-      const adminToAdd = newAdmin.database;
+      setLoading(true);
+      await handleCreateAdmin(employee); // call the API
 
       // Add it to state
-      handleFetchAdmins().catch((err) => console.error(err));
+      await handleFetchAdmins();
       // Reset modal and form
       setIsAddModalOpen(false);
       setFormData({
@@ -112,9 +136,24 @@ export default function TabAdmins() {
         phone: "",
         date_of_birth: "",
       });
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Admin created successfully',
+        timer: 2000,
+        showConfirmButton: false
+      });
     } catch (err) {
       console.error("Failed to add admin:", err.message);
       setErrorMessage(err.message || "Something went wrong");
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err.message || 'Failed to create admin'
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -281,12 +320,13 @@ export default function TabAdmins() {
 
           {/* Add/Cancel Buttons */}
           <div className={"grid grid-cols-2 gap-4"}>
-            <ButtonFill width="full" onClick={() => AddEmployee(formData)}>
-              Add Admin
+            <ButtonFill width="full" onClick={() => AddEmployee(formData)} disabled={loading}>
+              {loading ? 'Adding...' : 'Add Admin'}
             </ButtonFill>
             <ButtonOutline
               width="full"
               onClick={() => setIsAddModalOpen(false)}
+              disabled={loading}
             >
               Cancel
             </ButtonOutline>
@@ -342,10 +382,10 @@ export default function TabAdmins() {
         </div>
 
         <div className={"grid grid-cols-2 gap-4 mt-6"}>
-          <ButtonFill width="full" onClick={handleEditSubmit}>
-            Save Changes
+          <ButtonFill width="full" onClick={handleEditSubmit} disabled={loading}>
+            {loading ? 'Saving...' : 'Save Changes'}
           </ButtonFill>
-          <ButtonOutline width="full" onClick={() => setIsEditModalOpen(false)}>
+          <ButtonOutline width="full" onClick={() => setIsEditModalOpen(false)} disabled={loading}>
             Cancel
           </ButtonOutline>
         </div>
@@ -364,17 +404,33 @@ export default function TabAdmins() {
           <ButtonFill
             onClick={async () => {
               try {
+                setLoading(true);
                 await handleDeleteAdmin(selectedAdmin.user_id);
                 await handleFetchAdmins();
                 setIsDeleteModalOpen(false);
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Success!',
+                  text: 'Admin deleted successfully',
+                  timer: 2000,
+                  showConfirmButton: false
+                });
               } catch (err) {
                 console.error(err);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: err.message || 'Failed to delete admin'
+                });
+              } finally {
+                setLoading(false);
               }
             }}
+            disabled={loading}
           >
-            Yes
+            {loading ? 'Deleting...' : 'Yes'}
           </ButtonFill>
-          <ButtonOutline onClick={() => setIsDeleteModalOpen(false)}>
+          <ButtonOutline onClick={() => setIsDeleteModalOpen(false)} disabled={loading}>
             No
           </ButtonOutline>
         </div>

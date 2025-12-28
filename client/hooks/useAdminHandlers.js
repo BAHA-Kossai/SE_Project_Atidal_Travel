@@ -8,10 +8,7 @@ export function useAdminHandlers() {
   const handleFetchAdmins = async () => {
     try {
       setAdmins([]);
-      const accessToken = localStorage.getItem("accessToken");
-      if (!accessToken) throw new Error("No access token found");
-
-      const res = await getAllAdmins(accessToken);
+      const res = await getAllAdmins();
 
       if (res.status !== "success") {
         setMessage(res.message || "Failed to fetch admins");
@@ -30,10 +27,7 @@ export function useAdminHandlers() {
  // Create a new admin
   const handleCreateAdmin = async (adminData) => {
     try {
-      const accessToken = localStorage.getItem("accessToken");
-      if (!accessToken) throw new Error("No access token found");
-  
-      const res = await createAdmin(accessToken, adminData);
+      const res = await createAdmin(adminData);
       
       if (res.status !== "success") {
         setMessage(res.message || "Failed to create admin");
@@ -52,8 +46,7 @@ export function useAdminHandlers() {
 
   const handleDeleteAdmin = async (adminId) => {
     try {
-      const accessToken = localStorage.getItem("accessToken");
-      const res = await deleteAdmin(accessToken, adminId);
+      const res = await deleteAdmin(adminId);
 
       if (res.status !== "success") {
         throw new Error(res.message || "Failed to delete admin");
@@ -71,10 +64,7 @@ export function useAdminHandlers() {
 
   const handleUpdateAdmin = async (adminId, updateData) => {
   try {
-    const accessToken = localStorage.getItem("accessToken");
-    if (!accessToken) throw new Error("No access token found");
-
-    const res = await updateAdmin(accessToken, adminId, updateData);
+    const res = await updateAdmin(adminId, updateData);
 
     if (res.status !== "success") {
       throw new Error(res.message || "Failed to update admin");
