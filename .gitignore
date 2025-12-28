@@ -7,22 +7,25 @@ client/.vite/
 client/build/
 server/build/
 
-# IDE and editor specific files
+# Editor & IDE
 .idea/
 .vscode/
 
-# Log files
+# Editor history / auto-backup files
+.history/
+client/.history/
+server/.history/
+
+# Logs
 logs/
 *.log
 
-# Operating System specific files
-.DS_Store          # macOS
-Thumbs.db          # Windows
+# OS files
+.DS_Store
+Thumbs.db
 
 # Environment variables (do not commit sensitive data)
 .env
 .env.local
 .env.*.local
-# Package lock files (optional if you want to commit them)
-# client/package-lock.json
-# server/package-lock.json
+*.env
