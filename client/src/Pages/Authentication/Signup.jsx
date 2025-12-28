@@ -14,15 +14,35 @@ const Signup = () => {
 
   const [errors, setErrors] = useState({});
 
+  // Track password requirements
+  const [passwordRequirements, setPasswordRequirements] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    specialChar: false
+  });
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
-    // Clear error when user starts typing
+
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: '' }));
+    }
+
+    // Update password requirements
+    if (name === 'password') {
+      setPasswordRequirements({
+        length: value.length >= 8,
+        uppercase: /[A-Z]/.test(value),
+        lowercase: /[a-z]/.test(value),
+        number: /[0-9]/.test(value),
+        specialChar: /[!@#$%^&*(),.?":{}|<>]/.test(value)
+      });
     }
   };
 
@@ -37,8 +57,12 @@ const Signup = () => {
     
     if (!formData.password) {
       newErrors.password = 'Password is required';
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
+    } else {
+      // Check all requirements
+      const { length, uppercase, lowercase, number, specialChar } = passwordRequirements;
+      if (!length || !uppercase || !lowercase || !number || !specialChar) {
+        newErrors.password = 'Password does not meet all requirements';
+      }
     }
     
     if (!formData.confirmPassword) {
@@ -69,8 +93,8 @@ const Signup = () => {
     <Layout>
       <div className="min-h-screen bg-white flex items-center justify-center px-4 py-8">
         <div className="w-full max-w-[1312px] bg-white border border-[#e2e5e9] rounded-3xl overflow-hidden relative">
-          {/* Decorative airplane path - hidden on mobile */}
-          <div className="hidden lg:block absolute left-10 top-[120px] pointer-events-none" >
+          {/* Decorative airplane path */}
+          <div className="hidden lg:block absolute left-10 top-[120px] pointer-events-none">
             <img src={signupPath} alt="" className="w-[654px] h-[581px]" />
           </div>
 
@@ -136,6 +160,25 @@ const Signup = () => {
                     {errors.password && (
                       <p className="text-sm text-red-500 mt-1">{errors.password}</p>
                     )}
+
+                    {/* Password Requirements */}
+                    <ul className="text-sm mt-2 space-y-1">
+                      <li className={passwordRequirements.length ? 'text-green-600' : 'text-gray-400'}>
+                        * At least 8 characters
+                      </li>
+                      <li className={passwordRequirements.uppercase ? 'text-green-600' : 'text-gray-400'}>
+                        * At least 1 uppercase letter
+                      </li>
+                      <li className={passwordRequirements.lowercase ? 'text-green-600' : 'text-gray-400'}>
+                        * At least 1 lowercase letter
+                      </li>
+                      <li className={passwordRequirements.number ? 'text-green-600' : 'text-gray-400'}>
+                        * At least 1 number
+                      </li>
+                      <li className={passwordRequirements.specialChar ? 'text-green-600' : 'text-gray-400'}>
+                        * At least 1 special character
+                      </li>
+                    </ul>
                   </div>
 
                   {/* Confirm Password Field */}
