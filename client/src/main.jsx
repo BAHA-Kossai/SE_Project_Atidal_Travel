@@ -31,7 +31,7 @@ createRoot(rootElement).render(
         <BrowserRouter>
             <Routes>
                 {/* User Side */}
-                <Route path="/" element={<HomePage/>} />
+                <Route path="/" element={<Profile/>} />
                 <Route path="/umrah" element={<UmrahPage/>} />
                 <Route path="/group-trip" element={<GroupTrip/>} />
                 <Route path="/branches" element={<Branches/>} />
