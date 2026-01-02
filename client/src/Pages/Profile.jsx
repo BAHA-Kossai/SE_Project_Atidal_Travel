@@ -1,16 +1,117 @@
-import React, { useState } from "react";
-import { Search, ArrowUpDown, Filter, Star, Eye, EyeOff } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Search, ArrowUpDown, Filter, Star, CheckCircle, XCircle } from "lucide-react";
 import Layout from "../components/layout/Layout";
+import Table from "../components/Table.jsx"; 
+import { useAuthHandlers } from "../../hooks/useAuthHandlers.js";
+import { useUserHandlers } from "../../hooks/useUserHandlers.js";
+import { useUserBookings } from "../../hooks/useUserBookings.js";
+import { useRating } from "../../hooks/useRating.js";
 
 export default function Profile() {
-  // Mock user data
-  const [profileData, setProfileData] = useState({
-    email: "user@example.com",
-    first_name: "John",
-    last_name: "Doe",
-    phone: "+1234567890",
-    date_of_birth: "1990-01-01",
-    password: "mypassword123"
+  const { handleSignOut } = useAuthHandlers();
+  const { handleDeleteUser } = useUserHandlers();
+  
+  // Initialize rating hook
+  const { loading: ratingLoading, error: ratingError, success: ratingSuccess, submitRating } = useRating();
+  
+  const accessToken = localStorage.getItem("accessToken");
+  const refreshToken = localStorage.getItem("refreshToken");
+  const userData = localStorage.getItem("user");
+  
+  const storedProfile = userData ? JSON.parse(userData) : null;
+  
+  const userId = storedProfile?.database?.id || storedProfile?.user_id || storedProfile?.id || storedProfile?.supabase_id;
+
+  const { bookings: userBookings, loading: bookingsLoading, error: bookingsError } = useUserBookings(userId);
+
+  const getProfileData = () => {
+    if (!storedProfile) {
+      return {
+        email: "",
+        first_name: "",
+        last_name: "",
+        phone: "",
+        date_of_birth: "",
+      };
+    }
+
+    if (storedProfile.supabase && storedProfile.database) {
+      return {
+        email: storedProfile.supabase.email,
+        first_name: storedProfile.supabase.first_name,
+        last_name: storedProfile.supabase.last_name,
+        phone: storedProfile.database.phone,
+        date_of_birth: storedProfile.supabase.date_of_birth,
+        user_id: storedProfile.database.id,
+        supabase_id: storedProfile.database.supabase_id
+      };
+    } else if (storedProfile.email) {
+      return {
+        email: storedProfile.email,
+        first_name: storedProfile.first_name,
+        last_name: storedProfile.last_name,
+        phone: storedProfile.phone,
+        date_of_birth: storedProfile.date_of_birth,
+        user_id: storedProfile.user_id || storedProfile.id
+      };
+    } else {
+      return storedProfile;
+    }
+  };
+
+  const [profileData, setProfileData] = useState(getProfileData());
+
+  const [searchQuery, setSearchQuery] = useState("");
+  const [rating, setRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [feedback, setFeedback] = useState("");
+  const [focusedField, setFocusedField] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [feedbackList, setFeedbackList] = useState([]);
+  
+  // Add state for API feedback message
+  const [apiFeedbackMessage, setApiFeedbackMessage] = useState({
+    show: false,
+    type: '', // 'success' or 'error'
+    message: ''
+  });
+
+  const hasUserData = profileData && (profileData.email || profileData.first_name);
+
+  const transformBookingsData = (bookings) => {
+    
+    if (!bookings || !Array.isArray(bookings)) {
+      return [];
+    }
+    
+    return bookings.map((booking) => {
+      const tripInfo = booking.TripInfo || {};
+      
+      return {
+        id: booking.booking_id,
+        booking_id: booking.booking_id,
+        destination_city: tripInfo.destination_city || 'Not specified',
+        destination_country: tripInfo.destination_country || 'Not specified',
+        trip_date: tripInfo.trip_date || booking.trip_date || 'Not specified',
+        booking_status: booking.booking_status || 'pending',
+        type: booking.type || 'normal',
+        rawBooking: booking
+      };
+    });
+  };
+
+  const filteredBookings = transformBookingsData(userBookings).filter((booking) => {
+    if (!searchQuery) return true;
+
+    const searchLower = searchQuery.toLowerCase();
+    return (
+      booking.booking_id.toString().includes(searchLower) ||
+      booking.destination_city.toLowerCase().includes(searchLower) ||
+      booking.destination_country.toLowerCase().includes(searchLower) ||
+      booking.trip_date.toLowerCase().includes(searchLower) ||
+      booking.booking_status.toLowerCase().includes(searchLower) ||
+      booking.type.toLowerCase().includes(searchLower)
+    );
   });
 
   // Mock bookings data with test rows
@@ -82,43 +183,102 @@ export default function Profile() {
     alert("Signing out...");
   };
 
+  // UPDATED: Handle feedback submission with backend API
+  const handleSubmitFeedback = async () => {
+    // Clear any previous feedback messages
+    setApiFeedbackMessage({ show: false, type: '', message: '' });
+
+    // Validation (no username needed)
+    if (rating === 0) {
+      setApiFeedbackMessage({
+        show: true,
+        type: 'error',
+        message: 'Please select a rating'
+      });
+      return;
+    }
+
+    if (!feedback.trim()) {
+      setApiFeedbackMessage({
+        show: true,
+        type: 'error',
+        message: 'Please enter your feedback'
+      });
+      return;
+    }
+
+    try {
+      // Get user_id from profile (like booking API)
+      const userId = profileData.user_id;
+      
+      if (!userId) {
+        throw new Error('User ID not found. Please make sure you are logged in.');
+      }
+
+      // Prepare rating data for backend (like booking API pattern)
+      const ratingData = {
+        user_id: userId,
+        comment: feedback.trim(),
+        rating: rating,
+        // created_at will be added by the hook
+      };
+
+      console.log('📤 Submitting rating data:', ratingData);
+
+      // Call the API using your hook
+      const result = await submitRating(ratingData);
+      
+      console.log('✅ Rating submitted successfully:', result);
+
+      // Success - show success message
+      setApiFeedbackMessage({
+        show: true,
+        type: 'success',
+        message: 'Thank you for your feedback! It has been submitted for approval.'
+      });
+      
+      // Reset form
+      setRating(0);
+      setHoverRating(0);
+      setFeedback("");
+      
+      // Also update local feedback list for display
+      const newFeedback = {
+        name: `${profileData.first_name || ''} ${profileData.last_name || ''}`.trim() || 'You',
+        rating: rating,
+        feedback: feedback.trim(),
+        timestamp: new Date().toISOString(),
+        approved: false, // Pending approval from admin
+      };
+      
+      setFeedbackList((prev) => [newFeedback, ...prev]);
+      
+    } catch (error) {
+      console.error('❌ Error submitting feedback:', error);
+      setApiFeedbackMessage({
+        show: true,
+        type: 'error',
+        message: error.message || 'Failed to submit feedback. Please try again.'
+      });
+    }
+  };
+
+  // Auto-hide feedback message after 5 seconds
+  useEffect(() => {
+    if (apiFeedbackMessage.show) {
+      const timer = setTimeout(() => {
+        setApiFeedbackMessage({ show: false, type: '', message: '' });
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [apiFeedbackMessage.show]);
+
   const getUserInitials = () => {
-    if (profileData.first_name && profileData.last_name) 
+    if (profileData.first_name && profileData.last_name) {
       return `${profileData.first_name[0]}${profileData.last_name[0]}`.toUpperCase();
-    return profileData.email ? profileData.email[0].toUpperCase() : "U";
-  };
-
-  // Filter and Sort functionality
-  const filteredAndSortedBookings = () => {
-    let filtered = userBookings.filter((booking) => {
-      const matchesSearch = !searchQuery || (
-        booking.booking_id.toString().includes(searchQuery.toLowerCase()) ||
-        booking.destination_city.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        booking.destination_country.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        booking.trip_date.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        booking.booking_status.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        booking.type.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-
-      const matchesFilter = !filterStatus || booking.booking_status === filterStatus;
-      return matchesSearch && matchesFilter;
-    });
-
-    return filtered.sort((a, b) => {
-      let aVal = a[sortBy];
-      let bVal = b[sortBy];
-
-      if (typeof aVal === 'string') aVal = aVal.toLowerCase();
-      if (typeof bVal === 'string') bVal = bVal.toLowerCase();
-
-      if (aVal < bVal) return sortOrder === "asc" ? -1 : 1;
-      if (aVal > bVal) return sortOrder === "asc" ? 1 : -1;
-      return 0;
-    });
-  };
-
-  const handleToggleSortOrder = () => {
-    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    }
+    return profileData.email ? profileData.email[0].toUpperCase() : 'U';
   };
 
   // Edit booking functionality
@@ -197,22 +357,92 @@ export default function Profile() {
               </div>
             </div>
 
-            {/* Profile Info */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
-              {["first_name", "last_name", "phone", "date_of_birth", "password"].map((field) => (
-                <div key={field} style={{ display: "flex", flexDirection: "column" }}>
-                  <label style={{ fontSize: "0.875rem", fontWeight: "500", color: "#495057", marginBottom: "0.5rem" }}>
-                    {field === "password" ? "Password" : field.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase())}
+            {/* Feedback Section - UPDATED WITH API INTEGRATION */}
+            <div
+              style={{
+                backgroundColor: "white",
+                borderRadius: "0.5rem",
+                boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                padding: "1.5rem",
+                marginBottom: "1.5rem",
+              }}
+            >
+              <h2 style={{ fontSize: "1.25rem", fontWeight: "600", color: "#212529", margin: "0 0 1.5rem 0" }}>
+                Share Your Feedback
+              </h2>
+
+              {/* API Feedback Messages */}
+              {apiFeedbackMessage.show && (
+                <div
+                  style={{
+                    padding: "1rem",
+                    borderRadius: "0.5rem",
+                    marginBottom: "1.5rem",
+                    backgroundColor: apiFeedbackMessage.type === 'success' ? '#d1fae5' : '#fee2e2',
+                    border: `1px solid ${apiFeedbackMessage.type === 'success' ? '#10b981' : '#ef4444'}`,
+                    color: apiFeedbackMessage.type === 'success' ? '#065f46' : '#991b1b',
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                  }}
+                >
+                  {apiFeedbackMessage.type === 'success' ? (
+                    <CheckCircle size={20} />
+                  ) : (
+                    <XCircle size={20} />
+                  )}
+                  <span>{apiFeedbackMessage.message}</span>
+                </div>
+              )}
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: "1fr",
+                  gap: "1.5rem",
+                  marginBottom: "1.5rem",
+                }}
+              >
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  <label
+                    style={{
+                      display: "block",
+                      fontSize: "0.875rem",
+                      fontWeight: "500",
+                      color: "#495057",
+                      marginBottom: "0.5rem",
+                    }}
+                  >
+                    Rating *
                   </label>
-                  {editing ? (
-                    field === "password" ? (
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", position: "relative" }}>
-                        <input
-                          type={showPassword ? "text" : "password"}
-                          value={profileData.password || ""}
-                          onChange={(e) => setProfileData({ ...profileData, password: e.target.value })}
-                          placeholder="Leave empty to keep current"
-                          style={{ padding: "0.625rem 1rem", borderRadius: "0.5rem", border: "1px solid #dee2e6", fontSize: "1rem", flex: 1 }}
+                  <div style={{ display: "flex", gap: "0.5rem" }}>
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        onMouseEnter={() => !ratingLoading && setHoverRating(star)}
+                        onMouseLeave={() => !ratingLoading && setHoverRating(0)}
+                        onClick={() => !ratingLoading && setRating(star)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          padding: "0",
+                          cursor: ratingLoading ? "not-allowed" : "pointer",
+                          opacity: ratingLoading ? 0.6 : 1,
+                        }}
+                        disabled={ratingLoading}
+                      >
+                        <Star
+                          size={28}
+                          style={{
+                            fill:
+                              star <= (hoverRating || rating)
+                                ? "#fbbf24"
+                                : "none",
+                            color:
+                              star <= (hoverRating || rating)
+                                ? "#fbbf24"
+                                : "#d1d5db",
+                          }}
                         />
                         <button
                           type="button"
@@ -255,28 +485,77 @@ export default function Profile() {
             </div>
           </div>
 
-          {/* Bookings Section */}
-          <div style={{ backgroundColor: "white", borderRadius: "0.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", padding: "1.5rem", marginBottom: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.25rem", fontWeight: "600", marginBottom: "1.5rem" }}>Booking History</h2>
-
-            {/* Search and Controls */}
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", gap: "1rem", flexWrap: "wrap" }}>
-              <div style={{ position: "relative", flex: "1", maxWidth: "320px" }}>
-                <Search style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#495057", pointerEvents: "none" }} size={20} />
-                <input
-                  type="text"
-                  placeholder="Search your bookings..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  style={{ width: "100%", padding: "0.5rem 1rem 0.5rem 2.5rem", borderRadius: "0.5rem", border: "1px solid #dee2e6" }}
+              <div style={{ marginBottom: "1.5rem" }}>
+                <label
+                  style={{
+                    display: "block",
+                    fontSize: "0.875rem",
+                    fontWeight: "500",
+                    color: "#495057",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  Your feedback *
+                </label>
+                <textarea
+                  placeholder="Share with us your feedback"
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  onFocus={() => setFocusedField("feedbackText")}
+                  onBlur={() => setFocusedField(null)}
+                  rows={6}
+                  style={{
+                    width: "100%",
+                    padding: "0.75rem 1rem",
+                    border: `1px solid ${
+                      focusedField === "feedbackText" ? "#212529" : "#dee2e6"
+                    }`,
+                    borderRadius: "0.5rem",
+                    fontSize: "1rem",
+                    color: "#212529",
+                    fontFamily: "inherit",
+                    resize: "none",
+                    transition: "border-color 0.2s",
+                    opacity: ratingLoading ? 0.6 : 1,
+                  }}
+                  disabled={ratingLoading}
                 />
               </div>
-              <div style={{ display: "flex", gap: "0.75rem" }}>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "1rem" }}>
+                {ratingLoading && (
+                  <div style={{ display: "flex", alignItems: "center", color: "#117BB8" }}>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-2"></div>
+                    <span>Submitting...</span>
+                  </div>
+                )}
                 <button
-                  onClick={handleToggleSortOrder}
-                  style={{ display: "flex", alignItems: "center", gap: "0.5rem", backgroundColor: "#117BB8", color: "white", padding: "0.5rem 1rem", border: "none", borderRadius: "0.5rem", cursor: "pointer" }}
+                  onClick={handleSubmitFeedback}
+                  disabled={ratingLoading}
+                  style={{
+                    backgroundColor: ratingLoading ? "#94a3b8" : "#117BB8",
+                    color: "white",
+                    padding: "0.625rem 2rem",
+                    border: "none",
+                    borderRadius: "0.5rem",
+                    fontSize: "1rem",
+                    fontWeight: "500",
+                    cursor: ratingLoading ? "not-allowed" : "pointer",
+                    transition: "background-color 0.2s",
+                    opacity: ratingLoading ? 0.7 : 1,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!ratingLoading) {
+                      e.currentTarget.style.backgroundColor = "#0d5a8a";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!ratingLoading) {
+                      e.currentTarget.style.backgroundColor = "#117BB8";
+                    }
+                  }}
                 >
-                  <ArrowUpDown size={18} /> {sortOrder === "asc" ? "↑" : "↓"} Sort
+                  {ratingLoading ? "Submitting..." : "Submit feedback"}
                 </button>
                 <div style={{ position: "relative" }}>
                   <button
