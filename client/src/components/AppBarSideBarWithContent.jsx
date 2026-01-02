@@ -1,5 +1,5 @@
 import React, { useState ,useEffect } from 'react';
-import {Menu, X, Bell, Search, Home, Calendar, Users, UserCheck, Plane, Building2, BookOpen} from 'lucide-react';
+import {Menu, X, Bell, Search, Home, Calendar, UserCheck, Plane, Building2, BookOpen, Bolt} from 'lucide-react';
 import '../styles/app_bar_side_bar_with_content.css';
 import {useNavigate} from "react-router-dom";
 
@@ -142,14 +142,15 @@ const AppBar = ({ onMenuClick }) => {
 const Sidebar = ({ isOpen, onClose }) => {
     const navigate = useNavigate();
     const menuItems = [
-        { icon: Home, label: 'Dashboard', route: "/admin/", active: true },
-        { icon: Calendar, label: 'Bookings', route: "/admin/bookings", active: true },
+        { icon: Home, label: 'Dashboard', route: "/admin/" },
+        { icon: Calendar, label: 'Bookings', route: "/admin/bookings" },
         // { icon: Users, label: 'Users' },
-        { icon: UserCheck, label: 'Employees', route: "/admin/employees", active: true },
-        { icon: BookOpen, label: 'Guided Trips', route: "/admin/guided-trips", active: true },
+        { icon: UserCheck, label: 'Employees', route: "/admin/employees" },
+        { icon: BookOpen, label: 'Guided Trips', route: "/admin/guided-trips" },
         // { icon: Calendar, label: 'Umrah' },
-        { icon: Plane, label: 'Destinations', route: "/admin/destinations", active: true },
-        { icon: Building2, label: 'Branches', route: "/admin/branches", active: true }
+        { icon: Plane, label: 'Destinations', route: "/admin/destinations" },
+        { icon: Building2, label: 'Branches', route: "/admin/branches" },
+        { icon: Bolt, label: 'Settings', route: "/admin/settings" }
     ];
 
     return (

@@ -43,7 +43,7 @@ export function useAuthHandlers() {
       const res = await signUp(data); // call your API
       // console.log(res);
       // Check HTTP status
-      if (res.status != "success") {
+      if (res.status !== "success") {
         setMessage(res.message || "Signup failed");
         throw new Error(res.message || "Signup failed");
       }
