@@ -7,6 +7,11 @@ import Table from "../Table.jsx";
 import ModalDialog from "../ModalDialog.jsx";
 import ButtonFill from "../ButtonFill.jsx";
 import InputField from "../InputField.jsx";
+import { useAllBookings } from "../../../hooks/useBookings.js";
+import { useBranches } from "../../../hooks/useBranches.js";
+import { assignBranchToBooking, updateBookingStatus } from "../../../api/bookings.js";
+import BookingPaymentStatus from "../BookingPaymentStatus.jsx";
+import Swal from "sweetalert2";
 
 const bookingStatus = Object.freeze({
     DRAFT: "draft",
@@ -15,12 +20,6 @@ const bookingStatus = Object.freeze({
     CANCELLED: "cancelled",
     COMPLETED: "completed",
     REJECTED: "rejected"
-})
-
-const bookingType = Object.freeze({
-    NORMAL: "normal",
-    UMRAH: "umrah",
-    GUIDED_TRIP: "guided_trip"
 })
 
 export const TabBookings = () => {
@@ -53,269 +52,219 @@ const BookingsTable = ({searchQuery}) => {
     const [isEditBookingModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteBookingModalOpen, setIsDeleteModalOpen] = useState(false);
     const [errors, setErrors] = useState({});
-    const handleDelete = (id) => {
-        setBookings(bookings.filter(booking => booking["booking_id"] !== id));
-        setIsDeleteModalOpen(false);
-    };
+    const [submitLoading, setSubmitLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    // Use API hooks
+    const { bookings, loading, error, refetch } = useAllBookings();
+    const { branches } = useBranches();
+
     const [formData, setFormData] = useState({
-        branch_name: '',
+        branch_id: '',
         booking_status: ''
-    })
+    });
+
     useEffect(() => {
-        if (selectedBooking) {
+        if (selectedBooking && isEditBookingModalOpen) {
             setFormData({
-                branch_name: selectedBooking.Branches.branch_name,
-                booking_status: selectedBooking.booking_status,
+                branch_id: selectedBooking.branch_id || '',
+                booking_status: selectedBooking.booking_status || '',
             });
         }
     }, [selectedBooking, isEditBookingModalOpen]);
 
-
-    const handleEdit = () => {
-        const errors = validateForm();
-        setErrors(errors);
-
-        if (Object.keys(errors).length === 0) {
-            const updateBookings = bookings.map((booking) =>
-                booking["booking_id"] === selectedBooking["booking_id"]
-                    ? {...booking,
-                        booking_status: formData.booking_status,
-                        Branches: {
-                            ...booking.Branches,
-                            branch_name: formData.branch_name,
-                        }
-                    } : booking
-            )
-
-            setBookings(updateBookings);
-            setIsEditModalOpen(false);
-        }
-    }
-
     const validateForm = () => {
         const errors = {};
-
-        if (!formData.branch_name.trim()) {
-            errors.branch_name = 'Branch is required';
+        if (!formData.booking_status) {
+            errors.booking_status = 'Booking status is required';
         }
-
         return errors;
     };
 
-    const [bookings, setBookings] = useState([
-            {
-                booking_id: 12014,
-                created_at: "2025-02-14T13:45:30.123+00:00",
-                user_id: 230,
-                Users: { first_name: "Mohamed", last_name: "Salhi", phone: "320413202" },
-                branch_id: 30241,
-                Branches: { branch_name: "Guelma" },
-                guide_id: 6954,
-                booking_status: bookingStatus.DRAFT,
-                needs_visa_assistance: false,
-                info_id: 4203,
-                TripInfo: {
-                    trip_date: "2025-11-29",
-                    destination_city: "Algiers",
-                    destination_country: "Algeria"
-                },
-                updated_at: "2025-02-14T13:45:30.123+00:00",
-                type: bookingType.NORMAL
-            },
+    const handleEdit = async () => {
+        const validationErrors = validateForm();
+        setErrors(validationErrors);
 
-            {
-                booking_id: 12015,
-                created_at: "2025-02-16T09:18:10.551+00:00",
-                user_id: 231,
-                Users: { first_name: "Sara", last_name: "Benali", phone: "0559123498" },
-                branch_id: 30242,
-                Branches: { branch_name: "Constantine" },
-                guide_id: 6955,
-                booking_status: bookingStatus.PENDING,
-                needs_visa_assistance: true,
-                info_id: 4204,
-                TripInfo: {
-                    trip_date: "2025-10-12",
-                    destination_city: "Oran",
-                    destination_country: "Algeria"
-                },
-                updated_at: "2025-02-16T09:18:10.551+00:00",
-                type: bookingType.NORMAL
-            },
+        if (Object.keys(validationErrors).length > 0) {
+            return;
+        }
 
-            {
-                booking_id: 12016,
-                created_at: "2025-02-18T17:30:45.789+00:00",
-                user_id: 232,
-                Users: { first_name: "Yacine", last_name: "Larbi", phone: "0660192837" },
-                branch_id: 30243,
-                Branches: { branch_name: "Algiers" },
-                guide_id: 6956,
-                booking_status: bookingStatus.CONFIRMED,
-                needs_visa_assistance: false,
-                info_id: 4205,
-                TripInfo: {
-                    trip_date: "2025-09-01",
-                    destination_city: "Tunis",
-                    destination_country: "Tunisia"
-                },
-                updated_at: "2025-02-18T17:30:45.789+00:00",
-                type: bookingType.NORMAL
-            },
+        try {
+            setSubmitLoading(true);
+            setErrorMessage('');
 
-            {
-                booking_id: 12017,
-                created_at: "2025-02-20T11:05:20.230+00:00",
-                user_id: 233,
-                Users: { first_name: "Leila", last_name: "Khaldi", phone: "0771234567" },
-                branch_id: 30244,
-                Branches: { branch_name: "Annaba" },
-                guide_id: 6957,
-                booking_status: bookingStatus.CANCELLED,
-                needs_visa_assistance: false,
-                info_id: 4206,
-                TripInfo: {
-                    trip_date: "2025-12-20",
-                    destination_city: "Paris",
-                    destination_country: "France"
-                },
-                updated_at: "2025-02-21T11:05:20.230+00:00",
-                type: bookingType.NORMAL
-            },
-
-            {
-                booking_id: 12018,
-                created_at: "2025-02-21T14:22:11.600+00:00",
-                user_id: 234,
-                Users: { first_name: "Karim", last_name: "Mansouri", phone: "0690021122" },
-                branch_id: 30242,
-                Branches: { branch_name: "Constantine" },
-                guide_id: 6958,
-                booking_status: bookingStatus.COMPLETED,
-                needs_visa_assistance: false,
-                info_id: 4207,
-                TripInfo: {
-                    trip_date: "2025-08-05",
-                    destination_city: "Madrid",
-                    destination_country: "Spain"
-                },
-                updated_at: "2025-02-21T14:22:11.600+00:00",
-                type: bookingType.UMRAH
-            },
-
-            {
-                booking_id: 12019,
-                created_at: "2025-02-23T08:45:55.901+00:00",
-                user_id: 235,
-                Users: { first_name: "Nadia", last_name: "Boukhalfa", phone: "0548789923" },
-                branch_id: 30241,
-                Branches: { branch_name: "Guelma" },
-                guide_id: 6959,
-                booking_status: bookingStatus.REJECTED,
-                needs_visa_assistance: true,
-                info_id: 4208,
-                TripInfo: {
-                    trip_date: "2025-07-14",
-                    destination_city: "London",
-                    destination_country: "UK"
-                },
-                updated_at: "2025-02-23T08:45:55.901+00:00",
-                type: bookingType.NORMAL
-            },
-
-            {
-                booking_id: 12020,
-                created_at: "2025-02-25T16:10:44.300+00:00",
-                user_id: 236,
-                Users: { first_name: "Amine", last_name: "Djebbar", phone: "0791123344" },
-                branch_id: 30245,
-                Branches: { branch_name: "Blida" },
-                guide_id: 6960,
-                booking_status: bookingStatus.PENDING,
-                needs_visa_assistance: false,
-                info_id: 4209,
-                TripInfo: {
-                    trip_date: "2025-11-02",
-                    destination_city: "Cairo",
-                    destination_country: "Egypt"
-                },
-                updated_at: "2025-02-25T16:10:44.300+00:00",
-                type: bookingType.NORMAL
-            },
-
-            {
-                booking_id: 12021,
-                created_at: "2025-02-26T10:22:19.100+00:00",
-                user_id: 237,
-                Users: { first_name: "Samir", last_name: "Cherif", phone: "0677001133" },
-                branch_id: 30246,
-                Branches: { branch_name: "Tlemcen" },
-                guide_id: 6961,
-                booking_status: bookingStatus.CONFIRMED,
-                needs_visa_assistance: true,
-                info_id: 4210,
-                TripInfo: {
-                    trip_date: "2025-06-11",
-                    destination_city: "Dubai",
-                    destination_country: "UAE"
-                },
-                updated_at: "2025-02-26T10:22:19.100+00:00",
-                type: bookingType.UMRAH
-            },
-
-            {
-                booking_id: 12022,
-                created_at: "2025-02-28T12:32:55.777+00:00",
-                user_id: 238,
-                Users: { first_name: "Ikram", last_name: "Saadi", phone: "0654019283" },
-                branch_id: 30241,
-                Branches: { branch_name: "Guelma" },
-                guide_id: 6962,
-                booking_status: bookingStatus.DRAFT,
-                needs_visa_assistance: false,
-                info_id: 4211,
-                TripInfo: {
-                    trip_date: "2025-12-01",
-                    destination_city: "Rome",
-                    destination_country: "Italy"
-                },
-                updated_at: "2025-02-28T12:32:55.777+00:00",
-                type: bookingType.GUIDED_TRIP
-            },
-
-            {
-                booking_id: 12023,
-                created_at: "2025-03-01T18:40:12.450+00:00",
-                user_id: 239,
-                Users: { first_name: "Rania", last_name: "Haddad", phone: "0765412288" },
-                branch_id: 30243,
-                Branches: { branch_name: "Algiers" },
-                guide_id: 6963,
-                booking_status: bookingStatus.COMPLETED,
-                needs_visa_assistance: true,
-                info_id: 4212,
-                TripInfo: {
-                    trip_date: "2025-09-20",
-                    destination_city: "Istanbul",
-                    destination_country: "Turkey"
-                },
-                updated_at: "2025-03-01T18:40:12.450+00:00",
-                type: bookingType.GUIDED_TRIP
+            // Update booking status if changed
+            if (formData.booking_status && formData.booking_status !== selectedBooking.booking_status) {
+                await updateBookingStatus(selectedBooking.booking_id, formData.booking_status);
             }
-    ]);
+
+            // Assign branch if changed
+            if (formData.branch_id && formData.branch_id !== selectedBooking.branch_id) {
+                await assignBranchToBooking(selectedBooking.booking_id, formData.branch_id);
+            }
+
+            await refetch();
+            setIsEditModalOpen(false);
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Booking updated successfully',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } catch (err) {
+            setErrorMessage(err.message || 'Failed to update booking');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: err.message || 'Failed to update booking'
+            });
+        } finally {
+            setSubmitLoading(false);
+        }
+    };
+
+    // Helper to get user info
+    const getUserInfo = (booking) => {
+        // API might return user info differently
+        if (booking.Users) return booking.Users;
+        if (booking.user) return booking.user;
+        return { first_name: 'N/A', last_name: '', phone: '' };
+    };
+
+    // Helper to get branch info
+    const getBranchInfo = (booking) => {
+        if (booking.Branches) return booking.Branches;
+        if (booking.branch) return booking.branch;
+        const branch = branches.find(b => b.branch_id === booking.branch_id);
+        return branch ? { branch_name: branch.branch_name } : { branch_name: 'N/A' };
+    };
+
+    // Helper to get trip info
+    const getTripInfo = (booking) => {
+        if (booking.TripInfo) return booking.TripInfo;
+        if (booking.trip_info) return booking.trip_info;
+        return { destination_country: 'N/A', destination_city: 'N/A', trip_date: 'N/A' };
+    };
 
     const filteredBookings = bookings.filter((booking) => {
         const query = searchQuery.toLowerCase();
+        const userInfo = getUserInfo(booking);
+        const branchInfo = getBranchInfo(booking);
+        const tripInfo = getTripInfo(booking);
+        
         return (
-            booking.Users.first_name.toLowerCase().includes(query) ||
-            booking.Users.last_name.toLowerCase().includes(query) ||
-            booking.Users.phone.toLowerCase().includes(query) ||
-            booking.TripInfo.destination_city.toLowerCase().includes(query) ||
-            booking.TripInfo.destination_country.toLowerCase().includes(query) ||
-            booking.Branches.branch_name.toLowerCase().includes(query) ||
-            booking.booking_status.toLowerCase().includes(query)
+            (userInfo.first_name || '').toLowerCase().includes(query) ||
+            (userInfo.last_name || '').toLowerCase().includes(query) ||
+            (userInfo.phone || '').toLowerCase().includes(query) ||
+            (tripInfo.destination_city || '').toLowerCase().includes(query) ||
+            (tripInfo.destination_country || '').toLowerCase().includes(query) ||
+            (branchInfo.branch_name || '').toLowerCase().includes(query) ||
+            (booking.booking_status || '').toLowerCase().includes(query)
         );
-    })
+    });
+
+    if (loading) {
+        return (
+            <div className="text-center py-8">
+                <p className="text-gray-500">Loading bookings...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                {error}
+            </div>
+        );
+    }
+
+    const columns = [
+        {
+            title: 'Booking ID',
+            format: (item) => (
+                <td className={"text-center text-gray-400 cursor-pointer hover:underline"}>
+                    {item["booking_id"]}
+                </td>
+            )
+        },
+        {
+            title: 'Username',
+            format: (item) => {
+                const userInfo = getUserInfo(item);
+                return (
+                    <td className={"text-center text-gray-400"}>
+                        {userInfo.first_name} {userInfo.last_name}
+                    </td>
+                );
+            }
+        },
+        {
+            title: 'Destination',
+            format: (item) => {
+                const tripInfo = getTripInfo(item);
+                return (
+                    <td className={"text-center text-gray-400"}>
+                        {tripInfo.destination_country}, {tripInfo.destination_city}
+                    </td>
+                );
+            }
+        },
+        {
+            title: 'Date',
+            format: (item) => {
+                const tripInfo = getTripInfo(item);
+                return (
+                    <td className={"text-center text-gray-400"}>
+                        {tripInfo.trip_date ? new Date(tripInfo.trip_date).toLocaleDateString() : 'N/A'}
+                    </td>
+                );
+            }
+        },
+        {
+            title: 'Phone Number',
+            format: (item) => {
+                const userInfo = getUserInfo(item);
+                return (
+                    <td className={"text-center text-gray-400"}>
+                        {userInfo.phone || 'N/A'}
+                    </td>
+                );
+            }
+        },
+        {
+            title: 'Branch',
+            format: (item) => {
+                const branchInfo = getBranchInfo(item);
+                return (
+                    <td className={"text-center text-gray-400"}>
+                        {branchInfo.branch_name || 'N/A'}
+                    </td>
+                );
+            }
+        },
+        {
+            title: 'Booking Status',
+            format: (item) => (
+                <td className={"text-center text-gray-400"}>
+                    {bookingStatusWidget(item.booking_status)}
+                </td>
+            )
+        },
+        {
+            title: 'Payment Status',
+            format: (item) => (
+                <BookingPaymentStatus 
+                    booking={item} 
+                    onStatusChange={(bookingId, status) => {
+                        // Optionally refetch or update local state
+                        refetch();
+                    }}
+                />
+            )
+        },
+    ];
 
     return (
         <>
@@ -334,66 +283,7 @@ const BookingsTable = ({searchQuery}) => {
                         setIsDeleteModalOpen(true);
                     }
                 }
-                columns={
-                    [
-                        {
-                            title: 'Booking ID',
-                            format: (item) => (
-                                <td className={"text-center text-(--color-text-secondary) cursor-pointer hover:underline"}>
-                                    {item["booking_id"]}
-                                </td>
-                            )
-                        },
-                        {
-                            title: 'Username',
-                            format: (item) => (
-                                <td className={"text-center text-gray-400"}>
-                                    {item.Users.first_name} {item.Users.last_name}
-                                </td>
-                            )
-                        },
-                        {
-                            title: 'Destination',
-                            format: (item) => (
-                                <td className={"text-center text-gray-400"}>
-                                    {item.TripInfo.destination_country}, {item.TripInfo.destination_city}
-                                </td>
-                            )
-                        },
-                        {
-                            title: 'Date',
-                            format: (item) => (
-                                <td className={"text-center text-gray-400"}>
-                                    {item.TripInfo.trip_date}
-                                </td>
-                            )
-                        },
-                        {
-                            title: 'Phone Number',
-                            format: (item) => (
-                                <td className={"text-center text-gray-400"}>
-                                    {item.Users.phone}
-                                </td>
-                            )
-                        },
-                        {
-                            title: 'Branch',
-                            format: (item) => (
-                                <td className={"text-center text-gray-400"}>
-                                    {item.Branches.branch_name}
-                                </td>
-                            )
-                        },
-                        {
-                            title: 'Status',
-                            format: (item) => (
-                                <td className={"text-center text-gray-400"}>
-                                    {bookingStatusWidget(item.booking_status)}
-                                </td>
-                            )
-                        },
-                    ]
-                }
+                columns={columns}
                 data={filteredBookings}
             />
 
@@ -403,18 +293,14 @@ const BookingsTable = ({searchQuery}) => {
             >
                 <div className={"text-center text-xl"}>
                     <h1>
-                        Are you sure that you want to delete the booking with ID
+                        Note: Booking deletion is not available through this interface.
                     </h1>
-                    <span className={"text-(--color-text-secondary)"}>
-                    {selectedBooking?.["booking_id"]}
-                    </span>
                     <h1>
-                        This action cannot be undone
+                        Please contact system administrator for booking deletion.
                     </h1>
                 </div>
-                <div className={"grid grid-cols-2 gap-4 mt-8"}>
-                    <ButtonFill onClick={() => handleDelete(selectedBooking?.["booking_id"])}>Yes</ButtonFill>
-                    <ButtonOutline onClick={() => setIsDeleteModalOpen(false)}>No</ButtonOutline>
+                <div className={"grid grid-cols-1 gap-4 mt-8"}>
+                    <ButtonOutline onClick={() => setIsDeleteModalOpen(false)}>Close</ButtonOutline>
                 </div>
             </ModalDialog>
 
@@ -423,24 +309,45 @@ const BookingsTable = ({searchQuery}) => {
                 title={`Edit Booking ${selectedBooking?.["booking_id"] ?? ""}`}
                 open={isEditBookingModalOpen}
             >
+                {errorMessage && (
+                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+                        {errorMessage}
+                    </div>
+                )}
                 <div className={"grid grid-cols-2 gap-4"}>
+                    <div className="flex flex-col">
+                        <label className="mb-2 text-gray-700">Branch</label>
+                        <select
+                            value={formData.branch_id || ''}
+                            onChange={(e) => setFormData({...formData, branch_id: e.target.value ? parseInt(e.target.value) : ''})}
+                            className="border-1 py-3 px-3 border-gray-500 rounded-lg"
+                        >
+                            <option value="">Select a branch</option>
+                            {branches.map((branch) => (
+                                <option key={branch.branch_id} value={branch.branch_id}>
+                                    {branch.branch_name} ({branch.branch_city})
+                                </option>
+                            ))}
+                        </select>
+                        {errors.branch_id && (
+                            <p className="text-red-500 text-xs mt-1">{errors.branch_id}</p>
+                        )}
+                    </div>
                     <InputField
-                        label={"Branch"}
-                        disabled={false}
-                        value={formData.branch_name}
-                        onChange={(e) => setFormData({...formData, branch_name:e.target.value})}
-                        error={errors.branch_name}
-                    />
-                    <InputField
-                        label={"Booking Status"}
+                        label={"Booking Status *"}
                         disabled={false}
                         value={formData.booking_status}
                         type={"select"}
                         options={Object.values(bookingStatus)}
-                        onChange={(e) => setFormData({...formData, booking_status:e.target.value})}
+                        onChange={(e) => setFormData({...formData, booking_status: e.target.value})}
+                        error={errors.booking_status}
                     />
-                    <ButtonFill onClick={() => handleEdit()}>Edit Booking</ButtonFill>
-                    <ButtonOutline onClick={() => setIsEditModalOpen(false)}>Cancel</ButtonOutline>
+                    <ButtonFill onClick={handleEdit} disabled={submitLoading}>
+                        {submitLoading ? 'Updating...' : 'Edit Booking'}
+                    </ButtonFill>
+                    <ButtonOutline onClick={() => setIsEditModalOpen(false)} disabled={submitLoading}>
+                        Cancel
+                    </ButtonOutline>
                 </div>
             </ModalDialog>
         </>

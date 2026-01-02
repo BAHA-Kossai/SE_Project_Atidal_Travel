@@ -2,7 +2,7 @@ import {AppBarSideBarWithContent} from "../components/AppBarSideBarWithContent.j
 import WhiteContainer from "../components/WhiteContainer.jsx";
 import PagePath from "../components/PagePath.jsx";
 import SearchBar from "../components/SearchBar.jsx";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import ButtonOutline from "../components/ButtonOutline.jsx";
 import ButtonFill from "../components/ButtonFill.jsx";
 import {ArrowUpDown, Plus, SlidersHorizontal} from "lucide-react";
@@ -11,63 +11,60 @@ import ModalDialog from "../components/ModalDialog.jsx";
 import InputField from "../components/InputField.jsx";
 import FileDropzone from "../components/FileDropzone.jsx";
 import TableEntryModal from "../components/TableEntryModal.jsx";
+import { useGuidedTrips } from "../../hooks/useGuidedTrips.js";
+import { API_BASE } from "../../config/env.js";
 
 const trip_type = Object.freeze({
-    NORMAL: "guided_trip",
-    UMRAH: "umrah"
+    NORMAL: "Normal",
+    UMRAH: "Umrah"
 })
 
 export default function AdminGuidedTripsPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedGuidedTrip, setSelectedGuidedTrip] = useState(null);
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEntryModalOpen, setIsEntryModalOpen] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-    const [selectedImage, setSelectedImage] = useState();
-    const [selectedAgendaFile, setSelectedAgendaFile] = useState();
 
+    // Use the API hook
+    const { trips, loading, error, refetch } = useGuidedTrips();
 
-    const [guidedTrips, setGuidedTrips] = useState([
-            {
-                trip_id: 1,
-                created_by: "Mohamed",
-                created_at: "2025-02-14T13:45:30.123+00:00",
-                available_seats: 24,
-                destination: {
-                    city: "Algiers",
-                    country: "Algeria"
-                },
-                description: "lorem",
-                imageURL: "https://ibnbattutatravel.com/wp-content/uploads/listing-images/ibnbattuta-tfXoMXA-EqM2l-dz2.jpg",
-                type : trip_type.UMRAH
-            },
-            {
-                trip_id: 2,
-                created_by: "Sara",
-                created_at: "2025-03-02T09:12:10.520+00:00",
-                available_seats: 18,
-                destination: {
-                    city: "Oran",
-                    country: "Algeria"
-                },
-                description: "Weekend getaway to the coastal city of Oran.",
-                imageURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Oran_Cityscape.jpg/640px-Oran_Cityscape.jpg",
-                type : trip_type.NORMAL
-            },
-        ]
-    );
-    const currentGuidedTrips = guidedTrips.filter(guidedTrip => {
-        const query = searchQuery.toLowerCase();
-        return (
-            guidedTrip.created_by.toLowerCase().includes(query) ||
-            guidedTrip.destination.city.toLowerCase().includes(query) ||
-            guidedTrip.destination.country.toLowerCase().includes(query)
-        );
-    })
-    const handleDelete = (id) => {
-        setGuidedTrips(guidedTrips.filter(booking => booking["trip_id"] !== id));
-        setIsDeleteModalOpen(false);
+    // Helper to get image URL
+    const getImageUrl = (trip) => {
+        if (trip.image_path) {
+            return trip.image_path.startsWith('http') 
+                ? trip.image_path 
+                : `${API_BASE}${trip.image_path}`;
+        }
+        if (trip.trip_info?.image_path) {
+            return trip.trip_info.image_path.startsWith('http')
+                ? trip.trip_info.image_path
+                : `${API_BASE}${trip.trip_info.image_path}`;
+        }
+        return trip.imageURL || '';
     };
+
+    // Helper to get destination info
+    const getDestination = (trip) => {
+        if (trip.trip_info) {
+            return {
+                country: trip.trip_info.destination_country || '',
+                city: trip.trip_info.destination_city || ''
+            };
+        }
+        return trip.destination || { country: '', city: '' };
+    };
+
+    const currentGuidedTrips = trips.filter(trip => {
+        const query = searchQuery.toLowerCase();
+        const destination = getDestination(trip);
+        return (
+            (trip.created_by || '').toLowerCase().includes(query) ||
+            destination.city.toLowerCase().includes(query) ||
+            destination.country.toLowerCase().includes(query) ||
+            (trip.description || '').toLowerCase().includes(query)
+        );
+    });
     return (
         <AppBarSideBarWithContent>
 
@@ -78,7 +75,7 @@ export default function AdminGuidedTripsPage() {
                 <PagePath pathItems={["Dashboard", "Guided Trips"]}/>
             </div>
             <WhiteContainer>
-                {/* Search / Sort / Filter/ New Guided Trip */}
+                {/* Search / Sort / Filter */}
                 <div className="flex flex-row justify-between items-center mb-5">
                     <SearchBar
                         placeholder={"Search for a guided trip"}
@@ -89,14 +86,25 @@ export default function AdminGuidedTripsPage() {
                     <div className="flex flex-row justify-between w-100">
                         <ButtonOutline>Sort<ArrowUpDown size={18} className={"ml-2"}/></ButtonOutline>
                         <ButtonOutline>Filter<SlidersHorizontal size={18} className={"ml-2"}/></ButtonOutline>
-                        <ButtonFill onClick={() => setIsAddModalOpen(true)}>
-                            New Guided Trip
-                            <Plus size={22} className={"ml-2"}/></ButtonFill>
+                         <ButtonFill onClick={() => setIsAddModalOpen(true)}>New guided trip<Plus size={22} className={"ml-2"}/></ButtonFill>
                     </div>
                 </div>
 
-                {/* Table */}
-                <Table
+                {/* Error Message */}
+                {error && (
+                    <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                        {error}
+                    </div>
+                )}
+
+                {/* Loading State */}
+                {loading ? (
+                    <div className="text-center py-8">
+                        <p className="text-gray-500">Loading guided trips...</p>
+                    </div>
+                ) : (
+                    /* Table */
+                    <Table
                     onSelect={(trip) => {
                         setSelectedGuidedTrip(trip);
                         setIsEntryModalOpen(true);
@@ -125,12 +133,12 @@ export default function AdminGuidedTripsPage() {
 
                                             {/* Avatar / Image placeholder */}
                                             <div className="w-10 h-10 bg-gray-100 rounded">
-                                                <img src={item["imageURL"]} width={40} alt="img"/>
+                                                <img src={getImageUrl(item)} width={40} height={40} alt="trip" className="object-cover rounded"/>
                                             </div>
 
                                             <div className={"flex flex-col items-start gap-3"}>
-                                                <div className="text-gray-700 font-medium">{item["destination"]["country"]}</div>
-                                                <div className="text-(--color-text-secondary) text-sm cursor-pointer">{item["destination"]["city"]}</div>
+                                                <div className="text-gray-700 font-medium">{getDestination(item).country}</div>
+                                                <div className="text-(--color-text-secondary) text-sm cursor-pointer">{getDestination(item).city}</div>
                                             </div>
 
                                         </div>
@@ -139,9 +147,15 @@ export default function AdminGuidedTripsPage() {
                             )
                         },
                         {
+                            title: "Trip Type",
+                            format: (item) => (
+                                <td className={"text-gray-400 text-left"}>{tripTypeWidget(item.type || trip_type.NORMAL)}</td>
+                            )
+                        },
+                        {
                             title: "Created By",
                             format: (item) => (
-                                <td className={"text-gray-400 text-left"}>{item["created_by"]}</td>
+                                <td className={"text-gray-400 text-left"}>{item.created_by || 'N/A'}</td>
                             )
                         },
                         {
@@ -159,18 +173,13 @@ export default function AdminGuidedTripsPage() {
                         {
                             title: "Available Seats",
                             format: (item) => (
-                                <td className={"text-gray-400 text-left"}>{item["available_seats"]}</td>
-                            )
-                        },
-                        {
-                            title: "Trip Type",
-                            format: (item) => (
-                                <td className={"text-gray-400 text-left"}>{tripTypeWidget(item.type)}</td>
+                                <td className={"text-gray-400 text-left"}>{item.available_seats || 0}</td>
                             )
                         }
                     ]}
                     data={currentGuidedTrips}
                 />
+                )}
             </WhiteContainer>
 
 
@@ -202,55 +211,18 @@ export default function AdminGuidedTripsPage() {
                     },
                     {
                         name: "Trip Type",
-                        value: selectedGuidedTrip?.type === trip_type.UMRAH ? "Umrah" : "Normal",
+                        value: selectedGuidedTrip?.type || 'Normal',
+                    },
+                    {
+                        name: "Available Seats",
+                        value: selectedGuidedTrip?.available_seats || 0,
+                    },
+                    {
+                        name: "Description",
+                        value: selectedGuidedTrip?.description || 'N/A',
                     },
                 ]}
             />
-
-            {/* Add Modal */}
-            <ModalDialog
-                open={isAddModalOpen}
-                className={"overflow-y-scroll"}
-            >
-                {/* Image Dropzone */}
-                <FileDropzone
-                    accept={"image/*"}
-                    height={"150"}
-                    selectedFile={selectedImage}
-                    setSelectedFile={setSelectedImage}
-                    placeholderText={"Drop an image, or browse"}
-                />
-
-                <div className={"grid grid-cols-2 gap-4 my-8"}>
-                    <InputField label={"Destination Country"}/>
-                    <InputField label={"Destination City(ies)"}/>
-                    <InputField label={"Description"}/>
-                    <InputField label={"Available Seats"} type={"number"}/>
-                    <InputField label={"Guided Trip Type"} type={"select"} options={["Umrah", "Normal"]}/>
-                    <InputField label={"Guide Name"}/>
-                </div>
-
-                {/* Agenda Dropzone */}
-                <FileDropzone
-                    accept={"application/pdf"}
-                    height={100}
-                    selectedFile={selectedAgendaFile}
-                    setSelectedFile={setSelectedAgendaFile}
-                    placeholderText={"Drop agenda file, or browse"}
-                />
-
-                {/* Add/Cancel Buttons */}
-                <div className={"grid grid-cols-2 gap-4 mt-8"}>
-                    <ButtonOutline onClick={() =>
-                    {
-                        setIsAddModalOpen(false)
-                        setSelectedImage(null)
-                        setSelectedAgendaFile(null)
-                    }
-                    }>Cancel</ButtonOutline>
-                    <ButtonFill>Add guided trip</ButtonFill>
-                </div>
-            </ModalDialog>
 
             {/* Delete Modal */}
             <ModalDialog
@@ -258,18 +230,11 @@ export default function AdminGuidedTripsPage() {
             >
                 <div className={"text-center text-xl"}>
                     <h1>
-                        Are you sure that you want to delete the booking with ID
-                    </h1>
-                    <span className={"text-(--color-text-secondary)"}>
-                    {selectedGuidedTrip?.["trip_id"]}
-                    </span>
-                    <h1>
-                        This action cannot be undone
+                        Note: Guided trips are read-only. Delete functionality is not available.
                     </h1>
                 </div>
-                <div className={"grid grid-cols-2 gap-4 mt-8"}>
-                    <ButtonFill onClick={() => handleDelete(selectedGuidedTrip?.["trip_id"])}>Yes</ButtonFill>
-                    <ButtonOutline onClick={() => setIsDeleteModalOpen(false)}>No</ButtonOutline>
+                <div className={"grid grid-cols-1 gap-4 mt-8"}>
+                    <ButtonOutline onClick={() => setIsDeleteModalOpen(false)}>Close</ButtonOutline>
                 </div>
             </ModalDialog>
         </AppBarSideBarWithContent>
@@ -281,16 +246,23 @@ const tripTypeWidget = (type) => {
     let foregroundColor = ""
     let backgroundColor = ""
     let text = ""
-    switch (type) {
-        case trip_type.NORMAL:
+    const normalizedType = type?.toLowerCase() || 'normal';
+    switch (normalizedType) {
+        case 'normal':
+        case 'guided_trip':
             foregroundColor = "green-600"
             backgroundColor = "green-100"
             text = "Normal"
             break
-        case trip_type.UMRAH:
+        case 'umrah':
             foregroundColor = "amber-600"
             backgroundColor = "amber-100"
             text = "Umrah"
+            break
+        default:
+            foregroundColor = "gray-600"
+            backgroundColor = "gray-100"
+            text = normalizedType
     }
 
 

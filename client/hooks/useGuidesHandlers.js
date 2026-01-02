@@ -52,10 +52,7 @@ export function useGuideHandlers() {
   // Create a new guide (requires token)
   const handleCreateGuide = async (guideData) => {
     try {
-      const accessToken = localStorage.getItem("accessToken");
-      if (!accessToken) throw new Error("No access token found");
-
-      const res = await createGuide(accessToken, guideData);
+      const res = await createGuide(guideData);
 
       if (res.status !== "success") {
         setMessage(res.message || "Failed to create guide");
@@ -74,10 +71,7 @@ export function useGuideHandlers() {
   // Update an existing guide by ID (requires token)
   const handleUpdateGuide = async (guideId, updateData) => {
     try {
-      const accessToken = localStorage.getItem("accessToken");
-      if (!accessToken) throw new Error("No access token found");
-
-      const res = await updateGuide(accessToken, guideId, updateData);
+      const res = await updateGuide(guideId, updateData);
 
       if (res.status !== "success") {
         setMessage(res.message || "Failed to update guide");
@@ -99,10 +93,7 @@ export function useGuideHandlers() {
   // Delete a guide by ID (requires token)
   const handleDeleteGuide = async (guideId) => {
     try {
-      const accessToken = localStorage.getItem("accessToken");
-      if (!accessToken) throw new Error("No access token found");
-
-      const res = await deleteGuide(accessToken, guideId);
+      const res = await deleteGuide(guideId);
 
       if (res.status !== "success") {
         throw new Error(res.message || "Failed to delete guide");

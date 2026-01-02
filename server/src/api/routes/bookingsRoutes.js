@@ -25,6 +25,14 @@ router.post("/create", bookingsController.createBooking);
 
 router.get("/user/:userId", bookingsController.getUserBookings);
 
+// Get all bookings (for admin) - requires authentication
+router.get(
+  "/",
+  verifySupabaseToken,
+  requireAdmin_or_SuperAdmin,
+  bookingsController.getAllBookings
+);
+
 router.patch(
   "/assign-branch",
   verifySupabaseToken,

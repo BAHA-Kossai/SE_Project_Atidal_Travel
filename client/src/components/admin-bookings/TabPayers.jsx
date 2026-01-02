@@ -2,11 +2,13 @@ import WhiteContainer from "../WhiteContainer.jsx";
 import SearchBar from "../SearchBar.jsx";
 import ButtonOutline from "../ButtonOutline.jsx";
 import {ArrowUpDown, SlidersHorizontal, X} from "lucide-react";
-import {useState} from "react";
+import {useState, useEffect} from "react";
 import Table from "../Table.jsx";
 import ModalDialog from "../ModalDialog.jsx";
 import ButtonFill from "../ButtonFill.jsx";
 import TableEntryModal from "../TableEntryModal.jsx";
+import { usePayers } from "../../../hooks/usePayers.js";
+import Swal from "sweetalert2";
 
 export const TabPayers = () => {
     const [searchQuery, setSearchQuery] = useState("");
@@ -35,35 +37,61 @@ export const TabPayers = () => {
 }
 
 const PayersTable = ({searchQuery}) => {
-    const [payers, setPayers] = useState([
-        {
-            payer_id: "#CR000123",
-            traveler_id: "#CR000123",
-            booking_id: "#CR000123",
-            first_name: "Mohammed",
-            last_name: "Hamid",
-            phone: "0544444444",
-            confirmed_at: "2025-02-14T13:45:30.123+00:00",
-            cancelled_at: "2025-02-14T13:45:30.123+00:00",
-            booking_notes: "placeholder text",
-            created_at: "2025-02-14T13:45:30.123+00:00",
-        },
-    ]);
+    // Use API hook to fetch payers from backend
+    const { payers, loading, error, remove, refetch } = usePayers();
     const [selectedPayer, setSelectedPayer] = useState(null);
     const [isEntryModalOpen, setIsEntryModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const handleDelete = (id) => {
-        setPayers(payers.filter(payer => payer["booking_id"] !== id));
-        setIsDeleteModalOpen(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
+
+    // Show loading state
+    if (loading) {
+        return (
+            <div className="text-center py-8">
+                <p className="text-gray-500">Loading payers...</p>
+            </div>
+        );
+    }
+
+    // Show error state
+    if (error) {
+        return (
+            <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                {error}
+            </div>
+        );
+    }
+
+    const handleDelete = async (id) => {
+        try {
+            setDeleteLoading(true);
+            await remove(id);
+            setIsDeleteModalOpen(false);
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Payer deleted successfully',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } catch (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: err.message || 'Failed to delete payer'
+            });
+        } finally {
+            setDeleteLoading(false);
+        }
     };
 
     const filteredPayers = payers.filter(payer => {
         const query = searchQuery.toLowerCase();
         return (
-            payer.first_name.toLowerCase().includes(query) ||
-            payer.last_name.toLowerCase().includes(query) ||
-            payer.phone.toLowerCase().includes(query)
+            payer.first_name?.toLowerCase().includes(query) ||
+            payer.last_name?.toLowerCase().includes(query) ||
+            (payer.phone?.toLowerCase() || '').includes(query)  // ← SAFE
         )
     })
 
@@ -207,15 +235,17 @@ const PayersTable = ({searchQuery}) => {
                         Are you sure that you want to delete the payer with ID
                     </h1>
                     <span className={"text-(--color-text-secondary)"}>
-                    {selectedPayer?.["booking_id"]}
+                    {selectedPayer?.["payer_id"]}
                     </span>
                     <h1>
                         This action cannot be undone
                     </h1>
                 </div>
                 <div className={"grid grid-cols-2 gap-4 mt-8"}>
-                    <ButtonFill onClick={() => handleDelete(selectedPayer?.["booking_id"])}>Yes</ButtonFill>
-                    <ButtonOutline onClick={() => setIsDeleteModalOpen(false)}>No</ButtonOutline>
+                    <ButtonFill onClick={() => handleDelete(selectedPayer?.["payer_id"])} disabled={deleteLoading}>
+                        {deleteLoading ? 'Deleting...' : 'Yes'}
+                    </ButtonFill>
+                    <ButtonOutline onClick={() => setIsDeleteModalOpen(false)} disabled={deleteLoading}>No</ButtonOutline>
                 </div>
             </ModalDialog>
 

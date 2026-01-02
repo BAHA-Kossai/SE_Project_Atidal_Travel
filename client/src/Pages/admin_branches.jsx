@@ -1,5 +1,4 @@
 import {AppBarSideBarWithContent} from "../components/AppBarSideBarWithContent.jsx";
-import BranchesTable from "../components/admin-branches/BranchesTable.jsx";
 import {useEffect, useState} from "react";
 import PagePath from "../components/PagePath.jsx";
 import WhiteContainer from "../components/WhiteContainer.jsx";
@@ -11,10 +10,17 @@ import Table from "../components/Table.jsx";
 import TableEntryModal from "../components/TableEntryModal.jsx";
 import ModalDialog from "../components/ModalDialog.jsx";
 import InputField from "../components/InputField.jsx";
+import { useBranches } from "../../hooks/useBranches.js";
+import Swal from "sweetalert2";
 
 export default function Admin_branches() {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedBranch, setselectedBranch] = useState({});
+    const [submitLoading, setSubmitLoading] = useState(false);
+    const [errorMessage, setErrorMessage] = useState('');
+
+    // Use the API hook
+    const { branches, loading, error, create, update, remove, refetch } = useBranches();
 
     // Modals
     const [isEntryModalOpen, setIsEntryModalOpen] = useState(false);
@@ -22,82 +28,161 @@ export default function Admin_branches() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-
-    const [branches, setBranches] = useState([
-        {
-            branch_id: '#CR000123',
-            branch_city: 'Algiers',
-            branch_address: 'Algiers',
-            email: 'email@gmail.com',
-            phone: '+213 541 234 456',
-            admin_id: '#CR000123',
-            opening_time: "14:30:00",
-            closing_time: "20:30:00",
-            working_days: ["Sunday", "Monday"],
-            is_active: false,
-            created_at: "2025-02-14T13:45:30.123+00:00"
-        },
-    ]);
-
+    // Filter branches based on search query
     const filteredBranches = branches.filter((branch) => {
         const query = searchQuery.toLowerCase();
         return (
-            branch.branch_city.toLowerCase().includes(query) ||
-            branch.email.toLowerCase().includes(query) ||
-            branch.branch_address.toLowerCase().includes(query) ||
-            branch.phone.includes(query)
+            (branch.branch_city || '').toLowerCase().includes(query) ||
+            (branch.email || '').toLowerCase().includes(query) ||
+            (branch.branch_address || '').toLowerCase().includes(query) ||
+            (branch.phone || '').includes(query) ||
+            (branch.branch_name || '').toLowerCase().includes(query)
         );
-    })
-
+    });
 
     const [formData, setFormData] = useState({
+        branch_name: '',
         branch_city: '',
         branch_address: '',
         phone: '',
         email: '',
         opening_time: '',
         closing_time: '',
-        is_active: false,
-        created_at: '',
-    })
+        working_days: [],
+        is_active: true,
+    });
+
+    // Reset form when modal closes
     useEffect(() => {
-        if (selectedBranch && selectedBranch.branch_id) {
+        if (!isAddModalOpen && !isEditModalOpen) {
             setFormData({
-                branch_city: selectedBranch.branch_city,
-                branch_address: selectedBranch.branch_address,
-                phone: selectedBranch.phone,
-                email: selectedBranch.email,
-                opening_time: selectedBranch.opening_time,
-                closing_time: selectedBranch.closing_time,
-                is_active: false,
-                created_at: selectedBranch.created_at,
+                branch_name: '',
+                branch_city: '',
+                branch_address: '',
+                phone: '',
+                email: '',
+                opening_time: '',
+                closing_time: '',
+                working_days: [],
+                is_active: true,
+            });
+            setErrorMessage('');
+        }
+    }, [isAddModalOpen, isEditModalOpen]);
+
+    // Populate form when editing
+    useEffect(() => {
+        if (selectedBranch && selectedBranch.branch_id && isEditModalOpen) {
+            setFormData({
+                branch_name: selectedBranch.branch_name || '',
+                branch_city: selectedBranch.branch_city || '',
+                branch_address: selectedBranch.branch_address || '',
+                phone: selectedBranch.phone || '',
+                email: selectedBranch.email || '',
+                opening_time: selectedBranch.opening_time || '',
+                closing_time: selectedBranch.closing_time || '',
+                working_days: selectedBranch.working_days || [],
+                is_active: selectedBranch.is_active !== undefined ? selectedBranch.is_active : true,
             });
         }
     }, [selectedBranch, isEditModalOpen]);
 
+    const validateForm = () => {
+        const errors = {};
+        if (!formData.branch_name?.trim()) errors.branch_name = 'Branch name is required';
+        if (!formData.branch_address?.trim()) errors.branch_address = 'Branch address is required';
+        if (!formData.branch_city?.trim()) errors.branch_city = 'Branch city is required';
+        if (!formData.phone?.trim()) errors.phone = 'Phone is required';
+        if (!formData.email?.trim()) errors.email = 'Email is required';
+        if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            errors.email = 'Invalid email format';
+        }
+        return errors;
+    };
 
-    const handleEdit = () => {
-        const updateBranches = branches.map((branch) =>
-            branch.branch_id === selectedBranch.branch_id
-                ? {...branch,
-                    branch_city: formData.branch_city,
-                    branch_address: formData.branch_address,
-                    phone: formData.phone,
-                    email: formData.email,
-                    opening_time: formData.opening_time,
-                    closing_time: formData.closing_time,
-                    is_active: formData.is_active,
-                    created_at: formData.created_at,
-                } : branch
-        )
+    const handleAdd = async () => {
+        const errors = validateForm();
+        if (Object.keys(errors).length > 0) {
+            setErrorMessage(Object.values(errors).join(', '));
+            return;
+        }
 
-        setBranches(updateBranches);
-        setIsEditModalOpen(false);
-    }
+        try {
+            setSubmitLoading(true);
+            setErrorMessage('');
+            await create(formData);
+            setIsAddModalOpen(false);
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Branch created successfully',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } catch (err) {
+            setErrorMessage(err.message || 'Failed to create branch');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: err.message || 'Failed to create branch'
+            });
+        } finally {
+            setSubmitLoading(false);
+        }
+    };
 
-    const handleDelete = (id) => {
-        setBranches(branches.filter(branch => branch.branch_id !== id));
-        setIsDeleteModalOpen(false);
+    const handleEdit = async () => {
+        const errors = validateForm();
+        if (Object.keys(errors).length > 0) {
+            setErrorMessage(Object.values(errors).join(', '));
+            return;
+        }
+
+        try {
+            setSubmitLoading(true);
+            setErrorMessage('');
+            await update(selectedBranch.branch_id, formData);
+            setIsEditModalOpen(false);
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Branch updated successfully',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } catch (err) {
+            setErrorMessage(err.message || 'Failed to update branch');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: err.message || 'Failed to update branch'
+            });
+        } finally {
+            setSubmitLoading(false);
+        }
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            setSubmitLoading(true);
+            await remove(id);
+            setIsDeleteModalOpen(false);
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Branch deleted successfully',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } catch (err) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: err.message || 'Failed to delete branch'
+            });
+        } finally {
+            setSubmitLoading(false);
+        }
     };
 
     return (
@@ -130,8 +215,21 @@ export default function Admin_branches() {
                     </div>
                 </div>
 
-                {/* Table */}
-                <Table
+                {/* Error Message */}
+                {error && (
+                    <div className="mb-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                        {error}
+                    </div>
+                )}
+
+                {/* Loading State */}
+                {loading ? (
+                    <div className="text-center py-8">
+                        <p className="text-gray-500">Loading branches...</p>
+                    </div>
+                ) : (
+                    /* Table */
+                    <Table
                     onSelect={ (branch) => {
                         setselectedBranch(branch)
                         setIsEntryModalOpen(true)
@@ -153,6 +251,12 @@ export default function Admin_branches() {
                                 <td className={"text-center text-(--color-text-secondary)"}>
                                     {item.branch_id}
                                 </td>
+                            )
+                        },
+                        {
+                            title: 'Branch Name',
+                            format: (item) => (
+                                <td className={"text-gray-400 text-left"}>{item.branch_name || 'N/A'}</td>
                             )
                         },
                         {
@@ -190,6 +294,7 @@ export default function Admin_branches() {
                     ]}
                     data={filteredBranches}
                 />
+                )}
             </WhiteContainer>
 
             {/* Entry Modal */}
@@ -244,7 +349,7 @@ export default function Admin_branches() {
                     },
                     {
                         name: 'Status',
-                        value: selectedBranch?.status ? "Active" : "Inactive",
+                        value: selectedBranch?.is_active ? "Active" : "Inactive",
                     }
                 ]}
                 />
@@ -255,101 +360,143 @@ export default function Admin_branches() {
                 description={"Add a new branch to the agency"}
                 open={isAddModalOpen}
             >
+                {errorMessage && (
+                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+                        {errorMessage}
+                    </div>
+                )}
                 <div className={"grid grid-cols-2 gap-4"}>
                     <InputField
-                        label={"Branch City"}
+                        label={"Branch Name *"}
                         disabled={false}
+                        value={formData.branch_name}
+                        onChange={(e) => setFormData({...formData, branch_name: e.target.value})}
+                    />
+                    <InputField
+                        label={"Branch City *"}
+                        disabled={false}
+                        value={formData.branch_city}
                         onChange={(e) => setFormData({...formData, branch_city: e.target.value})}
                     />
                     <InputField
-                        label={"Branch Address"}
+                        label={"Branch Address *"}
                         disabled={false}
+                        value={formData.branch_address}
                         onChange={(e) => setFormData({...formData, branch_address: e.target.value})}
                     />
                     <InputField
-                        label={"Phone number"}
+                        label={"Phone number *"}
                         disabled={false}
+                        value={formData.phone}
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     />
                     <InputField
-                        label={"Email"}
+                        label={"Email *"}
                         disabled={false}
+                        type="email"
+                        value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
                     />
                     <InputField
                         label={"Opening Time"}
+                        type="time"
+                        value={formData.opening_time}
                         onChange={(e) => setFormData({...formData, opening_time: e.target.value})}
                     />
                     <InputField
                         label={"Closing Time"}
+                        type="time"
+                        value={formData.closing_time}
                         onChange={(e) => setFormData({...formData, closing_time: e.target.value})}
                     />
                     <InputField
                         label={"Status"}
                         type={"select"}
+                        value={formData.is_active ? "Active" : "Inactive"}
                         options={["Active", "Inactive"]}
-                        onChange={(e) => setFormData({...formData, status: e.target.value === "Active"})}
+                        onChange={(e) => setFormData({...formData, is_active: e.target.value === "Active"})}
                     />
                 </div>
                 <div className={"grid grid-cols-2 gap-4 mt-5"}>
-                    <ButtonOutline onClick={() => setIsAddModalOpen(false)}>Cancel</ButtonOutline>
-                    <ButtonFill>Add Branch</ButtonFill>
+                    <ButtonOutline onClick={() => setIsAddModalOpen(false)} disabled={submitLoading}>
+                        Cancel
+                    </ButtonOutline>
+                    <ButtonFill onClick={handleAdd} disabled={submitLoading}>
+                        {submitLoading ? 'Adding...' : 'Add Branch'}
+                    </ButtonFill>
                 </div>
             </ModalDialog>
 
 
             {/* Edit Modal */}
             <ModalDialog
-                title={`Edit Guide ${selectedBranch?.branch_id}`}
+                title={`Edit Branch ${selectedBranch?.branch_id || ''}`}
                 open={isEditModalOpen}
             >
+                {errorMessage && (
+                    <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+                        {errorMessage}
+                    </div>
+                )}
                 <div className={"grid grid-cols-2 gap-4"}>
                     <InputField
-                        label={"Branch City"}
+                        label={"Branch Name *"}
+                        disabled={false}
+                        value={formData.branch_name}
+                        onChange={(e) => setFormData({...formData, branch_name: e.target.value})}
+                    />
+                    <InputField
+                        label={"Branch City *"}
                         disabled={false}
                         value={formData.branch_city}
                         onChange={(e) => setFormData({...formData, branch_city: e.target.value})}
                     />
                     <InputField
-                        label={"Branch Address"}
+                        label={"Branch Address *"}
                         disabled={false}
                         value={formData.branch_address}
                         onChange={(e) => setFormData({...formData, branch_address: e.target.value})}
                     />
                     <InputField
-                        label={"Phone number"}
+                        label={"Phone number *"}
                         disabled={false}
                         value={formData.phone}
                         onChange={(e) => setFormData({...formData, phone: e.target.value})}
                     />
                     <InputField
-                        label={"Email"}
+                        label={"Email *"}
                         disabled={false}
+                        type="email"
                         value={formData.email}
                         onChange={(e) => setFormData({...formData, email: e.target.value})}
                     />
                     <InputField
                         label={"Opening Time"}
+                        type="time"
                         value={formData.opening_time}
                         onChange={(e) => setFormData({...formData, opening_time: e.target.value})}
                     />
                     <InputField
                         label={"Closing Time"}
+                        type="time"
                         value={formData.closing_time}
                         onChange={(e) => setFormData({...formData, closing_time: e.target.value})}
                     />
                     <InputField
                         label={"Status"}
-                        value={formData.status ? "Active" : "Inactive"}
+                        value={formData.is_active ? "Active" : "Inactive"}
                         type={"select"}
                         options={["Active", "Inactive"]}
-                        onChange={(e) => setFormData({...formData, status: e.target.value === "Active"})}
+                        onChange={(e) => setFormData({...formData, is_active: e.target.value === "Active"})}
                     />
                 </div>
-                <div className={"grid grid-cols-2 gap-4 mt-4"}
-                >
-                    <ButtonOutline onClick={() => setIsEditModalOpen(false)}>Cancel</ButtonOutline>
-                    <ButtonFill onClick={() => handleEdit()}>Edit Branch</ButtonFill>
+                <div className={"grid grid-cols-2 gap-4 mt-4"}>
+                    <ButtonOutline onClick={() => setIsEditModalOpen(false)} disabled={submitLoading}>
+                        Cancel
+                    </ButtonOutline>
+                    <ButtonFill onClick={handleEdit} disabled={submitLoading}>
+                        {submitLoading ? 'Updating...' : 'Edit Branch'}
+                    </ButtonFill>
                 </div>
             </ModalDialog>
 
@@ -369,8 +516,12 @@ export default function Admin_branches() {
                     </h1>
                 </div>
                 <div className={"grid grid-cols-2 gap-4 mt-8"}>
-                    <ButtonFill onClick={() => handleDelete(selectedBranch.branch_id)}>Yes</ButtonFill>
-                    <ButtonOutline onClick={() => setIsDeleteModalOpen(false)}>No</ButtonOutline>
+                    <ButtonFill onClick={() => handleDelete(selectedBranch.branch_id)} disabled={submitLoading}>
+                        {submitLoading ? 'Deleting...' : 'Yes'}
+                    </ButtonFill>
+                    <ButtonOutline onClick={() => setIsDeleteModalOpen(false)} disabled={submitLoading}>
+                        No
+                    </ButtonOutline>
                 </div>
             </ModalDialog>
 

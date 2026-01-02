@@ -1,35 +1,27 @@
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
 
-const rootUploadDir = path.resolve(process.cwd(), 'server', 'uploads');
+// Use memory storage so we can directly upload to Supabase
+const storage = multer.memoryStorage();
 
-const ensureDir = (dirPath) => {
-  if (!fs.existsSync(dirPath)) {
-    fs.mkdirSync(dirPath, { recursive: true });
+// File filter to validate file types and sizes
+const fileFilter = (req, file, cb) => {
+  const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/webp'];
+  
+  if (!allowedMimeTypes.includes(file.mimetype)) {
+    cb(new Error(`Invalid file type: ${file.mimetype}. Allowed: JPEG, PNG, WebP`));
+  } else {
+    cb(null, true);
   }
 };
 
-const fieldDirectoryMap = {
-  destination_picture: 'destinations',
-  picture: 'destinations',
-  cover_image: path.join('guided-trips', 'images')
-};
-
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const subDir = fieldDirectoryMap[file.fieldname] || 'misc';
-    const targetDir = path.join(rootUploadDir, subDir);
-    ensureDir(targetDir);
-    cb(null, targetDir);
-  },
-  filename: (req, file, cb) => {
-    const safeName = file.originalname.replace(/\s+/g, '_');
-    cb(null, `${Date.now()}-${safeName}`);
+// Configure multer for Supabase upload
+export const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB
   }
 });
-
-export const upload = multer({ storage });
 
 export default upload;
 

@@ -1,17 +1,39 @@
 import { request } from "./request.js";
 
-
-// Update user profile
-export const updateUserProfile = (accessToken, data) =>
-  request("/api/user/update-profile", {
-    method: "PUT",
-    headers: { Authorization: `Bearer ${accessToken}` },
-    data,
+/**
+ * Get current user profile
+ */
+export const getUserProfile = () =>
+  request("/api/user/me", {
+    method: "GET",
+    requiresAuth: true
   });
 
-// Delete logged-in user
-export const deleteUserProfile = (accessToken) =>
+/**
+ * Update user profile
+ */
+export const updateUserProfile = (data) =>
+  request("/api/user/update-profile", {
+    method: "PUT",
+    data,
+    requiresAuth: true
+  });
+
+/**
+ * Delete logged-in user
+ */
+export const deleteUserProfile = () =>
   request("/api/user/delete-profile", {
     method: "DELETE",
-    headers: { Authorization: `Bearer ${accessToken}` },
+    requiresAuth: true
+  });
+
+/**
+ * Change user password
+ */
+export const changePassword = (currentPassword, newPassword) =>
+  request("/api/user/change-password", {
+    method: "PUT",
+    data: { currentPassword, newPassword },
+    requiresAuth: true
   });

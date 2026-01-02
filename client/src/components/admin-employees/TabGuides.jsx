@@ -10,6 +10,7 @@ import InputField from "../InputField.jsx";
 import TableEntryModal from "../TableEntryModal.jsx";
 
 import { useGuideHandlers } from "../../../hooks/useGuidesHandlers.js";
+import Swal from "sweetalert2";
 
 export default function TabGuides() {
   const {
@@ -21,8 +22,17 @@ export default function TabGuides() {
     message,
   } = useGuideHandlers();
 
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    handleFetchGuides().catch((err) => console.error(err));
+    handleFetchGuides().catch((err) => {
+      console.error(err);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err.message || 'Failed to fetch guides'
+      });
+    });
   }, []);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -55,6 +65,7 @@ export default function TabGuides() {
 
   const AddGuide = async (guide) => {
     try {
+      setLoading(true);
       await handleCreateGuide(guide);
       await handleFetchGuides();
       setIsAddModalOpen(false);
@@ -65,15 +76,30 @@ export default function TabGuides() {
         experiance: "",
         birth_date: new Date().toISOString(),
       });
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Guide created successfully',
+        timer: 2000,
+        showConfirmButton: false
+      });
     } catch (err) {
       console.error(err);
       setErrorMessage(err.message || "Something went wrong");
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err.message || 'Failed to create guide'
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleEditSubmit = async () => {
     if (!selectedGuide) return;
     try {
+      setLoading(true);
       await handleUpdateGuide(selectedGuide.guide_id, formData);
       await handleFetchGuides();
       setIsEditModalOpen(false);
@@ -84,9 +110,23 @@ export default function TabGuides() {
         experiance: "",
         birth_date: new Date().toISOString(),
       });
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Guide updated successfully',
+        timer: 2000,
+        showConfirmButton: false
+      });
     } catch (err) {
       console.error(err);
       setErrorMessage(err.message || "Something went wrong");
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: err.message || 'Failed to update guide'
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -182,8 +222,12 @@ export default function TabGuides() {
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
-          <ButtonFill onClick={() => AddGuide(formData)}>Add Guide</ButtonFill>
-          <ButtonOutline onClick={() => setIsAddModalOpen(false)}>Cancel</ButtonOutline>
+          <ButtonFill onClick={() => AddGuide(formData)} disabled={loading}>
+            {loading ? 'Adding...' : 'Add Guide'}
+          </ButtonFill>
+          <ButtonOutline onClick={() => setIsAddModalOpen(false)} disabled={loading}>
+            Cancel
+          </ButtonOutline>
         </div>
       </ModalDialog>
 
@@ -202,8 +246,12 @@ export default function TabGuides() {
           />
         </div>
         <div className="grid grid-cols-2 gap-4 mt-6">
-          <ButtonFill onClick={handleEditSubmit}>Save Changes</ButtonFill>
-          <ButtonOutline onClick={() => setIsEditModalOpen(false)}>Cancel</ButtonOutline>
+          <ButtonFill onClick={handleEditSubmit} disabled={loading}>
+            {loading ? 'Saving...' : 'Save Changes'}
+          </ButtonFill>
+          <ButtonOutline onClick={() => setIsEditModalOpen(false)} disabled={loading}>
+            Cancel
+          </ButtonOutline>
         </div>
       </ModalDialog>
 
@@ -218,17 +266,35 @@ export default function TabGuides() {
             onClick={async () => {
               if (!selectedGuide) return;
               try {
+                setLoading(true);
                 await handleDeleteGuide(selectedGuide.guide_id);
                 await handleFetchGuides();
                 setIsDeleteModalOpen(false);
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Success!',
+                  text: 'Guide deleted successfully',
+                  timer: 2000,
+                  showConfirmButton: false
+                });
               } catch (err) {
                 console.error(err);
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: err.message || 'Failed to delete guide'
+                });
+              } finally {
+                setLoading(false);
               }
             }}
+            disabled={loading}
           >
-            Yes
+            {loading ? 'Deleting...' : 'Yes'}
           </ButtonFill>
-          <ButtonOutline onClick={() => setIsDeleteModalOpen(false)}>No</ButtonOutline>
+          <ButtonOutline onClick={() => setIsDeleteModalOpen(false)} disabled={loading}>
+            No
+          </ButtonOutline>
         </div>
       </ModalDialog>
     </>
