@@ -62,7 +62,7 @@ const FillInformation = () => {
 
       try {
         const res = await handleSignUp(completeData);
-
+        console.log(res);
         // Signup successful → go to home or login
         setSuccessMessage("Please check your email to confirm your account!");
         setErrorMessage("");

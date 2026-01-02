@@ -4,7 +4,7 @@ import WhyChooseUs from '../components/home/WhyChooseUs.jsx';
 import FeedbackSection from '../components/home/Feedback.jsx';
 import PopularDestinations from '../components/home/PopularDestinations.jsx';
 import { UmrahHadjPacks, GroupTrips } from '../components/home/InfoSection.jsx';
-import TravelHeroSection from '../components/home/Search.jsx';
+import TravelHeroSection from '../components/home/TravelHeroSection.jsx';
 
 function HomePage() {
   return (

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useBookings } from '../../../hooks/useBookings';
+import { MapPin, Hotel, User, Phone, Mail, MapPinned, Users, Plane, Package, Calendar as CalendarIcon, Map } from 'lucide-react';
 
 // Import frontend validation functions
 import {
@@ -19,24 +20,33 @@ import {
 } from '../../../utils/validation';
 
 export default function BookingForm() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { packageData, isUmrah, isGroupTrip } = location.state || {};
+
+  // Booking type flags
+  const isUmrahBooking = isUmrah === true;
+  const isGroupTripBooking = isGroupTrip === true;
+  const isSpecialBooking = isUmrahBooking || isGroupTripBooking;
+
+  // Step state: always start at step 1 for all trip types
   const [currentStep, setCurrentStep] = useState(1);
   const [formErrors, setFormErrors] = useState({});
   const [showSuccess, setShowSuccess] = useState(false);
-  const navigate = useNavigate();
   
-  // Booking Info State
+  // Booking Info State - Pre-fill from package data for special bookings
   const [bookingInfo, setBookingInfo] = useState({
-    destination_country: '',
-    destination_city: '',
-    trip_date: '',
-    returning_date: '',
-    departure_time: '',
-    returning_time: '',
-    price: '',
-    duration_days: '',
-    hotel_stars: '',
-    no_hotel_needed: false,
-    needs_visa_assistance: false
+    destination_country: isUmrahBooking ? 'Saudi Arabia' : isGroupTripBooking ? (packageData?.TripInfo?.destination_country || '') : '',
+    destination_city: isUmrahBooking ? 'Mecca' : isGroupTripBooking ? (packageData?.TripInfo?.destination_city || '') : '',
+    trip_date: isUmrahBooking ? (packageData?.TripInfo?.trip_date || '') : isGroupTripBooking ? (packageData?.TripInfo?.trip_date || '') : '',
+    returning_date: isUmrahBooking ? (packageData?.TripInfo?.returning_date || '') : isGroupTripBooking ? (packageData?.TripInfo?.returning_date || '') : '',
+    departure_time: isUmrahBooking ? (packageData?.TripInfo?.departure_time || '') : isGroupTripBooking ? (packageData?.TripInfo?.departure_time || '') : '',
+    returning_time: isUmrahBooking ? (packageData?.TripInfo?.returning_time || '') : isGroupTripBooking ? (packageData?.TripInfo?.returning_time || '') : '',
+    price: isUmrahBooking ? (packageData?.TripInfo?.price || '') : isGroupTripBooking ? (packageData?.TripInfo?.price || '') : '',
+    duration_days: isUmrahBooking ? (packageData?.TripInfo?.duration || '') : isGroupTripBooking ? (packageData?.TripInfo?.duration || '') : '',
+    hotel_stars: isUmrahBooking ? (packageData?.TripInfo?.hotel_stars || '') : isGroupTripBooking ? (packageData?.TripInfo?.hotel_stars || '') : '',
+    no_hotel_needed: isUmrahBooking ? (packageData?.TripInfo?.no_hotel_needed || false) : isGroupTripBooking ? (packageData?.TripInfo?.no_hotel_needed || false) : false,
+    needs_visa_assistance: isUmrahBooking ? (packageData?.needs_visa_assistance || false) : isGroupTripBooking ? (packageData?.needs_visa_assistance || false) : false
   });
 
   // Payer Info State
@@ -102,26 +112,34 @@ export default function BookingForm() {
     const errors = {};
 
     if (step === 1) {
-      if (!validateDestinationCountry(bookingInfo.destination_country)) {
-        errors.destination_country = 'Destination country is required';
+      // For special bookings (umrah/group), skip validation since fields are pre-filled
+      // For normal bookings, validate all trip details
+      if (!isSpecialBooking) {
+        if (!validateDestinationCountry(bookingInfo.destination_country)) {
+          errors.destination_country = 'Destination country is required';
+        }
+        if (!validateDate(bookingInfo.trip_date)) {
+          errors.trip_date = 'Valid trip date is required';
+        }
+        if (!validateDate(bookingInfo.returning_date)) {
+          errors.returning_date = 'Valid return date is required';
+        }
+        if (!validateTime(bookingInfo.departure_time)) {
+          errors.departure_time = 'Valid departure time is required';
+        }
+        if (!validateTime(bookingInfo.returning_time)) {
+          errors.returning_time = 'Valid return time is required';
+        }
+        if (!validatePrice(bookingInfo.price)) {
+          errors.price = 'Valid price is required';
+        }
+        if (!validateDuration(bookingInfo.duration_days)) {
+          errors.duration_days = 'Valid duration is required';
+        }
       }
-      if (!validateDate(bookingInfo.trip_date)) {
-        errors.trip_date = 'Valid trip date is required';
-      }
-      if (!validateDate(bookingInfo.returning_date)) {
-        errors.returning_date = 'Valid return date is required';
-      }
-      if (!validateTime(bookingInfo.departure_time)) {
-        errors.departure_time = 'Valid departure time is required';
-      }
-      if (!validateTime(bookingInfo.returning_time)) {
-        errors.returning_time = 'Valid return time is required';
-      }
-      if (!validatePrice(bookingInfo.price)) {
-        errors.price = 'Valid price is required';
-      }
-      if (!validateDuration(bookingInfo.duration_days)) {
-        errors.duration_days = 'Valid duration is required';
+      // For all trip types, hotel selection may be required
+      if (!bookingInfo.no_hotel_needed && !bookingInfo.hotel_stars) {
+        errors.hotel_stars = 'Please select hotel stars or check "I don\'t need hotel"';
       }
     }
 
@@ -229,26 +247,63 @@ export default function BookingForm() {
       return;
     }
 
+    const formatTime = (timeString) => {
+      if (!timeString) return '';
+      if (timeString.includes(':') && timeString.split(':').length === 3) {
+        return timeString.substring(0, 5); 
+      }
+      return timeString; 
+    };
+
     const bookingData = {
-      type: 'normal',
+      type: isUmrahBooking ? 'umrah' : isGroupTripBooking ? 'guided_trip' : 'normal',
+      
       price: Number(bookingInfo.price) || 0,
+      
       trip_date: bookingInfo.trip_date,
       returning_date: bookingInfo.returning_date || bookingInfo.trip_date,
-      departure_time: bookingInfo.departure_time,
-      returning_time: bookingInfo.returning_time,
+      
+      departure_time: formatTime(bookingInfo.departure_time),
+      returning_time: formatTime(bookingInfo.returning_time),
+      
       destination_country: bookingInfo.destination_country,
-      destination_city: bookingInfo.destination_city || 'none',
+      destination_city: bookingInfo.destination_city || '',
+      
       no_hotel_needed: bookingInfo.no_hotel_needed,
       hotel_stars: bookingInfo.no_hotel_needed ? null : bookingInfo.hotel_stars,
+      
       duration_days: Number(bookingInfo.duration_days) || 7,
       needs_visa_assistance: bookingInfo.needs_visa_assistance,
       booking_status: 'pending',
       
-      // Get user ID from localStorage
       user_id: JSON.parse(localStorage.getItem('user'))?.id || JSON.parse(localStorage.getItem('user'))?.user_id,
       
       branch_id: null,
       guide_id: null,
+
+      ...(isUmrahBooking && packageData && {
+        package_info: {
+          package_id: packageData.id || packageData._id,
+          package_type: packageData.type || 'standard',
+          package_name: packageData.name || 'Umrah Package',
+          ...(packageData.TripInfo && {
+            duration: packageData.TripInfo.duration,
+            included_services: packageData.TripInfo.included_services || []
+          })
+        }
+      }),
+
+      ...(isGroupTripBooking && packageData && {
+        group_trip_info: {
+          group_trip_id: packageData.id || packageData._id,
+          trip_name: packageData.name || packageData.TripInfo?.destination_city || 'Group Trip',
+          ...(packageData.TripInfo && {
+            guide_included: packageData.TripInfo.guide_included || false,
+            max_participants: packageData.TripInfo.max_participants,
+            current_participants: packageData.TripInfo.current_participants
+          })
+        }
+      }),
 
       payer_info: {
         first_name: payerInfo.first_name,
@@ -277,18 +332,28 @@ export default function BookingForm() {
       }))
     };
 
+    console.log('Submitting booking data:', bookingData);
+
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (!user || (!user.id && !user.user_id)) {
+      setError('You must be logged in to create a booking');
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+      return;
+    }
+
     try {
       await submitBooking(bookingData);
       setShowSuccess(true);
       setTimeout(() => {
-        navigate('/'); // Redirect to home page after 3 seconds
+        navigate('/'); 
       }, 3000);
     } catch (err) {
-      // Error is handled by the hook
+      console.error('Booking submission failed:', err);
     }
   };
 
-  // Success message component
   if (showSuccess) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center p-4">
@@ -310,7 +375,6 @@ export default function BookingForm() {
     );
   }
 
-  // Step indicator
   const steps = [
     { number: 1, title: 'Trip Details' },
     { number: 2, title: 'Payer Info' },
@@ -321,10 +385,49 @@ export default function BookingForm() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Create New Booking</h1>
-          <p className="text-gray-600">Fill in the details below to create your travel booking</p>
+        <div className="text-center mb-12">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+            {isUmrahBooking ? 'Umrah Booking' : isGroupTripBooking ? 'Guided Trip Booking' : 'Create New Booking'}
+          </h1>
+          <p className="text-gray-600">
+            {isUmrahBooking ? 'Complete your spiritual journey' : isGroupTripBooking ? 'Join an amazing guided adventure' : 'Fill in the details below to create your travel booking'}
+          </p>
         </div>
+
+        {/* Package/Group Trip Info Display */}
+        {isUmrahBooking && packageData && (
+          <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 mb-8">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-center gap-2 bg-blue-50 rounded-xl px-4 py-3">
+                <Plane className="w-5 h-5 text-[#117BB8]" />
+                <p className="text-[#117BB8] font-semibold">Umrah Package</p>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="flex items-center justify-center gap-2 bg-blue-50 rounded-xl px-4 py-3">
+                  <Package className="w-5 h-5 text-[#495057]" />
+                  <p className="text-[#495057]">{packageData.type || 'Premium'} Package</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isGroupTripBooking && packageData && (
+          <div className="bg-white rounded-3xl p-6 shadow-xl border border-gray-100 mb-8">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-center gap-2 bg-blue-50 rounded-xl px-4 py-3">
+                <Users className="w-5 h-5 text-[#117BB8]" />
+                <p className="text-[#117BB8] font-semibold">Guided Trip</p>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="flex items-center justify-center gap-2 bg-blue-50 rounded-xl px-4 py-3">
+                  <Map className="w-5 h-5 text-[#495057]" />
+                  <p className="text-[#495057]">{packageData.TripInfo?.destination_city || packageData.TripInfo?.destination_country}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Progress Steps */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
@@ -374,10 +477,16 @@ export default function BookingForm() {
 
         {/* Form Container */}
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          {/* Step 1: Booking Information */}
+          {/* Step 1: Booking Information - Always show, but read-only for special bookings */}
           {currentStep === 1 && (
             <div className="p-8">
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Trip Details</h2>
+              
+              {isSpecialBooking && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                  <p className="text-blue-800 text-sm">ℹ️ This trip information is pre-filled from your selected package. Please review the details below.</p>
+                </div>
+              )}
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -386,9 +495,10 @@ export default function BookingForm() {
                     type="text"
                     value={bookingInfo.destination_country}
                     onChange={(e) => updateBookingInfo('destination_country', e.target.value)}
+                    disabled={isSpecialBooking}
                     className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       formErrors.destination_country ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    } ${isSpecialBooking ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''}`}
                     placeholder="Enter destination country"
                     required
                   />
@@ -403,7 +513,8 @@ export default function BookingForm() {
                     type="text"
                     value={bookingInfo.destination_city}
                     onChange={(e) => updateBookingInfo('destination_city', e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    disabled={isSpecialBooking}
+                    className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent border-gray-300 ${isSpecialBooking ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''}`}
                     placeholder="Enter destination city"
                   />
                 </div>
@@ -414,9 +525,10 @@ export default function BookingForm() {
                     type="date"
                     value={bookingInfo.trip_date}
                     onChange={(e) => updateBookingInfo('trip_date', e.target.value)}
+                    disabled={isSpecialBooking}
                     className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       formErrors.trip_date ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    } ${isSpecialBooking ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''}`}
                     required
                   />
                   {formErrors.trip_date && (
@@ -430,9 +542,10 @@ export default function BookingForm() {
                     type="date"
                     value={bookingInfo.returning_date}
                     onChange={(e) => updateBookingInfo('returning_date', e.target.value)}
+                    disabled={isSpecialBooking}
                     className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       formErrors.returning_date ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    } ${isSpecialBooking ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''}`}
                     required
                   />
                   {formErrors.returning_date && (
@@ -446,9 +559,10 @@ export default function BookingForm() {
                     type="time"
                     value={bookingInfo.departure_time}
                     onChange={(e) => updateBookingInfo('departure_time', e.target.value)}
+                    disabled={isSpecialBooking}
                     className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       formErrors.departure_time ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    } ${isSpecialBooking ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''}`}
                     required
                   />
                   {formErrors.departure_time && (
@@ -462,9 +576,10 @@ export default function BookingForm() {
                     type="time"
                     value={bookingInfo.returning_time}
                     onChange={(e) => updateBookingInfo('returning_time', e.target.value)}
+                    disabled={isSpecialBooking}
                     className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       formErrors.returning_time ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    } ${isSpecialBooking ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''}`}
                     required
                   />
                   {formErrors.returning_time && (
@@ -478,9 +593,10 @@ export default function BookingForm() {
                     type="number"
                     value={bookingInfo.price}
                     onChange={(e) => updateBookingInfo('price', e.target.value)}
+                    disabled={isSpecialBooking}
                     className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       formErrors.price ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    } ${isSpecialBooking ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''}`}
                     placeholder="0.00"
                     min="0"
                     step="0.01"
@@ -497,9 +613,10 @@ export default function BookingForm() {
                     type="number"
                     value={bookingInfo.duration_days}
                     onChange={(e) => updateBookingInfo('duration_days', e.target.value)}
+                    disabled={isSpecialBooking}
                     className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       formErrors.duration_days ? 'border-red-500' : 'border-gray-300'
-                    }`}
+                    } ${isSpecialBooking ? 'bg-gray-100 cursor-not-allowed opacity-60' : ''}`}
                     placeholder="7"
                     min="1"
                     required
@@ -516,8 +633,8 @@ export default function BookingForm() {
                   <select
                     value={bookingInfo.hotel_stars}
                     onChange={(e) => updateBookingInfo('hotel_stars', e.target.value)}
-                    disabled={bookingInfo.no_hotel_needed}
-                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                    disabled={bookingInfo.no_hotel_needed || isSpecialBooking}
+                    className={`w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed ${isSpecialBooking ? 'opacity-60' : ''}`}
                   >
                     <option value="">Select rating</option>
                     <option value="3">3 Stars</option>
@@ -529,22 +646,24 @@ export default function BookingForm() {
                 <div className="space-y-4">
                   <label className="block text-sm font-medium text-gray-700">Options</label>
                   <div className="flex flex-col space-y-3">
-                    <label className="flex items-center space-x-3">
+                    <label className={`flex items-center space-x-3 ${isSpecialBooking ? 'opacity-60 cursor-not-allowed' : ''}`}>
                       <input
                         type="checkbox"
                         checked={bookingInfo.no_hotel_needed}
                         onChange={(e) => updateBookingInfo('no_hotel_needed', e.target.checked)}
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        disabled={isSpecialBooking}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 disabled:cursor-not-allowed"
                       />
                       <span className="text-gray-700">No Hotel Needed</span>
                     </label>
                     
-                    <label className="flex items-center space-x-3">
+                    <label className={`flex items-center space-x-3 ${isSpecialBooking ? 'opacity-60 cursor-not-allowed' : ''}`}>
                       <input
                         type="checkbox"
                         checked={bookingInfo.needs_visa_assistance}
                         onChange={(e) => updateBookingInfo('needs_visa_assistance', e.target.checked)}
-                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        disabled={isSpecialBooking}
+                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 disabled:cursor-not-allowed"
                       />
                       <span className="text-gray-700">Need Visa Assistance</span>
                     </label>
