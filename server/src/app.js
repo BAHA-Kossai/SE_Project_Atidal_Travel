@@ -10,6 +10,7 @@ import authRoutes from './api/routes/authRoutes.js';
 import guideRouter from './api/routes/guideRoutes.js';
 import userRouter from './api/routes/userRoutes.js';
 import adminRouter from './api/routes/adminRoutes.js';
+import ratingsRouter from './api/routes/ratingRoutes.js';
 
 
 
@@ -41,6 +42,7 @@ app.use('/api/destinations', destinationsRoutes);
 app.use('/api/bookings', bookingsRoutes);
 app.use('/api/guided-trips', guidedTripsRoutes);
 app.use('/api/branches', branchesRoutes);
+app.use('/api/ratings', ratingsRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ 

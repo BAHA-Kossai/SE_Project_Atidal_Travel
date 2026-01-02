@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Search, ArrowUpDown, Filter, Star } from "lucide-react";
+import { Search, ArrowUpDown, Filter, Star, CheckCircle, XCircle } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import Table from "../components/Table.jsx"; 
 import { useAuthHandlers } from "../../hooks/useAuthHandlers.js";
 import { useUserHandlers } from "../../hooks/useUserHandlers.js";
 import { useUserBookings } from "../../hooks/useUserBookings.js";
+import { useRating } from "../../hooks/useRating.js";
 
 export default function Profile() {
   const { handleSignOut } = useAuthHandlers();
   const { handleDeleteUser } = useUserHandlers();
+  
+  // Initialize rating hook
+  const { loading: ratingLoading, error: ratingError, success: ratingSuccess, submitRating } = useRating();
   
   const accessToken = localStorage.getItem("accessToken");
   const refreshToken = localStorage.getItem("refreshToken");
@@ -63,8 +67,14 @@ export default function Profile() {
   const [feedback, setFeedback] = useState("");
   const [focusedField, setFocusedField] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [feedbackName, setFeedbackName] = useState("");
   const [feedbackList, setFeedbackList] = useState([]);
+  
+  // Add state for API feedback message
+  const [apiFeedbackMessage, setApiFeedbackMessage] = useState({
+    show: false,
+    type: '', // 'success' or 'error'
+    message: ''
+  });
 
   const hasUserData = profileData && (profileData.email || profileData.first_name);
 
@@ -166,36 +176,96 @@ export default function Profile() {
     }
   };
 
-  const handleSubmitFeedback = () => {
-    if (!feedbackName.trim()) {
-      alert("Please enter your name");
-      return;
-    }
+  // UPDATED: Handle feedback submission with backend API
+  const handleSubmitFeedback = async () => {
+    // Clear any previous feedback messages
+    setApiFeedbackMessage({ show: false, type: '', message: '' });
 
+    // Validation (no username needed)
     if (rating === 0) {
-      alert("Please select a rating");
+      setApiFeedbackMessage({
+        show: true,
+        type: 'error',
+        message: 'Please select a rating'
+      });
       return;
     }
 
     if (!feedback.trim()) {
-      alert("Please enter your feedback");
+      setApiFeedbackMessage({
+        show: true,
+        type: 'error',
+        message: 'Please enter your feedback'
+      });
       return;
     }
 
-    const newFeedback = {
-      name: feedbackName.trim(),
-      rating: rating,
-      feedback: feedback.trim(),
-      timestamp: new Date().toISOString(),
-    };
+    try {
+      // Get user_id from profile (like booking API)
+      const userId = profileData.user_id;
+      
+      if (!userId) {
+        throw new Error('User ID not found. Please make sure you are logged in.');
+      }
 
-    setFeedbackList((prev) => [...prev, newFeedback]);
-    setFeedbackName("");
-    setRating(0);
-    setHoverRating(0);
-    setFeedback("");
-    alert("Thank you for your feedback!");
+      // Prepare rating data for backend (like booking API pattern)
+      const ratingData = {
+        user_id: userId,
+        comment: feedback.trim(),
+        rating: rating,
+        // created_at will be added by the hook
+      };
+
+      console.log('📤 Submitting rating data:', ratingData);
+
+      // Call the API using your hook
+      const result = await submitRating(ratingData);
+      
+      console.log('✅ Rating submitted successfully:', result);
+
+      // Success - show success message
+      setApiFeedbackMessage({
+        show: true,
+        type: 'success',
+        message: 'Thank you for your feedback! It has been submitted for approval.'
+      });
+      
+      // Reset form
+      setRating(0);
+      setHoverRating(0);
+      setFeedback("");
+      
+      // Also update local feedback list for display
+      const newFeedback = {
+        name: `${profileData.first_name || ''} ${profileData.last_name || ''}`.trim() || 'You',
+        rating: rating,
+        feedback: feedback.trim(),
+        timestamp: new Date().toISOString(),
+        approved: false, // Pending approval from admin
+      };
+      
+      setFeedbackList((prev) => [newFeedback, ...prev]);
+      
+    } catch (error) {
+      console.error('❌ Error submitting feedback:', error);
+      setApiFeedbackMessage({
+        show: true,
+        type: 'error',
+        message: error.message || 'Failed to submit feedback. Please try again.'
+      });
+    }
   };
+
+  // Auto-hide feedback message after 5 seconds
+  useEffect(() => {
+    if (apiFeedbackMessage.show) {
+      const timer = setTimeout(() => {
+        setApiFeedbackMessage({ show: false, type: '', message: '' });
+      }, 5000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [apiFeedbackMessage.show]);
 
   const getUserInitials = () => {
     if (profileData.first_name && profileData.last_name) {
@@ -432,7 +502,7 @@ export default function Profile() {
               )}
             </div>
 
-            {/* Feedback Section */}
+            {/* Feedback Section - UPDATED WITH API INTEGRATION */}
             <div
               style={{
                 backgroundColor: "white",
@@ -442,10 +512,38 @@ export default function Profile() {
                 marginBottom: "1.5rem",
               }}
             >
+              <h2 style={{ fontSize: "1.25rem", fontWeight: "600", color: "#212529", margin: "0 0 1.5rem 0" }}>
+                Share Your Feedback
+              </h2>
+
+              {/* API Feedback Messages */}
+              {apiFeedbackMessage.show && (
+                <div
+                  style={{
+                    padding: "1rem",
+                    borderRadius: "0.5rem",
+                    marginBottom: "1.5rem",
+                    backgroundColor: apiFeedbackMessage.type === 'success' ? '#d1fae5' : '#fee2e2',
+                    border: `1px solid ${apiFeedbackMessage.type === 'success' ? '#10b981' : '#ef4444'}`,
+                    color: apiFeedbackMessage.type === 'success' ? '#065f46' : '#991b1b',
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.75rem",
+                  }}
+                >
+                  {apiFeedbackMessage.type === 'success' ? (
+                    <CheckCircle size={20} />
+                  ) : (
+                    <XCircle size={20} />
+                  )}
+                  <span>{apiFeedbackMessage.message}</span>
+                </div>
+              )}
+
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "1fr 1fr",
+                  gridTemplateColumns: "1fr",
                   gap: "1.5rem",
                   marginBottom: "1.5rem",
                 }}
@@ -460,53 +558,23 @@ export default function Profile() {
                       marginBottom: "0.5rem",
                     }}
                   >
-                    User name
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="User name"
-                    value={feedbackName}
-                    onChange={(e) => setFeedbackName(e.target.value)}
-                    onFocus={() => setFocusedField("feedbackName")}
-                    onBlur={() => setFocusedField(null)}
-                    style={{
-                      width: "100%",
-                      padding: "0.625rem 1rem",
-                      border: `1px solid ${
-                        focusedField === "feedbackName" ? "#212529" : "#dee2e6"
-                      }`,
-                      borderRadius: "0.5rem",
-                      fontSize: "1rem",
-                      color: "#212529",
-                      transition: "border-color 0.2s",
-                    }}
-                  />
-                </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <label
-                    style={{
-                      display: "block",
-                      fontSize: "0.875rem",
-                      fontWeight: "500",
-                      color: "#495057",
-                      marginBottom: "0.5rem",
-                    }}
-                  >
-                    Rating
+                    Rating *
                   </label>
                   <div style={{ display: "flex", gap: "0.5rem" }}>
                     {[1, 2, 3, 4, 5].map((star) => (
                       <button
                         key={star}
-                        onMouseEnter={() => setHoverRating(star)}
-                        onMouseLeave={() => setHoverRating(0)}
-                        onClick={() => setRating(star)}
+                        onMouseEnter={() => !ratingLoading && setHoverRating(star)}
+                        onMouseLeave={() => !ratingLoading && setHoverRating(0)}
+                        onClick={() => !ratingLoading && setRating(star)}
                         style={{
                           background: "none",
                           border: "none",
                           padding: "0",
-                          cursor: "pointer",
+                          cursor: ratingLoading ? "not-allowed" : "pointer",
+                          opacity: ratingLoading ? 0.6 : 1,
                         }}
+                        disabled={ratingLoading}
                       >
                         <Star
                           size={28}
@@ -537,7 +605,7 @@ export default function Profile() {
                     marginBottom: "0.5rem",
                   }}
                 >
-                  Your feedback
+                  Your feedback *
                 </label>
                 <textarea
                   placeholder="Share with us your feedback"
@@ -558,32 +626,46 @@ export default function Profile() {
                     fontFamily: "inherit",
                     resize: "none",
                     transition: "border-color 0.2s",
+                    opacity: ratingLoading ? 0.6 : 1,
                   }}
+                  disabled={ratingLoading}
                 />
               </div>
 
-              <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", gap: "1rem" }}>
+                {ratingLoading && (
+                  <div style={{ display: "flex", alignItems: "center", color: "#117BB8" }}>
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 mr-2"></div>
+                    <span>Submitting...</span>
+                  </div>
+                )}
                 <button
                   onClick={handleSubmitFeedback}
+                  disabled={ratingLoading}
                   style={{
-                    backgroundColor: "#117BB8",
+                    backgroundColor: ratingLoading ? "#94a3b8" : "#117BB8",
                     color: "white",
                     padding: "0.625rem 2rem",
                     border: "none",
                     borderRadius: "0.5rem",
                     fontSize: "1rem",
                     fontWeight: "500",
-                    cursor: "pointer",
+                    cursor: ratingLoading ? "not-allowed" : "pointer",
                     transition: "background-color 0.2s",
+                    opacity: ratingLoading ? 0.7 : 1,
                   }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#0d5a8a")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.backgroundColor = "#117BB8")
-                  }
+                  onMouseEnter={(e) => {
+                    if (!ratingLoading) {
+                      e.currentTarget.style.backgroundColor = "#0d5a8a";
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!ratingLoading) {
+                      e.currentTarget.style.backgroundColor = "#117BB8";
+                    }
+                  }}
                 >
-                  Submit feedback
+                  {ratingLoading ? "Submitting..." : "Submit feedback"}
                 </button>
               </div>
             </div>
