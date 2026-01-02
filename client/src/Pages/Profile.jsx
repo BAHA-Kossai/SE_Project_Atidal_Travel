@@ -114,73 +114,66 @@ export default function Profile() {
     );
   });
 
-  // Mock bookings data with test rows
-  const [userBookings, setUserBookings] = useState([
+  const bookingColumns = [
     {
-      booking_id: 1001,
-      destination_city: "Paris",
-      destination_country: "France",
-      trip_date: "2026-02-15",
-      booking_status: "confirmed",
-      type: "normal"
+      title: "Booking ID",
+      format: (item) => (
+        <span className="text-blue-600 font-medium">#{item.booking_id}</span>
+      )
     },
     {
-      booking_id: 1002,
-      destination_city: "Tokyo",
-      destination_country: "Japan",
-      trip_date: "2026-03-20",
-      booking_status: "pending",
-      type: "premium"
+      title: "Destination",
+      format: (item) => (
+        <div>
+          <div className="font-medium">{item.destination_city}</div>
+          <div className="text-sm text-gray-500">{item.destination_country}</div>
+        </div>
+      )
     },
     {
-      booking_id: 1003,
-      destination_city: "New York",
-      destination_country: "USA",
-      trip_date: "2026-01-10",
-      booking_status: "completed",
-      type: "normal"
+      title: "Trip Date",
+      format: (item) => (
+        <span>{new Date(item.trip_date).toLocaleDateString()}</span>
+      )
     },
     {
-      booking_id: 1004,
-      destination_city: "Barcelona",
-      destination_country: "Spain",
-      trip_date: "2026-04-05",
-      booking_status: "cancelled",
-      type: "premium"
+      title: "Status",
+      format: (item) => {
+        const statusColors = {
+          'confirmed': 'bg-green-100 text-green-800',
+          'pending': 'bg-yellow-100 text-yellow-800',
+          'cancelled': 'bg-red-100 text-red-800',
+          'completed': 'bg-blue-100 text-blue-800'
+        };
+        
+        const colorClass = statusColors[item.booking_status] || 'bg-gray-100 text-gray-800';
+        
+        return (
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}>
+            {item.booking_status?.charAt(0).toUpperCase() + item.booking_status?.slice(1)}
+          </span>
+        );
+      }
     },
     {
-      booking_id: 1005,
-      destination_city: "Dubai",
-      destination_country: "UAE",
-      trip_date: "2026-05-12",
-      booking_status: "confirmed",
-      type: "normal"
+      title: "Type",
+      format: (item) => (
+        <span className="capitalize">{item.type}</span>
+      )
     }
-  ]);
+  ];
 
-  const [editing, setEditing] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [sortBy, setSortBy] = useState("booking_id");
-  const [sortOrder, setSortOrder] = useState("asc");
-  const [filterStatus, setFilterStatus] = useState("");
-  const [showFilterPopup, setShowFilterPopup] = useState(false);
-  const [rating, setRating] = useState(0);
-  const [hoverRating, setHoverRating] = useState(0);
-  const [feedback, setFeedback] = useState("");
-  const [feedbackName, setFeedbackName] = useState("");
-  const [editingBookingId, setEditingBookingId] = useState(null);
-  const [editingBookingData, setEditingBookingData] = useState({});
-
-  const toggleEdit = () => setEditing(!editing);
-
-  const handleSaveProfile = () => {
-    setEditing(false);
-    // Profile saved without alert popup
+  const handleBookingSelect = (booking) => {
+    
   };
 
-  const handleSignOut = () => {
-    alert("Signing out...");
+  const handleBookingEdit = (booking) => {
+  };
+
+  const handleBookingDelete = (booking) => {
+    if (window.confirm(`Are you sure you want to delete booking #${booking.booking_id}?`)) {
+      console.log('Delete booking:', booking);
+    }
   };
 
   // UPDATED: Handle feedback submission with backend API
@@ -281,80 +274,232 @@ export default function Profile() {
     return profileData.email ? profileData.email[0].toUpperCase() : 'U';
   };
 
-  // Edit booking functionality
-  const handleBookingEdit = (booking) => {
-    setEditingBookingId(booking.booking_id);
-    setEditingBookingData({
-      destination_city: booking.destination_city,
-      destination_country: booking.destination_country,
-      trip_date: booking.trip_date,
-      booking_status: booking.booking_status
-    });
-  };
+  const handleDeleteAccount = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete your account? This action cannot be undone."
+    );
+    
+    if (confirmed) {
+      try {
+        const accessToken = localStorage.getItem("accessToken");
+        if (!accessToken) throw new Error("No access token found");
 
-  const handleSaveBookingEdit = (bookingId) => {
-    setUserBookings(userBookings.map(booking => 
-      booking.booking_id === bookingId 
-        ? { ...booking, ...editingBookingData }
-        : booking
-    ));
-    setEditingBookingId(null);
-    setEditingBookingData({});
-    // Booking saved without alert popup
-  };
+        await handleDeleteUser(accessToken);
 
-  const handleCancelBookingEdit = () => {
-    setEditingBookingId(null);
-    setEditingBookingData({});
-  };
+        localStorage.removeItem("user");
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
 
-  // Delete booking functionality
-  const handleBookingDelete = (booking) => {
-    if (window.confirm(`Delete booking #${booking.booking_id}?\n${booking.destination_city}, ${booking.destination_country}`)) {
-      setUserBookings(userBookings.filter(b => b.booking_id !== booking.booking_id));
-      alert("Booking deleted successfully!");
+        alert("Your account has been deleted successfully.");
+        window.location.href = "/";
+      } catch (err) {
+        alert("Error: " + (err.message || "Failed to delete your account."));
+      }
     }
   };
 
-  const handleSubmitFeedback = () => {
-    if (!feedbackName.trim()) return alert("Please enter your name");
-    if (rating === 0) return alert("Please select a rating");
-    if (!feedback.trim()) return alert("Please enter your feedback");
+  if (bookingsLoading && userId) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+          <div className="ml-4 text-gray-600">
+            <p>Loading bookings...</p>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
-    setFeedbackName("");
-    setRating(0);
-    setHoverRating(0);
-    setFeedback("");
-    alert("Thank you! Your feedback has been submitted.");
-  };
+  if (!hasUserData) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">No User Data Found</h2>
+            <p className="text-gray-600 mb-4">Please sign in to access your profile.</p>
+            <button
+              onClick={() => window.location.href = "/signin"}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+            >
+              Go to Sign In
+            </button>
+            <div className="mt-4 p-4 bg-gray-100 rounded text-left">
+              <p className="text-sm text-gray-700">Debug Info:</p>
+              <p className="text-sm text-gray-700">User in localStorage: {userData ? "Yes" : "No"}</p>
+              <p className="text-sm text-gray-700">Access Token: {accessToken ? "Exists" : "Missing"}</p>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
       <div style={{ minHeight: "100vh", backgroundColor: "#F1F9FE" }}>
         <main style={{ maxWidth: "1280px", margin: "0 auto", padding: "2rem 1rem" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-          
-          {/* Profile Section */}
-          <div style={{ backgroundColor: "white", borderRadius: "0.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", padding: "2rem", marginBottom: "1.5rem" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: "2rem" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
-                <div style={{ width: "4rem", height: "4rem", backgroundColor: "#117BB8", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "1.5rem", fontWeight: "600" }}>
-                  {getUserInitials()}
+          <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
+            
+            {/* Profile Section */}
+            <div style={{ backgroundColor: "white", borderRadius: "0.5rem", boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)", padding: "2rem", marginBottom: "1.5rem" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "2rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+                  <div style={{ width: "4rem", height: "4rem", backgroundColor: "#117BB8", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", color: "white", fontSize: "1.5rem", fontWeight: "600" }}>
+                    {getUserInitials()}
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <h2 style={{ fontSize: "1.125rem", fontWeight: "600", color: "#212529", margin: "0" }}>
+                      {profileData.first_name || 'User'} {profileData.last_name || ''}
+                    </h2>
+                    <p style={{ fontSize: "0.875rem", color: "#495057", margin: "0" }}>
+                      {profileData.email || 'No email'}
+                    </p>
+                  </div>
                 </div>
-                <div style={{ display: "flex", flexDirection: "column" }}>
-                  <h2 style={{ fontSize: "1.125rem", fontWeight: "600", color: "#212529", margin: 0 }}>
-                    {profileData.first_name} {profileData.last_name}
-                  </h2>
-                  <p style={{ fontSize: "0.875rem", color: "#495057", margin: 0 }}>{profileData.email}</p>
-                </div>
-              </div>
-              <div style={{ display: "flex", gap: "0.5rem" }}>
-                <button style={{ backgroundColor: "#117BB8", color: "white", padding: "0.625rem 1.5rem", border: "none", borderRadius: "0.5rem", cursor: "pointer" }} onClick={toggleEdit}>
-                  {editing ? "Cancel" : "Edit Info"}
+                <button
+                  style={{ display: "flex", alignItems: "center", gap: "0.5rem", backgroundColor: "#117BB8", color: "white", padding: "0.625rem 1.5rem", border: "none", borderRadius: "0.5rem", fontSize: "1rem", fontWeight: "500", cursor: "pointer", transition: "background-color 0.2s" }}
+                  onClick={handleSignOut}
+                >
+                  Sign out
                 </button>
-                {editing && <button style={{ backgroundColor: "#28a745", color: "white", padding: "0.625rem 1.5rem", border: "none", borderRadius: "0.5rem", cursor: "pointer" }} onClick={handleSaveProfile}>Save</button>}
-                <button style={{ backgroundColor: "#117BB8", color: "white", padding: "0.625rem 1.5rem", border: "none", borderRadius: "0.5rem", cursor: "pointer" }} onClick={handleSignOut}>Sign out</button>
               </div>
+
+              {/* Profile Info Display (Read-only) */}
+              <div style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <label style={{ display: "block", fontSize: "0.875rem", fontWeight: "500", color: "#495057", marginBottom: "0.5rem" }}>
+                      First name
+                    </label>
+                    <div style={{
+                      width: "100%",
+                      padding: "0.625rem 1rem",
+                      border: "1px solid #dee2e6",
+                      borderRadius: "0.5rem",
+                      fontSize: "1rem",
+                      color: "#212529",
+                      backgroundColor: "#f8f9fa",
+                    }}>
+                      {profileData.first_name || 'Not provided'}
+                    </div>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <label style={{ display: "block", fontSize: "0.875rem", fontWeight: "500", color: "#495057", marginBottom: "0.5rem" }}>
+                      Last name
+                    </label>
+                    <div style={{
+                      width: "100%",
+                      padding: "0.625rem 1rem",
+                      border: "1px solid #dee2e6",
+                      borderRadius: "0.5rem",
+                      fontSize: "1rem",
+                      color: "#212529",
+                      backgroundColor: "#f8f9fa",
+                    }}>
+                      {profileData.last_name || 'Not provided'}
+                    </div>
+                  </div>
+                </div>
+
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <label style={{ display: "block", fontSize: "0.875rem", fontWeight: "500", color: "#495057", marginBottom: "0.5rem" }}>
+                      Phone number
+                    </label>
+                    <div style={{
+                      width: "100%",
+                      padding: "0.625rem 1rem",
+                      border: "1px solid #dee2e6",
+                      borderRadius: "0.5rem",
+                      fontSize: "1rem",
+                      color: "#212529",
+                      backgroundColor: "#f8f9fa",
+                    }}>
+                      {profileData.phone || 'Not provided'}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column" }}>
+                    <label style={{ display: "block", fontSize: "0.875rem", fontWeight: "500", color: "#495057", marginBottom: "0.5rem" }}>
+                      Birth date
+                    </label>
+                    <div style={{
+                      width: "100%",
+                      padding: "0.625rem 1rem",
+                      border: "1px solid #dee2e6",
+                      borderRadius: "0.5rem",
+                      fontSize: "1rem",
+                      color: "#212529",
+                      backgroundColor: "#f8f9fa",
+                    }}>
+                      {profileData.date_of_birth || 'Not provided'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bookings History Section */}
+            <div style={{ backgroundColor: "white", borderRadius: "0.5rem", boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)", padding: "1.5rem", marginBottom: "1.5rem" }}>
+              <h2 style={{ fontSize: "1.25rem", fontWeight: "600", color: "#212529", margin: "0 0 1.5rem 0" }}>
+                Booking History
+              </h2>
+
+              {/* Search and Filters */}
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "1.5rem", gap: "1rem", flexWrap: "wrap" }}>
+                <div style={{ position: "relative", flex: "1", maxWidth: "320px" }}>
+                  <Search style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#495057", pointerEvents: "none" }} size={20} />
+                  <input
+                    type="text"
+                    placeholder="Search your bookings..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onFocus={() => setFocusedField("search")}
+                    onBlur={() => setFocusedField(null)}
+                    style={{
+                      width: "100%",
+                      padding: "0.5rem 1rem 0.5rem 2.5rem",
+                      border: `1px solid ${focusedField === "search" ? "#212529" : "#dee2e6"}`,
+                      borderRadius: "0.5rem",
+                      fontSize: "1rem",
+                      color: "#212529",
+                      transition: "border-color 0.2s",
+                    }}
+                  />
+                </div>
+                <div style={{ display: "flex", gap: "0.75rem" }}>
+                  <button style={{ display: "flex", alignItems: "center", gap: "0.5rem", backgroundColor: "transparent", color: "#495057", padding: "0.5rem 1rem", border: "1px solid #dee2e6", borderRadius: "0.5rem", fontSize: "1rem", cursor: "pointer" }}>
+                    <ArrowUpDown size={18} /> Sort
+                  </button>
+                  <button style={{ display: "flex", alignItems: "center", gap: "0.5rem", backgroundColor: "transparent", color: "#495057", padding: "0.5rem 1rem", border: "1px solid #dee2e6", borderRadius: "0.5rem", fontSize: "1rem", cursor: "pointer" }}>
+                    <Filter size={18} /> Filter
+                  </button>
+                </div>
+              </div>
+
+              {/* Bookings Table */}
+              {bookingsError ? (
+                <div style={{ textAlign: "center", padding: "2rem", color: "#dc3545" }}>
+                  Error loading bookings: {bookingsError}
+                </div>
+              ) : userBookings.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "3rem", color: "#6c757d" }}>
+                  <p>No bookings found.</p>
+                  <p>Start by creating your first booking!</p>
+                </div>
+              ) : (
+                <div className="bg-white rounded-lg p-4">
+                  {/* Table Component */}
+                  <Table
+                    columns={bookingColumns}
+                    data={filteredBookings}
+                    onSelect={handleBookingSelect}
+                    onEdit={handleBookingEdit}
+                    onDelete={handleBookingDelete}
+                  />
+                </div>
+              )}
             </div>
 
             {/* Feedback Section - UPDATED WITH API INTEGRATION */}
@@ -444,46 +589,11 @@ export default function Profile() {
                                 : "#d1d5db",
                           }}
                         />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          style={{ position: "absolute", right: "0.5rem", backgroundColor: "transparent", border: "none", cursor: "pointer", color: "#495057", padding: "0.5rem", display: "flex", alignItems: "center", justifyContent: "center" }}
-                        >
-                          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                        </button>
-                      </div>
-                    ) : (
-                      <input
-                        type={field === "date_of_birth" ? "date" : "text"}
-                        value={profileData[field] || ""}
-                        onChange={(e) => setProfileData({ ...profileData, [field]: e.target.value })}
-                        style={{ padding: "0.625rem 1rem", borderRadius: "0.5rem", border: "1px solid #dee2e6", fontSize: "1rem" }}
-                      />
-                    )
-                  ) : (
-                    field === "password" ? (
-                      <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", position: "relative" }}>
-                        <div style={{ padding: "0.625rem 1rem", borderRadius: "0.5rem", backgroundColor: "#f8f9fa", fontSize: "1rem", color: "#212529", flex: 1 }}>
-                          {showPassword ? profileData.password || "Not set" : "••••••••"}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          style={{ position: "absolute", right: "0.5rem", backgroundColor: "transparent", border: "none", cursor: "pointer", color: "#495057", padding: "0.5rem", display: "flex", alignItems: "center", justifyContent: "center" }}
-                        >
-                          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                        </button>
-                      </div>
-                    ) : (
-                      <div style={{ padding: "0.625rem 1rem", borderRadius: "0.5rem", backgroundColor: "#f8f9fa", fontSize: "1rem", color: "#212529" }}>
-                        {profileData[field] || "Not provided"}
-                      </div>
-                    )
-                  )}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
+              </div>
 
               <div style={{ marginBottom: "1.5rem" }}>
                 <label
@@ -557,162 +667,37 @@ export default function Profile() {
                 >
                   {ratingLoading ? "Submitting..." : "Submit feedback"}
                 </button>
-                <div style={{ position: "relative" }}>
-                  <button
-                    onClick={() => setShowFilterPopup(!showFilterPopup)}
-                    style={{ display: "flex", alignItems: "center", gap: "0.5rem", backgroundColor: filterStatus ? "#117BB8" : "transparent", color: filterStatus ? "white" : "#495057", padding: "0.5rem 1rem", border: filterStatus ? "none" : "1px solid #dee2e6", borderRadius: "0.5rem", cursor: "pointer" }}
-                  >
-                    <Filter size={18} /> Filter {filterStatus && `(${filterStatus})`}
-                  </button>
-                  
-                  {/* Filter Popup */}
-                  {showFilterPopup && (
-                    <div style={{ position: "absolute", top: "100%", right: 0, backgroundColor: "white", border: "1px solid #dee2e6", borderRadius: "0.5rem", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", zIndex: 1000, minWidth: "200px", marginTop: "0.5rem" }}>
-                      <div style={{ padding: "1rem" }}>
-                        <p style={{ margin: "0 0 0.75rem 0", fontSize: "0.875rem", fontWeight: "600", color: "#212529" }}>Filter by Status</p>
-                        {["", "pending", "confirmed", "completed", "cancelled"].map((status) => (
-                          <label key={status} style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.5rem", cursor: "pointer" }}>
-                            <input
-                              type="radio"
-                              name="filter"
-                              value={status}
-                              checked={filterStatus === status}
-                              onChange={() => {
-                                setFilterStatus(status);
-                                setShowFilterPopup(false);
-                              }}
-                              style={{ cursor: "pointer" }}
-                            />
-                            <span style={{ fontSize: "0.875rem" }}>{status ? status.charAt(0).toUpperCase() + status.slice(1) : "All"}</span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
               </div>
             </div>
 
-            {/* Bookings Table */}
-            {userBookings.length === 0 ? (
-              <div style={{ textAlign: "center", padding: "3rem", color: "#6c757d" }}>
-                <p>No bookings found.</p>
-                <p>Start by creating your first booking!</p>
-              </div>
-            ) : (
-              <div style={{ overflowX: "auto" }}>
-                <table style={{ width: "100%", borderCollapse: "collapse" }}>
-                  <thead>
-                    <tr style={{ borderBottom: "1px solid #dee2e6" }}>
-                      <th style={{ textAlign: "left", padding: "0.75rem 1rem", fontSize: "0.875rem", fontWeight: "600", color: "#495057", cursor: "pointer" }} onClick={() => setSortBy("booking_id")}>
-                        Booking ID {sortBy === "booking_id" && (sortOrder === "asc" ? "↑" : "↓")}
-                      </th>
-                      <th style={{ textAlign: "left", padding: "0.75rem 1rem", fontSize: "0.875rem", fontWeight: "600", color: "#495057", cursor: "pointer" }} onClick={() => setSortBy("destination_city")}>
-                        Destination {sortBy === "destination_city" && (sortOrder === "asc" ? "↑" : "↓")}
-                      </th>
-                      <th style={{ textAlign: "left", padding: "0.75rem 1rem", fontSize: "0.875rem", fontWeight: "600", color: "#495057", cursor: "pointer" }} onClick={() => setSortBy("trip_date")}>
-                        Trip Date {sortBy === "trip_date" && (sortOrder === "asc" ? "↑" : "↓")}
-                      </th>
-                      <th style={{ textAlign: "left", padding: "0.75rem 1rem", fontSize: "0.875rem", fontWeight: "600", color: "#495057", cursor: "pointer" }} onClick={() => setSortBy("booking_status")}>
-                        Status {sortBy === "booking_status" && (sortOrder === "asc" ? "↑" : "↓")}
-                      </th>
-                      <th style={{ textAlign: "left", padding: "0.75rem 1rem", fontSize: "0.875rem", fontWeight: "600", color: "#495057", cursor: "pointer" }} onClick={() => setSortBy("type")}>
-                        Type {sortBy === "type" && (sortOrder === "asc" ? "↑" : "↓")}
-                      </th>
-                      <th style={{ textAlign: "left", padding: "0.75rem 1rem", fontSize: "0.875rem", fontWeight: "600", color: "#495057" }}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredAndSortedBookings().map((booking) => (
-                      <tr key={booking.booking_id} style={{ borderBottom: "1px solid #f1f3f5", transition: "background-color 0.2s", backgroundColor: editingBookingId === booking.booking_id ? "#f0f7ff" : "transparent" }} onMouseEnter={(e) => editingBookingId !== booking.booking_id && (e.currentTarget.style.backgroundColor = "#f8f9fa")} onMouseLeave={(e) => editingBookingId !== booking.booking_id && (e.currentTarget.style.backgroundColor = "transparent")}>
-                        <td style={{ padding: "1rem", fontSize: "0.875rem", color: "#117BB8", fontWeight: "500" }}>#{booking.booking_id}</td>
-                        {editingBookingId === booking.booking_id ? (
-                          <>
-                            <td style={{ padding: "1rem", fontSize: "0.875rem" }}>
-                              <input
-                                type="text"
-                                value={editingBookingData.destination_city}
-                                onChange={(e) => setEditingBookingData({ ...editingBookingData, destination_city: e.target.value })}
-                                style={{ width: "100%", padding: "0.5rem", marginBottom: "0.25rem", border: "1px solid #dee2e6", borderRadius: "0.375rem" }}
-                              />
-                              <input
-                                type="text"
-                                value={editingBookingData.destination_country}
-                                onChange={(e) => setEditingBookingData({ ...editingBookingData, destination_country: e.target.value })}
-                                style={{ width: "100%", padding: "0.5rem", border: "1px solid #dee2e6", borderRadius: "0.375rem" }}
-                              />
-                            </td>
-                            <td style={{ padding: "1rem", fontSize: "0.875rem" }}>
-                              <input
-                                type="date"
-                                value={editingBookingData.trip_date}
-                                onChange={(e) => setEditingBookingData({ ...editingBookingData, trip_date: e.target.value })}
-                                style={{ width: "100%", padding: "0.5rem", border: "1px solid #dee2e6", borderRadius: "0.375rem" }}
-                              />
-                            </td>
-                            <td style={{ padding: "1rem", fontSize: "0.875rem" }}>
-                              <select
-                                value={editingBookingData.booking_status}
-                                onChange={(e) => setEditingBookingData({ ...editingBookingData, booking_status: e.target.value })}
-                                style={{ width: "100%", padding: "0.5rem", border: "1px solid #dee2e6", borderRadius: "0.375rem" }}
-                              >
-                                <option value="pending">Pending</option>
-                                <option value="confirmed">Confirmed</option>
-                                <option value="completed">Completed</option>
-                                <option value="cancelled">Cancelled</option>
-                              </select>
-                            </td>
-                            <td style={{ padding: "1rem", fontSize: "0.875rem", color: "#212529", textTransform: "capitalize" }}>{booking.type}</td>
-                            <td style={{ padding: "1rem", fontSize: "0.875rem" }}>
-                              <button onClick={() => handleSaveBookingEdit(booking.booking_id)} style={{ backgroundColor: "#28a745", color: "white", padding: "0.375rem 0.75rem", border: "none", borderRadius: "0.375rem", marginRight: "0.5rem", cursor: "pointer", fontSize: "0.875rem" }}>Save</button>
-                              <button onClick={handleCancelBookingEdit} style={{ backgroundColor: "#6c757d", color: "white", padding: "0.375rem 0.75rem", border: "none", borderRadius: "0.375rem", cursor: "pointer", fontSize: "0.875rem" }}>Cancel</button>
-                            </td>
-                          </>
-                        ) : (
-                          <>
-                            <td style={{ padding: "1rem", fontSize: "0.875rem", color: "#212529" }}>
-                              <div>{booking.destination_city}</div>
-                              <div style={{ fontSize: "0.75rem", color: "#495057" }}>{booking.destination_country}</div>
-                            </td>
-                            <td style={{ padding: "1rem", fontSize: "0.875rem", color: "#495057" }}>{new Date(booking.trip_date).toLocaleDateString()}</td>
-                            <td style={{ padding: "1rem", fontSize: "0.875rem" }}>
-                              <span style={{ padding: "0.25rem 0.75rem", borderRadius: "9999px", fontSize: "0.75rem", fontWeight: "500", backgroundColor: booking.booking_status === "confirmed" ? "#dcfce7" : booking.booking_status === "pending" ? "#fef3c7" : booking.booking_status === "cancelled" ? "#fee2e2" : "#dbeafe", color: booking.booking_status === "confirmed" ? "#166534" : booking.booking_status === "pending" ? "#92400e" : booking.booking_status === "cancelled" ? "#991b1b" : "#1e40af" }}>
-                                {booking.booking_status.charAt(0).toUpperCase() + booking.booking_status.slice(1)}
-                              </span>
-                            </td>
-                            <td style={{ padding: "1rem", fontSize: "0.875rem", color: "#212529", textTransform: "capitalize" }}>{booking.type}</td>
-                            <td style={{ padding: "1rem", fontSize: "0.875rem" }}>
-                              <button onClick={() => handleBookingEdit(booking)} style={{ backgroundColor: "#117BB8", color: "white", padding: "0.375rem 0.75rem", border: "none", borderRadius: "0.375rem", marginRight: "0.5rem", cursor: "pointer", fontSize: "0.875rem" }}>Edit</button>
-                              <button onClick={() => handleBookingDelete(booking)} style={{ backgroundColor: "#dc3545", color: "white", padding: "0.375rem 0.75rem", border: "none", borderRadius: "0.375rem", cursor: "pointer", fontSize: "0.875rem" }}>Delete</button>
-                            </td>
-                          </>
-                        )}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-
-          {/* Feedback Section */}
-          <div style={{ backgroundColor: "white", borderRadius: "0.5rem", boxShadow: "0 1px 3px rgba(0,0,0,0.1)", padding: "1.5rem", marginBottom: "1.5rem" }}>
-            <h2 style={{ fontSize: "1.25rem", fontWeight: "600", marginBottom: "1rem" }}>Feedback</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem", marginBottom: "1rem" }}>
-              <input placeholder="Your Name" value={feedbackName} onChange={(e) => setFeedbackName(e.target.value)} style={{ padding: "0.625rem 1rem", borderRadius: "0.5rem", border: "1px solid #dee2e6" }} />
-              <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
-                {[1,2,3,4,5].map((star) => (
-                  <Star key={star} size={28} style={{ fill: star <= (hoverRating || rating) ? "#fbbf24" : "none", color: star <= (hoverRating || rating) ? "#fbbf24" : "#d1d5db", cursor: "pointer" }}
-                    onMouseEnter={() => setHoverRating(star)}
-                    onMouseLeave={() => setHoverRating(0)}
-                    onClick={() => setRating(star)}
-                  />
-                ))}
-              </div>
+            {/* Delete Account Section */}
+            <div style={{ marginTop: "20px" }}>
+              <button
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  padding: "0.625rem 1.5rem",
+                  border: "none",
+                  borderRadius: "0.5rem",
+                  fontSize: "1rem",
+                  fontWeight: "500",
+                  cursor: "pointer",
+                  transition: "background-color 0.2s",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#b02a37")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.backgroundColor = "#dc3545")
+                }
+                onClick={handleDeleteAccount}
+              >
+                Delete Account
+              </button>
             </div>
-            <textarea placeholder="Your feedback" value={feedback} onChange={(e) => setFeedback(e.target.value)} rows={4} style={{ width: "100%", padding: "0.75rem 1rem", borderRadius: "0.5rem", border: "1px solid #dee2e6", marginBottom: "1rem" }} />
-            <button style={{ backgroundColor: "#117BB8", color: "white", padding: "0.625rem 2rem", border: "none", borderRadius: "0.5rem", cursor: "pointer" }} onClick={handleSubmitFeedback}>Submit Feedback</button>
-          </div>
 
           </div>
         </main>
