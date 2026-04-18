@@ -153,18 +153,6 @@ The backend exposes RESTful endpoints that handle authentication, booking manage
 
 ---
 
-## Project Contribution
-
-Primary responsibilities included:
-
-* Backend development (major contribution)
-* Designing and implementing REST API endpoints
-* Integrating frontend with backend services
-* Developing administrative dashboard features
-* Participating in system design and requirements analysis
-
----
-
 ## Installation (Typical Setup)
 
 ```bash
